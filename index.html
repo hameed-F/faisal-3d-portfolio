@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Muhammad Faisal Hameed · Game Developer & Interactive 3D Programmer</title>
+  <meta name="description" content="Interactive 3D portfolio of Muhammad Faisal Hameed: game developer (Unreal Engine 5, Unity, Three.js) from Karachi, Pakistan." />
+  <meta name="theme-color" content="#14202b" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2314202b'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='%23e8b25a' font-family='Georgia' font-weight='700'>F</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body data-tier="full" data-theme="dusk">
+  <a class="skip" href="#content">Skip to content</a>
+
+  <!-- 3D stage (created by main.js unless tier = basic) -->
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <!-- HUD -->
+  <header class="hud" id="hud">
+    <button class="chip brand" data-go="home" aria-label="Back to start">MFH</button>
+    <nav class="chips" id="quickmenu" aria-label="Sections">
+      <button class="chip" data-go="about">About</button>
+      <button class="chip" data-go="skills">Skills</button>
+      <button class="chip" data-go="projects">Projects</button>
+      <button class="chip" data-go="journey">Journey</button>
+      <button class="chip" data-go="achievements">Achievements</button>
+      <button class="chip" data-go="promo">Promo</button>
+      <button class="chip" data-go="contact">Contact</button>
+    </nav>
+    <div class="chips right">
+      <button class="chip" id="tierChip" aria-haspopup="dialog">Quality: <b id="tierLabel">Full</b></button>
+      <button class="chip" id="themeChip" aria-label="Toggle day and dusk theme">◐</button>
+      <button class="chip" id="soundChip" aria-pressed="false" aria-label="Sound">♪ off</button>
+    </div>
+  </header>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Title screen -->
+  <section class="title" id="home" aria-label="Start">
+    <div class="title-inner">
+      <p class="eyebrow">Interactive 3D portfolio</p>
+      <h1>Muhammad<br />Faisal Hameed</h1>
+      <p class="lead" id="tagline"></p>
+      <ul class="menu" id="titleMenu">
+        <li><button class="menu-btn primary" id="startBtn">Start Game</button></li>
+        <li><button class="menu-btn" id="driveBtn">Free Drive</button></li>
+        <li><button class="menu-btn" id="plainBtn">Read as a page</button></li>
+        <li><button class="menu-btn" id="creditsBtn">Credits</button></li>
+      </ul>
+      <p class="hint">Tip: you can skip the intro at any time (any key or tap).</p>
+    </div>
+  </section>
+
+  <!-- Content panels (real HTML, readable without 3D) -->
+  <main id="content" tabindex="-1">
+    <section class="panel" id="about" data-panel hidden></section>
+    <section class="panel" id="skills" data-panel hidden></section>
+    <section class="panel wide" id="projects" data-panel hidden></section>
+    <section class="panel" id="journey" data-panel hidden></section>
+    <section class="panel" id="achievements" data-panel hidden></section>
+    <section class="panel" id="promo" data-panel hidden></section>
+    <section class="panel" id="contact" data-panel hidden></section>
+    <section class="panel" id="credits" data-panel hidden></section>
+  </main>
+
+  <!-- Chotu -->
+  <div id="chotu" class="chotu" hidden>
+    <button class="chotu-btn" id="chotuBtn" aria-label="Chat with Chotu, the portfolio assistant"><span class="snake" aria-hidden="true">🐍</span></button>
+    <div class="chat" id="chat" role="dialog" aria-label="Chat with Chotu" hidden>
+      <div class="chat-head"><b>Chotu</b><span>asks my portfolio, answers only from it</span><button id="chatClose" aria-label="Close chat">×</button></div>
+      <div class="chat-log" id="chatLog" aria-live="polite"></div>
+      <form class="chat-form" id="chatForm"><input id="chatInput" maxlength="300" placeholder="Ask about projects, skills, experience…" autocomplete="off" /><button>Send</button></form>
+      <details class="rag"><summary>How Chotu works</summary><div id="ragInfo"></div></details>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true"><button id="lbClose" aria-label="Close">×</button><div id="lbBody"></div></div>
+  <div class="loader" id="loader" role="status"><div class="bar"><i id="loadBar"></i></div><p id="loadMsg">Warming up the cabin…</p></div>
+
+  <script type="module" src="/src/main.js"></script>
+  <noscript><p style="padding:2rem;color:#fff">This portfolio needs JavaScript. Email: hameedfaisal24@gmail.com · GitHub: github.com/hameed-F</p></noscript>
+</body>
+</html>
