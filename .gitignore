@@ -22,3 +22,4 @@ Thumbs.db
 *.blend
 *.blend1
 *.fbx
+.tmp/

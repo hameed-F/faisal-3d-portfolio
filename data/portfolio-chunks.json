@@ -1,0 +1,284 @@
+[
+ {
+  "id": "profile",
+  "title": "Profile",
+  "section": "about",
+  "text": "Muhammad Faisal Hameed is a Game Developer & Interactive 3D Programmer. Game Developer (Unreal Engine 5 · Unity · Three.js) & Technical Gameplay Programmer. Tagline: \"I architect the gameplay logic, then build the 3D worlds they run in.\" Based in Karachi, Pakistan. Open to Game Development, Gameplay Programming, and Interactive 3D roles & internships."
+ },
+ {
+  "id": "summary",
+  "title": "Professional summary",
+  "section": "about",
+  "text": "Final-year Computer Science undergraduate (Gaming & Animation specialization, CGPA 3.605/4.00) at NED University of Engineering and Technology. Experienced in building responsive gameplay systems, AI behaviors, VR interactions, and browser-based 3D games across Unreal Engine 5, Unity, and Three.js, backed by hands-on industry experience in game development and AI-powered ERP software."
+ },
+ {
+  "id": "contact",
+  "title": "Contact details",
+  "section": "contact",
+  "text": "Email: hameedfaisal24@gmail.com. Phone: 0304-0639955. Location: Karachi, Pakistan. GitHub: https://github.com/hameed-F. Earlier portfolio (Framer): https://muhammadfaisalhameed.framer.website/#about. A downloadable CV is on the site. The contact form on the site sends a message straight to his email."
+ },
+ {
+  "id": "about-who",
+  "title": "About: Who I am",
+  "section": "about",
+  "text": "Who I am: A final-year Computer Science student (Gaming & Animation) at NED University of Engineering and Technology, Karachi, with a CGPA of 3.605/4.00, based in Karachi, Pakistan."
+ },
+ {
+  "id": "about-build",
+  "title": "About: What I build",
+  "section": "about",
+  "text": "What I build: Responsive gameplay systems, AI behaviors, VR interactions, and browser-based 3D games across Unreal Engine 5, Unity, and Three.js."
+ },
+ {
+  "id": "about-now",
+  "title": "About: What I am doing now",
+  "section": "about",
+  "text": "What I am doing now: Interning on AI-powered ERP software at Aerox ERP, and as a Game Development intern at Brave Believers, mentored by founder Jawwad Javed."
+ },
+ {
+  "id": "about-next",
+  "title": "About: What I am looking for",
+  "section": "about",
+  "text": "What I am looking for: Game Development, Gameplay Programming, and Interactive 3D roles and internships."
+ },
+ {
+  "id": "education",
+  "title": "Education",
+  "section": "journey",
+  "text": "BS Computer Science (Gaming & Animation specialization), NED University of Engineering and Technology, Karachi, 2023 to early 2027 (4th year). CGPA 3.605/4.00. Focus: game engine architecture, real-time 3D mechanics, AI behavior systems, semester game production. A new game is built each semester as coursework across varied genres and engines."
+ },
+ {
+  "id": "journey-0",
+  "title": "Starts BS Computer Science (Gaming & Animation)",
+  "section": "journey",
+  "text": "2023: Starts BS Computer Science (Gaming & Animation) (NED University of Engineering and Technology, Karachi). CGPA 3.605/4.00. Focus: game engine architecture, real-time 3D mechanics, AI behavior systems, semester game production. Expected early 2027."
+ },
+ {
+  "id": "journey-1",
+  "title": "Chrono Rebellion",
+  "section": "journey",
+  "text": "2025: Chrono Rebellion (Unity · team of 3). First-person time-travel shooter: gameplay programmer and level designer."
+ },
+ {
+  "id": "journey-2",
+  "title": "Global Game Jam 2026",
+  "section": "journey",
+  "text": "2026: Global Game Jam 2026 (Behind the Smile · team of 6). A complete narrative Unity game in 48 hours on the theme \"Mask\": animations, UI systems, asset integration."
+ },
+ {
+  "id": "journey-3",
+  "title": "IT Department intern",
+  "section": "journey",
+  "text": "2026: IT Department intern (Karachi Development Authority (KDA) · 4 weeks). Documented institutional IT infrastructure, file movement workflows, and backend server-side data handling across departments."
+ },
+ {
+  "id": "journey-4",
+  "title": "Google AI Professional Certificate",
+  "section": "journey",
+  "text": "2026: Google AI Professional Certificate (Google via Coursera). Seven-course professional certificate (June 2026)."
+ },
+ {
+  "id": "journey-5",
+  "title": "Game Development intern",
+  "section": "journey",
+  "text": "Present (2026): Game Development intern (Brave Believers · mentor: founder Jawwad Javed). Developing interactive gameplay systems, rapid game prototypes, and production game logic."
+ },
+ {
+  "id": "journey-6",
+  "title": "Software / ERP intern",
+  "section": "journey",
+  "text": "Present (2026): Software / ERP intern (Aerox ERP (Pakistan-based startup)). Contributing to AI-powered enterprise resource planning software focused on physical operations, asset tracking, and minimal operational downtime."
+ },
+ {
+  "id": "skills-king",
+  "title": "Skills: Game engines & 3D web",
+  "section": "skills",
+  "text": "Game engines & 3D web: Unreal Engine 5 (Blueprints & C++) (shown in: Light Up The House; CEGA Unreal Engine certification); Unity (C# & VR/XR) (shown in: Chrono Rebellion, Behind the Smile, B99 VR); Three.js (WebGL / 3D browser games) (shown in: Ghost Lantern, Mera Craft, Mochi and the Royal Fish)."
+ },
+ {
+  "id": "skills-queen",
+  "title": "Skills: Programming",
+  "section": "skills",
+  "text": "Programming: C++ & C (shown in: Light Up The House (UE5 C++), Pac-Man Clone (pure C)); C# (shown in: Chrono Rebellion, Behind the Smile, B99 VR); JavaScript / HTML / CSS (shown in: Ghost Lantern, Mera Craft, Mochi and the Royal Fish); React Native & Python / Java (shown in: Cross-platform mobile app development (React Native), coursework & tooling)."
+ },
+ {
+  "id": "skills-rook",
+  "title": "Skills: 3D art, motion & design",
+  "section": "skills",
+  "text": "3D art, motion & design: Blender (3D modeling & assets) (shown in: B99 VR, Stylized Low-Poly Aircraft & Props); Adobe After Effects & Premiere Pro (shown in: Scott Pilgrim Title Sequence, Documentary Style Edit, Parallax Wildwestern); Adobe Illustrator & Autodesk Maya (shown in: Vector poster artwork, walk cycle animation basics)."
+ },
+ {
+  "id": "skills-bishop",
+  "title": "Skills: Workflow & architecture",
+  "section": "skills",
+  "text": "Workflow & architecture: Git & GitHub (shown in: All repositories (github.com/hameed-F)); AI guard state machines, raycasting (shown in: Mochi and the Royal Fish, Ghost Lantern); ERP systems (shown in: Aerox ERP internship)."
+ },
+ {
+  "id": "skills-knight",
+  "title": "Skills: Also",
+  "section": "skills",
+  "text": "Also: VR/AR development (shown in: B99 VR); Game design principles (shown in: Semester game projects (a new game each semester))."
+ },
+ {
+  "id": "skills-overview",
+  "title": "Core technologies",
+  "section": "skills",
+  "text": "Core technologies: Unreal Engine 5 (C++ / Blueprints), Unity (C#), Three.js, Blender. Also C, C++, C#, JavaScript, Python, Java, React Native, Adobe After Effects, Premiere Pro, Illustrator, Autodesk Maya, Git & GitHub, VR/AR development."
+ },
+ {
+  "id": "project-light-up-the-house",
+  "title": "Light Up The House",
+  "section": "projects",
+  "text": "Light Up The House (featured project, 2026). Stack: Unreal Engine 5 (Blueprints & C++). Role: Solo / Lead Developer · Gameplay & Systems Programmer. Third-person sci-fi adventure aboard a dark, malfunctioning space shuttle where the player must restore a failed power grid before time runs out. Links: Trailer: https://youtu.be/SAdCzLdvwuI, Gameplay: https://youtu.be/IanUdZbedtk."
+ },
+ {
+  "id": "project-light-up-the-house-details",
+  "title": "Light Up The House: contributions",
+  "section": "projects",
+  "text": "What Faisal did on Light Up The House: Core gameplay & logical structures: end-to-end game loop, countdown timer state machine, tool-to-appliance matching validation (Blueprints and C++). Navigation & spatial flow: multi-corridor shuttle layout, dark-environment sightlines, dynamic lighting from emergency blackout to full illumination. Player interaction systems: third-person interaction triggers, item pickup/equip logic, visual feedback cues for broken ship systems."
+ },
+ {
+  "id": "project-ghost-lantern",
+  "title": "Ghost Lantern",
+  "section": "projects",
+  "text": "Ghost Lantern (featured project, 2026). Stack: Three.js · JavaScript (full-stack web). Role: Solo · Full-Stack Game & Web Developer. Multi-level first-person 3D browser horror-survival game with raycast torch combat, four ghost AI archetypes, and full-stack OTP user accounts with a global leaderboard. Links: Play live: https://ghost-lantern-nine.vercel.app/."
+ },
+ {
+  "id": "project-ghost-lantern-details",
+  "title": "Ghost Lantern: contributions",
+  "section": "projects",
+  "text": "What Faisal did on Ghost Lantern: First-person atmospheric exploration: multi-room levels with dense fog and a directional spotlight torch. Raycast combat & resource management: continuous raycasting to banish ghosts while the battery drains; non-regenerating health. Four ghost AI archetypes: Tall, Fast, Horrific, and a Friendly blue ghost that penalizes the player if beamed. Authentication & global leaderboard: email OTP verification, persistent player dashboards, run tracking across both levels."
+ },
+ {
+  "id": "project-chrono-rebellion",
+  "title": "Chrono Rebellion",
+  "section": "projects",
+  "text": "Chrono Rebellion (featured project, 2025). Stack: Unity · C#. Role: Team of 3 · Gameplay Programmer & Level Designer. First-person time-travel action shooter: a soldier from 2145 travels back to World War II to stop enemy forces armed with stolen alien technology. Links: Gameplay: https://youtu.be/FuWAgXPMjxw."
+ },
+ {
+  "id": "project-chrono-rebellion-details",
+  "title": "Chrono Rebellion: contributions",
+  "section": "projects",
+  "text": "What Faisal did on Chrono Rebellion: Concept & core combat scripting: co-created the concept; programmed player movement, aiming, and sci-fi weapon shooting in C#. Character animations & logic: combat and locomotion animation state transitions plus mission progression logic. Dual-era level setup: built and dressed scenes bridging the futuristic 2145 vessel and WWII combat zones."
+ },
+ {
+  "id": "project-behind-the-smile",
+  "title": "Behind the Smile",
+  "section": "projects",
+  "text": "Behind the Smile (featured project, 2025). Stack: Unity · C#. Role: Team of 6 · Asset Integration, Animation & UI Developer. A 48-hour Global Game Jam 2026 entry on the theme \"Mask\": an angel helps townspeople who hide their true emotions behind identical smiling masks. Links: Gameplay: https://youtu.be/tTceiBnP9YM."
+ },
+ {
+  "id": "project-behind-the-smile-details",
+  "title": "Behind the Smile: contributions",
+  "section": "projects",
+  "text": "What Faisal did on Behind the Smile: Character & environment animations: animation states and expressive transitions triggered when masks are removed. UI systems & dialogue flow: narrative UI panels, dialogue prompts, scene transition overlays in Unity. 3D asset pipeline: prepared, imported and configured 3D town and character assets within the 48-hour deadline."
+ },
+ {
+  "id": "project-mochi-royal-fish",
+  "title": "Mochi and the Royal Fish",
+  "section": "projects",
+  "text": "Mochi and the Royal Fish (featured project, 2026). Stack: Three.js · JavaScript. Role: Solo · Game & AI Programmer. Stylized 3D cat-and-dog stealth heist game demonstrating autonomous AI guard patrol, line-of-sight detection and tactical evasion. Links: Play live: https://mochi-heist.vercel.app/, Gameplay: https://youtu.be/1qQqhyVils8."
+ },
+ {
+  "id": "project-mochi-royal-fish-details",
+  "title": "Mochi and the Royal Fish: contributions",
+  "section": "projects",
+  "text": "What Faisal did on Mochi and the Royal Fish: Autonomous palace guard AI: patrol pathing, state switching and live minimap tracking for the guards \"Duke\" and \"Baron\". Stealth & ability mechanics: Sneak (Shift), Dash (Space), Yarn distraction (E), Hide (Q), Catnip charge meters. Custom heist HUD & minimap: guard patrol status, minimap radar, round scoring, remaining fish targets."
+ },
+ {
+  "id": "project-mera-craft",
+  "title": "Mera Craft",
+  "section": "projects",
+  "text": "Mera Craft (project, 2026). Stack: Web 3D · Three.js. Role: Solo. Browser-based Minecraft-inspired voxel sandbox recreated from scratch in Three.js: block placement, terrain generation, first-person controls. Links: Play live: https://meracraft2xuo.vercel.app/, Video: https://youtu.be/fIUiE5l_wqM."
+ },
+ {
+  "id": "project-b99-vr",
+  "title": "B99 VR (\"I Want It That Way\")",
+  "section": "projects",
+  "text": "B99 VR (\"I Want It That Way\") (project, 2026). Stack: VR & Systems · Unity & Blender. Role: Solo. Solo VR recreation of the Brooklyn Nine-Nine precinct lineup scene. Precinct props modeled in Blender; spatial VR staging, lighting and audio sync in Unity. Links: Video: https://youtu.be/4TKZvehTNtU."
+ },
+ {
+  "id": "project-pacman-clone",
+  "title": "Pac-Man Clone",
+  "section": "projects",
+  "text": "Pac-Man Clone (project). Stack: Systems / C · Pure C. Role: Solo. Classic Pac-Man built from scratch in C with standard libraries and no game engine: maze rendering, collision detection, scoring, ghost movement AI. Links: GitHub profile: https://github.com/hameed-F."
+ },
+ {
+  "id": "project-scott-pilgrim",
+  "title": "Scott Pilgrim vs. the World: Title Sequence",
+  "section": "projects",
+  "text": "Scott Pilgrim vs. the World: Title Sequence (project). Stack: Motion & 3D Art · After Effects. Role: Solo. Reimagined kinetic typography and comic-book title sequence: custom cutouts, crumpled paper textures, pixel art sprites, rhythmic transitions. Links: Video: https://youtu.be/DyrDWOMvIT4."
+ },
+ {
+  "id": "project-documentary",
+  "title": "Documentary Style Edit",
+  "section": "projects",
+  "text": "Documentary Style Edit (project). Stack: Motion & 3D Art · After Effects / Premiere. Role: Solo. Narrative documentary video piece: pacing, archival framing, lower-thirds motion design, atmospheric audio mixing. Links: Video: https://youtu.be/jXZs1dolJgo."
+ },
+ {
+  "id": "project-parallax-wildwestern",
+  "title": "Parallax Wildwestern",
+  "section": "projects",
+  "text": "Parallax Wildwestern (project). Stack: Motion & 3D Art · After Effects. Role: Solo. 2.5D depth-layered Western scene: flat illustrated layers animated through a virtual 3D camera rig. Links: Video: https://youtu.be/BU2gEggawEU."
+ },
+ {
+  "id": "project-design-vault",
+  "title": "3D Modeling & Vector Design Vault",
+  "section": "projects",
+  "text": "3D Modeling & Vector Design Vault (project). Stack: Motion & 3D Art · Blender & Illustrator. Role: Solo. Low-poly 3D game props (stylized propeller aircraft, battle axe, modular assets) in Blender, plus halftone vector poster artwork in Illustrator. No public link."
+ },
+ {
+  "id": "projects-overview",
+  "title": "All projects",
+  "section": "projects",
+  "text": "There are 12 projects: Light Up The House (Unreal, featured); Ghost Lantern (Three.js, featured); Chrono Rebellion (Unity, featured); Behind the Smile (Unity, featured); Mochi and the Royal Fish (Three.js, featured); Mera Craft (Three.js); B99 VR (\"I Want It That Way\") (Unity); Pac-Man Clone (Systems); Scott Pilgrim vs. the World: Title Sequence (Motion); Documentary Style Edit (Motion); Parallax Wildwestern (Motion); 3D Modeling & Vector Design Vault (Motion)."
+ },
+ {
+  "id": "cert-cega",
+  "title": "Unreal Engine: 100 credit hours training",
+  "section": "achievements",
+  "text": "Certificate: Unreal Engine: 100 credit hours training, issued by CEGA Training Program (\"Game Development & Visualisation\")."
+ },
+ {
+  "id": "cert-google",
+  "title": "Google AI Professional Certificate",
+  "section": "achievements",
+  "text": "Certificate: Google AI Professional Certificate, issued by Google via Coursera, dated Jun 16, 2026. Verify: https://coursera.org/verify/professional-cert/6W54OWS2UR6M"
+ },
+ {
+  "id": "cert-maya",
+  "title": "Walk Cycle Basics in Autodesk Maya",
+  "section": "achievements",
+  "text": "Certificate: Walk Cycle Basics in Autodesk Maya, issued by ITeachStuff, dated 2022-11-11."
+ },
+ {
+  "id": "cert-premiere",
+  "title": "Adobe Premiere Pro Basics",
+  "section": "achievements",
+  "text": "Certificate: Adobe Premiere Pro Basics, issued by ITeachStuff, dated 2022-11-11."
+ },
+ {
+  "id": "cert-video",
+  "title": "Video Basics",
+  "section": "achievements",
+  "text": "Certificate: Video Basics, issued by ITeachStuff, dated 2022-11-05."
+ },
+ {
+  "id": "cert-kda",
+  "title": "IT Department internship certificate",
+  "section": "achievements",
+  "text": "Certificate: IT Department internship certificate, issued by Karachi Development Authority (KDA)."
+ },
+ {
+  "id": "certs-overview",
+  "title": "Certifications overview",
+  "section": "achievements",
+  "text": "Certifications: Unreal Engine 100-hour training (CEGA); Google AI Professional Certificate (Coursera, June 2026); Walk Cycle Basics in Autodesk Maya, Adobe Premiere Pro Basics and Video Basics (ITeachStuff, November 2022); and an IT Department internship certificate from Karachi Development Authority. The resume also lists a CEGA Pre-Production certificate, but no copy of it is shown on the site."
+ },
+ {
+  "id": "site",
+  "title": "About this website",
+  "section": "credits",
+  "text": "This portfolio is an interactive 3D website built with Three.js and Vite and hosted on Vercel. It is a game-style cabin with board games: Ludo is About Me, chess is Skills (playable against an AI), the property board is Projects, Snakes & Ladders is the education and experience journey (playable), the trophy shelf holds certificates, the TV plays the promo video and the phone is the contact form. Chotu, the snake, is the chatbot."
+ }
+]

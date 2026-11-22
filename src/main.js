@@ -1,6 +1,7 @@
 import './style.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
+import { initChat } from './chat.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -156,6 +157,7 @@ async function boot3D() {
 }
 
 $('#chotu').hidden = false;
+initChat({ go, hooks });
 $('#startBtn').addEventListener('click', () => { $('#home').hidden = true; stage?.startDrive(); });
 $('#creditsBtn').addEventListener('click', () => { stage?.skipIntro(); go('credits'); });
 $('#driveBtn').addEventListener('click', () => {
