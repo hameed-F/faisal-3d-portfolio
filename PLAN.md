@@ -13,13 +13,13 @@ Facts about the owner come only from `../source/`. Anything missing is listed in
 One long level with 6 zones: **About me → Journey → Projects → Skills → Trophies → Contact**. The avatar is the player (run, jump, head-butt blocks).
 - **`</>` code blocks**: hit from below → a retro dialog card pops out (profile, about, CV, education, each journey step, 12 projects with image + links, 5 skill groups).
 - **Journey** is a staircase: each step is a milestone.
-- **Bugs** 🐞 patrol: stomp = "BUG FIXED +100"; touching one = knockback + Disappointed (no deaths).
+- **Deadlines** ⏰ (walking alarm clocks, shaking harder as you get close) patrol: stomp = "DEADLINE BEATEN +100"; touching one = "RIIING! TOO LATE" knockback + Disappointed (no deaths). (Bugs were dropped at the owner's request.)
 - **Commits** (gems) to collect; **trophies** = the 6 certificates (collect → card with Verify).
-- **Side quest**: arcade cabinet → chess vs my AI (3 levels). **Mailbox** → contact form. **TV** → promo video. **SHIP IT rocket** at the end → launch, COURSE CLEAR screen (score, blocks, trophies, bugs, time) with Send invite / Promo / CV / Play again.
+- **Side quest**: arcade cabinet → chess vs my AI (3 levels). **Mailbox** → contact form. **TV** → promo video. **SHIP IT rocket** at the end → launch, COURSE CLEAR screen (score, blocks, trophies, deadlines, time) with Send invite / Promo / CV / Play again.
 - **Chotu** reimagined as a hovering TV-head robot that follows the player (pixel face, "..." when thinking); tap it or the 🤖 button to chat.
 - **Retro loading screen** ("STAGE 1-1", lives ×∞, block progress bar) and **title screen** (logo, PRESS START, READ AS A PAGE).
 - HUD: SCORE · COMMITS · ZONE · TIME. Stage select in the menu (recruiter shortcut). Achievements toasts. Phone: D-pad + A button + USE.
-- Avatar clips: Idle, Walk (speed-scaled), Jump, Point (cards), Victory (skills, trophies, ship), Disappointed (bug hit), Think (chess), Throw (mailbox), Talk (Chotu), Wave (start), Dance (idle 9 s), Sit (idle 18 s).
+- Avatar clips: Idle, Walk (speed-scaled), Jump, Point (cards), Victory (skills, trophies, ship), Disappointed (deadline hit), Think (chess), Throw (mailbox), Talk (Chotu), Wave (start), Dance (idle 9 s), Sit (idle 18 s).
 
 ## 2. Art direction
 Bright retro: sky blue, pixel-art 16×16 textures (grass, dirt, stone, gold code blocks) with crisp nearest filtering, low-poly hills, trees, bushes and flowers in a 2.5D diorama, chunky "Press Start 2P" pixel font for UI headings with Inter for readable body text, navy dialog boxes with white pixel borders. All art is generated in code (no downloads).

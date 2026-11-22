@@ -53,3 +53,5 @@
 - Explained to the owner that Nintendo's actual Mario look/characters can't be copied; the game is genre-inspired and original.
 - Measured (Full, headless Intel UHD): 36 draw calls, ~59k triangles. Run chunk 35 kB gz; all art procedural (no model downloads). Removed the island version and props.glb.
 - Waiting on the owner's documentary-edit image (attachment did not reach this session).
+- Owner uploaded the Documentary Style Edit frame (paper collage, rotunda + king): added as public/img/projects/documentary-edit_frame.webp (29 kB) and used on its card/screen. Not copied into source/ (CLAUDE.md: ask before touching source).
+- Replaced bug enemies (owner: a friend's site uses bugs) with Deadlines: walking alarm clocks that shake harder when you are near; stomp = DEADLINE BEATEN.

@@ -122,7 +122,7 @@ export const projects = [
   { id: 'scott-pilgrim', name: 'Scott Pilgrim vs. the World: Title Sequence', group: 'Motion', stack: 'Motion & 3D Art · After Effects', role: 'Solo', image: T('scott-pilgrim-title_frame'),
     summary: 'Reimagined kinetic typography and comic-book title sequence: custom cutouts, crumpled paper textures, pixel art sprites, rhythmic transitions.',
     links: [['Video', 'https://youtu.be/DyrDWOMvIT4']] },
-  { id: 'documentary', name: 'Documentary Style Edit', group: 'Motion', stack: 'Motion & 3D Art · After Effects / Premiere', role: 'Solo', image: null,
+  { id: 'documentary', name: 'Documentary Style Edit', group: 'Motion', stack: 'Motion & 3D Art · After Effects / Premiere', role: 'Solo', image: T('documentary-edit_frame'),
     summary: 'Narrative documentary video piece: pacing, archival framing, lower-thirds motion design, atmospheric audio mixing.',
     links: [['Video', 'https://youtu.be/jXZs1dolJgo']] },
   { id: 'parallax-wildwestern', name: 'Parallax Wildwestern', group: 'Motion', stack: 'Motion & 3D Art · After Effects', role: 'Solo', image: T('parallax-wildwestern_credits-frame'),

@@ -8,7 +8,7 @@ import { TIERS, FpsGovernor } from '../quality.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const PW = 0.32; const PH = 1.7; // player half-width, height
-const ACH = { start: ['Press Start', 'Started your run'], block: ['Head-butt!', 'Opened your first code block'], bug: ['Bug Fixed', 'Stomped your first bug'], bugs5: ['QA Engineer', 'Fixed 5 bugs'], commits: ['Committed', 'Collected 25 commits'], trophies: ['Trophy Hunter', 'Collected all certificates'], all: ['Completionist', 'Opened every code block'], ship: ['Shipped It!', 'Launched the rocket'], chotu: ['New Friend', 'Talked to Chotu'], invite: ['Party Up', 'Sent an invite'], chess: ['Checkmate!', 'Beat the chess AI'] };
+const ACH = { start: ['Press Start', 'Started your run'], block: ['Head-butt!', 'Opened your first code block'], bug: ['On Time', 'Beat your first deadline'], bugs5: ['Crunch Survivor', 'Beat 5 deadlines'], commits: ['Committed', 'Collected 25 commits'], trophies: ['Trophy Hunter', 'Collected all certificates'], all: ['Completionist', 'Opened every code block'], ship: ['Shipped It!', 'Launched the rocket'], chotu: ['New Friend', 'Talked to Chotu'], invite: ['Party Up', 'Sent an invite'], chess: ['Checkmate!', 'Beat the chess AI'] };
 
 export async function initRun({ canvas, tierName, onProgress, onSlow, onCert, onChotu, onContact, onPromo, onChess, onReady, toast, reducedMotion, playSfx }) {
   psxUniforms.uSnap.value = 0;
@@ -118,7 +118,7 @@ export async function initRun({ canvas, tierName, onProgress, onSlow, onCert, on
   function finishScreen() {
     const opened = LV.blocks.filter((b) => b.used).length; const tr = LV.trophies.filter((t) => t.got).length;
     fin.innerHTML = `<div class="rf-in"><h2>COURSE CLEAR!</h2><p class="rf-sub">Thanks for playing through my portfolio.</p>
-      <dl><div><dt>SCORE</dt><dd>${pad6(score, 6)}</dd></div><div><dt>CODE BLOCKS</dt><dd>${opened}/${LV.blocks.length}</dd></div><div><dt>TROPHIES</dt><dd>${tr}/${LV.trophies.length}</dd></div><div><dt>BUGS FIXED</dt><dd>${bugsFixed}</dd></div><div><dt>COMMITS</dt><dd>${commits}</dd></div><div><dt>TIME</dt><dd>${hud.querySelector('#hTime').textContent}</dd></div></dl>
+      <dl><div><dt>SCORE</dt><dd>${pad6(score, 6)}</dd></div><div><dt>CODE BLOCKS</dt><dd>${opened}/${LV.blocks.length}</dd></div><div><dt>TROPHIES</dt><dd>${tr}/${LV.trophies.length}</dd></div><div><dt>DEADLINES BEATEN</dt><dd>${bugsFixed}</dd></div><div><dt>COMMITS</dt><dd>${commits}</dd></div><div><dt>TIME</dt><dd>${hud.querySelector('#hTime').textContent}</dd></div></dl>
       <div class="rf-acts"><button class="rbtn p" data-f="contact">✉ Send an invite</button><button class="rbtn" data-f="promo">▶ Promo</button><a class="rbtn" href="/Muhammad_Faisal_Hameed_Resume.pdf" download>⬇ CV</a><button class="rbtn" data-f="replay">↺ Play again</button></div></div>`;
     fin.hidden = false;
     fin.onclick = (e) => { const f = e.target.closest('[data-f]')?.dataset.f; if (!f) return; if (f === 'contact') { fin.hidden = true; onContact?.(); mode = 'play'; } if (f === 'promo') { fin.hidden = true; mode = 'play'; showCard(promoCard(api)); } if (f === 'replay') { fin.hidden = true; warp(0); mode = 'play'; } };
@@ -163,10 +163,10 @@ export async function initRun({ canvas, tierName, onProgress, onSlow, onCert, on
       for (const b of LV.bugs) {
         if (!b.alive) { if (b.squash > 0) { b.squash -= dt; b.mesh.scale.set(1.2, 0.25, 1.2); if (b.squash <= 0) b.mesh.visible = false; } continue; }
         b.x += b.dir * 1.4 * dt; if (b.x > b.x1) { b.x = b.x1; b.dir = -1; } if (b.x < b.x0) { b.x = b.x0; b.dir = 1; }
-        b.mesh.position.set(b.x, b.y + Math.abs(Math.sin(t * 10)) * 0.04, 0.1); b.mesh.rotation.y = b.dir > 0 ? 0 : Math.PI;
+        b.mesh.position.set(b.x, b.y + Math.abs(Math.sin(t * 10)) * 0.06, 0.1); b.mesh.rotation.y = b.dir > 0 ? 0.35 : -0.35; b.mesh.rotation.z = Math.sin(t * 40) * (Math.abs(b.x - P.x) < 4 ? 0.12 : 0.03);
         if (Math.abs(b.x - P.x) < 0.65 && P.y < b.y + 0.7 && P.y + PH > b.y) {
-          if (P.vy < -1 && P.y > b.y + 0.25) { b.alive = false; b.squash = 0.5; P.vy = 11; score += 100; bugsFixed++; popText('BUG FIXED +100', b.x, b.y + 1.2, '#7fe0c4'); playSfx?.('ladder'); unlock('bug'); if (bugsFixed === 5) unlock('bugs5'); hudUpdate(); }
-          else if (P.inv <= 0) { P.inv = 1.4; P.vx = (P.x < b.x ? -1 : 1) * 9; P.vy = 7; avatar.play('Disappointed'); popText('OUCH!', P.x, P.y + 2.2, '#ff8a7a'); playSfx?.('lose'); }
+          if (P.vy < -1 && P.y > b.y + 0.25) { b.alive = false; b.squash = 0.5; P.vy = 11; score += 100; bugsFixed++; popText('DEADLINE BEATEN +100', b.x, b.y + 1.2, '#7fe0c4'); playSfx?.('ladder'); unlock('bug'); if (bugsFixed === 5) unlock('bugs5'); hudUpdate(); }
+          else if (P.inv <= 0) { P.inv = 1.4; P.vx = (P.x < b.x ? -1 : 1) * 9; P.vy = 7; avatar.play('Disappointed'); popText('RIIING! TOO LATE', P.x, P.y + 2.2, '#ff8a7a'); playSfx?.('lose'); }
         }
       }
       // animation state

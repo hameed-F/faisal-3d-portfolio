@@ -166,8 +166,16 @@ export function buildLevel(scene, tier) {
   for (const tr of trophies) { const m = new THREE.Mesh(cupGeo, cupMat); m.position.set(tr.x, tr.y, 0); m.castShadow = hi; scene.add(m); tr.mesh = m; }
   update.push((t) => trophies.forEach((tr, i) => { if (tr.got) return; tr.mesh.rotation.y = t * 2 + i; tr.mesh.position.y = tr.y + Math.sin(t * 2 + i) * 0.12; }));
 
-  // bugs 🐞 (little voxel ladybugs)
-  const bugGeo = (() => { const parts = []; const P = (g, c) => parts.push(paint(g, c)); P(new THREE.SphereGeometry(0.4, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2).scale(1.2, 0.9, 1), '#e8413a'); P(new THREE.BoxGeometry(0.04, 0.36, 0.8).translate(0, 0.2, 0), '#23253a'); [[-0.2, 0.25, 0.15], [0.2, 0.22, -0.15], [-0.15, 0.2, -0.22], [0.18, 0.28, 0.2]].forEach(([x, y, z]) => P(new THREE.SphereGeometry(0.07, 6, 4).translate(x, y, z), '#23253a')); P(new THREE.SphereGeometry(0.2, 8, 6).translate(0.45, 0.12, 0), '#23253a'); P(new THREE.SphereGeometry(0.05, 6, 4).translate(0.6, 0.2, 0.1), '#ffffff'); P(new THREE.SphereGeometry(0.05, 6, 4).translate(0.6, 0.2, -0.1), '#ffffff'); P(new THREE.CylinderGeometry(0.015, 0.015, 0.3, 4).rotateZ(-0.6).translate(0.62, 0.38, 0.08), '#23253a'); P(new THREE.CylinderGeometry(0.015, 0.015, 0.3, 4).rotateZ(-0.6).translate(0.62, 0.38, -0.08), '#23253a'); for (const z of [-0.3, 0.3]) for (const x of [-0.2, 0, 0.2]) P(new THREE.BoxGeometry(0.04, 0.14, 0.04).translate(x, 0.02, z), '#23253a'); return mergeGeometries(parts); })();
+  // deadlines ⏰: little walking alarm clocks (stomp them before they ring)
+  const bugGeo = (() => { const parts = []; const P = (g, c) => parts.push(paint(g, c));
+    P(new THREE.CylinderGeometry(0.38, 0.38, 0.28, 16).rotateX(Math.PI / 2).translate(0, 0.5, 0), '#e8413a');
+    P(new THREE.CylinderGeometry(0.31, 0.31, 0.04, 16).rotateX(Math.PI / 2).translate(0, 0.5, 0.15), '#fff6d8');
+    P(new THREE.BoxGeometry(0.04, 0.22, 0.02).translate(0, 0.58, 0.18), '#1a1c2c'); P(new THREE.BoxGeometry(0.16, 0.04, 0.02).translate(0.07, 0.5, 0.18), '#1a1c2c');
+    P(new THREE.SphereGeometry(0.03, 6, 4).translate(0, 0.5, 0.19), '#e8413a');
+    for (const s of [-1, 1]) { P(new THREE.SphereGeometry(0.13, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2).rotateZ(s * 0.5).translate(s * 0.26, 0.86, 0), '#ffc93c'); P(new THREE.BoxGeometry(0.06, 0.16, 0.06).translate(s * 0.18, 0.12, 0), '#1a1c2c'); P(new THREE.BoxGeometry(0.14, 0.05, 0.12).translate(s * 0.2, 0.03, 0.02), '#1a1c2c'); }
+    P(new THREE.BoxGeometry(0.08, 0.1, 0.08).translate(0, 0.92, 0), '#1a1c2c');
+    for (const s of [-1, 1]) P(new THREE.BoxGeometry(0.07, 0.03, 0.02).translate(s * 0.1, 0.66, 0.18), '#1a1c2c'); // angry brows
+    return mergeGeometries(parts); })();
   const bugMat = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
   for (const b of bugs) { const m = new THREE.Mesh(bugGeo, bugMat); m.castShadow = hi; m.position.set(b.x, b.y, 0.1); scene.add(m); b.mesh = m; }
 
