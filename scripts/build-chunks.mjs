@@ -18,7 +18,11 @@ add('skills-overview', 'Core technologies', 'skills', 'Core technologies: Unreal
 for (const p of projects) {
   const head = `${p.name} (${p.featured ? 'featured project' : 'project'}${p.year ? `, ${p.year}` : ''}). Stack: ${p.stack}. Role: ${p.role}. ${p.summary}`;
   add(`project-${p.id}`, p.name, 'projects', head + (p.links.length ? ' Links: ' + p.links.map(([l, u]) => `${l}: ${u}`).join(', ') + '.' : ' No public link.'));
-  if (p.points) add(`project-${p.id}-details`, `${p.name}: contributions`, 'projects', `What ${profile.name.split(' ')[1]} did on ${p.name}: ` + p.points.join(' '));
+  if (p.points) add(`project-${p.id}-details`, `${p.name}: contributions`, 'projects', `What ${profile.name.split(' ')[1]} did on ${p.name} (${p.stack}): ` + p.points.join(' '));
+}
+for (const g of [...new Set(projects.map((p) => p.group))]) {
+  const list = projects.filter((p) => p.group === g);
+  add(`projects-by-${g.toLowerCase().replace(/[^a-z]/g, '')}`, `Projects made with ${g}`, 'projects', `Projects in the ${g} group (${list.length}): ` + list.map((p) => `${p.name} (${p.stack}${p.year ? ', ' + p.year : ''})`).join('; ') + '.');
 }
 add('projects-overview', 'All projects', 'projects', `There are ${projects.length} projects: ` + projects.map((p) => `${p.name} (${p.group}${p.featured ? ', featured' : ''})`).join('; ') + '.');
 for (const c of certificates) add(`cert-${c.id}`, c.title, 'achievements', `Certificate: ${c.title}, issued by ${c.issuer}${c.date ? `, dated ${c.date}` : ''}.${c.verify ? ` Verify: ${c.verify}` : ''}`);

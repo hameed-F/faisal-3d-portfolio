@@ -8,7 +8,7 @@ const INDEX = JSON.parse(readFileSync(new URL('../data/portfolio-index.json', im
 // gemini-3.8-flash timed out (>40 s) in testing; 3.5 Flash-Lite answered in about 1 s.
 const GEN_MODELS = [process.env.CHAT_MODEL, 'gemini-3.5-flash-lite', 'gemini-3.6-flash'].filter(Boolean);
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
-const TOP_K = 4; const MIN_SCORE = 0.45;
+const TOP_K = 5; const MIN_SCORE = 0.45;
 
 const SYSTEM = `You are Chotu, a friendly little snake who lives on the Snakes & Ladders board in Muhammad Faisal Hameed's 3D portfolio.
 Answer questions about Muhammad Faisal Hameed using ONLY the numbered context passages you are given.

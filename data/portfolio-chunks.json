@@ -135,7 +135,7 @@
   "id": "project-light-up-the-house-details",
   "title": "Light Up The House: contributions",
   "section": "projects",
-  "text": "What Faisal did on Light Up The House: Core gameplay & logical structures: end-to-end game loop, countdown timer state machine, tool-to-appliance matching validation (Blueprints and C++). Navigation & spatial flow: multi-corridor shuttle layout, dark-environment sightlines, dynamic lighting from emergency blackout to full illumination. Player interaction systems: third-person interaction triggers, item pickup/equip logic, visual feedback cues for broken ship systems."
+  "text": "What Faisal did on Light Up The House (Unreal Engine 5 (Blueprints & C++)): Core gameplay & logical structures: end-to-end game loop, countdown timer state machine, tool-to-appliance matching validation (Blueprints and C++). Navigation & spatial flow: multi-corridor shuttle layout, dark-environment sightlines, dynamic lighting from emergency blackout to full illumination. Player interaction systems: third-person interaction triggers, item pickup/equip logic, visual feedback cues for broken ship systems."
  },
  {
   "id": "project-ghost-lantern",
@@ -147,7 +147,7 @@
   "id": "project-ghost-lantern-details",
   "title": "Ghost Lantern: contributions",
   "section": "projects",
-  "text": "What Faisal did on Ghost Lantern: First-person atmospheric exploration: multi-room levels with dense fog and a directional spotlight torch. Raycast combat & resource management: continuous raycasting to banish ghosts while the battery drains; non-regenerating health. Four ghost AI archetypes: Tall, Fast, Horrific, and a Friendly blue ghost that penalizes the player if beamed. Authentication & global leaderboard: email OTP verification, persistent player dashboards, run tracking across both levels."
+  "text": "What Faisal did on Ghost Lantern (Three.js · JavaScript (full-stack web)): First-person atmospheric exploration: multi-room levels with dense fog and a directional spotlight torch. Raycast combat & resource management: continuous raycasting to banish ghosts while the battery drains; non-regenerating health. Four ghost AI archetypes: Tall, Fast, Horrific, and a Friendly blue ghost that penalizes the player if beamed. Authentication & global leaderboard: email OTP verification, persistent player dashboards, run tracking across both levels."
  },
  {
   "id": "project-chrono-rebellion",
@@ -159,7 +159,7 @@
   "id": "project-chrono-rebellion-details",
   "title": "Chrono Rebellion: contributions",
   "section": "projects",
-  "text": "What Faisal did on Chrono Rebellion: Concept & core combat scripting: co-created the concept; programmed player movement, aiming, and sci-fi weapon shooting in C#. Character animations & logic: combat and locomotion animation state transitions plus mission progression logic. Dual-era level setup: built and dressed scenes bridging the futuristic 2145 vessel and WWII combat zones."
+  "text": "What Faisal did on Chrono Rebellion (Unity · C#): Concept & core combat scripting: co-created the concept; programmed player movement, aiming, and sci-fi weapon shooting in C#. Character animations & logic: combat and locomotion animation state transitions plus mission progression logic. Dual-era level setup: built and dressed scenes bridging the futuristic 2145 vessel and WWII combat zones."
  },
  {
   "id": "project-behind-the-smile",
@@ -171,7 +171,7 @@
   "id": "project-behind-the-smile-details",
   "title": "Behind the Smile: contributions",
   "section": "projects",
-  "text": "What Faisal did on Behind the Smile: Character & environment animations: animation states and expressive transitions triggered when masks are removed. UI systems & dialogue flow: narrative UI panels, dialogue prompts, scene transition overlays in Unity. 3D asset pipeline: prepared, imported and configured 3D town and character assets within the 48-hour deadline."
+  "text": "What Faisal did on Behind the Smile (Unity · C#): Character & environment animations: animation states and expressive transitions triggered when masks are removed. UI systems & dialogue flow: narrative UI panels, dialogue prompts, scene transition overlays in Unity. 3D asset pipeline: prepared, imported and configured 3D town and character assets within the 48-hour deadline."
  },
  {
   "id": "project-mochi-royal-fish",
@@ -183,7 +183,7 @@
   "id": "project-mochi-royal-fish-details",
   "title": "Mochi and the Royal Fish: contributions",
   "section": "projects",
-  "text": "What Faisal did on Mochi and the Royal Fish: Autonomous palace guard AI: patrol pathing, state switching and live minimap tracking for the guards \"Duke\" and \"Baron\". Stealth & ability mechanics: Sneak (Shift), Dash (Space), Yarn distraction (E), Hide (Q), Catnip charge meters. Custom heist HUD & minimap: guard patrol status, minimap radar, round scoring, remaining fish targets."
+  "text": "What Faisal did on Mochi and the Royal Fish (Three.js · JavaScript): Autonomous palace guard AI: patrol pathing, state switching and live minimap tracking for the guards \"Duke\" and \"Baron\". Stealth & ability mechanics: Sneak (Shift), Dash (Space), Yarn distraction (E), Hide (Q), Catnip charge meters. Custom heist HUD & minimap: guard patrol status, minimap radar, round scoring, remaining fish targets."
  },
  {
   "id": "project-mera-craft",
@@ -226,6 +226,36 @@
   "title": "3D Modeling & Vector Design Vault",
   "section": "projects",
   "text": "3D Modeling & Vector Design Vault (project). Stack: Motion & 3D Art · Blender & Illustrator. Role: Solo. Low-poly 3D game props (stylized propeller aircraft, battle axe, modular assets) in Blender, plus halftone vector poster artwork in Illustrator. No public link."
+ },
+ {
+  "id": "projects-by-unreal",
+  "title": "Projects made with Unreal",
+  "section": "projects",
+  "text": "Projects in the Unreal group (1): Light Up The House (Unreal Engine 5 (Blueprints & C++), 2026)."
+ },
+ {
+  "id": "projects-by-threejs",
+  "title": "Projects made with Three.js",
+  "section": "projects",
+  "text": "Projects in the Three.js group (3): Ghost Lantern (Three.js · JavaScript (full-stack web), 2026); Mochi and the Royal Fish (Three.js · JavaScript, 2026); Mera Craft (Web 3D · Three.js, 2026)."
+ },
+ {
+  "id": "projects-by-unity",
+  "title": "Projects made with Unity",
+  "section": "projects",
+  "text": "Projects in the Unity group (3): Chrono Rebellion (Unity · C#, 2025); Behind the Smile (Unity · C#, 2025); B99 VR (\"I Want It That Way\") (VR & Systems · Unity & Blender, 2026)."
+ },
+ {
+  "id": "projects-by-systems",
+  "title": "Projects made with Systems",
+  "section": "projects",
+  "text": "Projects in the Systems group (1): Pac-Man Clone (Systems / C · Pure C)."
+ },
+ {
+  "id": "projects-by-motion",
+  "title": "Projects made with Motion",
+  "section": "projects",
+  "text": "Projects in the Motion group (4): Scott Pilgrim vs. the World: Title Sequence (Motion & 3D Art · After Effects); Documentary Style Edit (Motion & 3D Art · After Effects / Premiere); Parallax Wildwestern (Motion & 3D Art · After Effects); 3D Modeling & Vector Design Vault (Motion & 3D Art · Blender & Illustrator)."
  },
  {
   "id": "projects-overview",

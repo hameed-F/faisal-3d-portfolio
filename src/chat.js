@@ -17,9 +17,9 @@ export function initChat({ go, hooks }) {
   if (canSpeak) { spk.hidden = false; spk.addEventListener('click', () => { speakOn = !speakOn; spk.setAttribute('aria-pressed', String(speakOn)); if (!speakOn) stopSpeaking(); }); }
 
   $('#ragInfo').innerHTML = `<ol>
-    <li><b>Collect:</b> my profile, projects, skills, journey and certificates are split into 47 small passages ("chunks"), each tagged with where it came from.</li>
+    <li><b>Collect:</b> my profile, projects, skills, journey and certificates are split into about 50 small passages ("chunks"), each tagged with where it came from.</li>
     <li><b>Embed:</b> each chunk was turned into a 768-number vector with Google's <code>gemini-embedding-001</code> model, once, and saved with the site (no work at start-up).</li>
-    <li><b>Retrieve:</b> your question is embedded the same way, then compared to every chunk with cosine similarity. The 4 closest chunks are kept.</li>
+    <li><b>Retrieve:</b> your question is embedded the same way, then compared to every chunk with cosine similarity. The 5 closest chunks are kept.</li>
     <li><b>Generate:</b> only those chunks go to Gemini Flash, with strict instructions to answer from them alone and to say so when the portfolio does not cover something.</li>
     <li><b>Cite:</b> the chips under each answer show which chunks were used; tap one to open that section.</li></ol>`;
 
