@@ -41,3 +41,9 @@
 - Avatar: added SittingIdle (Sit) and Jump, in place; 12 clips, 0.9 MB (meshopt).
 - Static building + street merged into one vertex-coloured mesh. Measured (lobby, Full, headless Intel UHD): 36 draw calls, 42k triangles. Building chunk 37.6 kB gz.
 - Removed scrapped modules: src/world/*, cinema.js, music.js, stage/index.js, stage/world.js, stage/freedrive.js.
+
+## 2026-11-22 (late night 2): "Player One: Faisal" (full reset)
+- Owner asked to scrap everything except content + avatar. New concept: level-select floating island with 6 levels; game-menu screens (Player, Quest Log, Game Library, Inventory, Trophy Room, Multiplayer); XP + achievements; Chotu on the fountain; chess side quest (2D board in the menu).
+- 30 CC0 models (Quaternius, Kenney, CreativeTrio, iPoly3D, Isa Lousberg, Alperen) via Poly Pizza, packed by scripts/pack-props.mjs into public/models/props.glb (476 kB, textures stripped, meshopt). Logged in asset_inspo/ASSET_LOG.md and credited on the site.
+- Static island + props baked into one vertex-coloured mesh at load. Measured (overview, Full, headless Intel UHD): 57 draw calls, ~84k triangles. Game chunk 34.6 kB gz; three.js 148 kB gz.
+- Removed the tower code (src/building).

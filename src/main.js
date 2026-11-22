@@ -1,6 +1,6 @@
 import './style.css';
 import './theme.css';
-import './building/tower.css';
+import './game/game.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
@@ -35,22 +35,14 @@ export function go(id) {
   if (OVERLAY.includes(id)) { $('#' + id).scrollTop = 0; play('open'); }
 }
 function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }); $('#home').hidden = true; }
-export function enterPageMode() { body.dataset.mode = 'page'; showAllForPage(); $('#chotu').hidden = false; $$('.floors,.act-prompt,.ctrl-help,.floor-banner,.icard').forEach((e) => { e.hidden = true; }); }
+export function enterPageMode() { body.dataset.mode = 'page'; const f = $('#contactForm'); if (f && !$('#contact').contains(f)) $('#contact').appendChild(f); showAllForPage(); $('#chotu').hidden = false; document.querySelectorAll('.p1hud,.p1dock,.p1scr,.p1tip,.ach-toast').forEach((e) => { e.hidden = true; }); }
 
 document.addEventListener('click', (e) => {
   const gm = e.target.closest('[data-game]'); if (gm) { launchGame(gm.dataset.game === 'chess' ? 'chess' : 'snakes', { stage, go, toast }); return; }
+  const lv = e.target.closest('[data-lv]'); if (lv && !lv.closest('.p1dock')) { if (stage && body.dataset.mode === '3d') { if (stage.phase === 'title') { $('#home').hidden = true; stage.startPlay().then(() => stage.goLevel(lv.dataset.lv)); } else stage.goLevel(lv.dataset.lv); } else go({ player: 'about', quests: 'journey', library: 'projects', inventory: 'skills', trophies: 'achievements', multiplayer: 'contact' }[lv.dataset.lv]); return; }
+  if (e.target.closest('[data-chotu]')) { hooks.openChat?.(); return; }
   const g = e.target.closest('[data-go]');
-  if (g) {
-    if (isGameActive()) exitGame();
-    const id = g.dataset.go;
-    if (stage && body.dataset.mode === '3d') {
-      if (id === 'contact') { stage.goSection('lobby'); go('contact'); return; }
-      if (OVERLAY.includes(id)) { go(id); return; }
-      if (id === 'home') return;
-      go('home'); $('#home').hidden = true; stage.goSection(id); return;
-    }
-    go(id); return;
-  }
+  if (g) { if (isGameActive()) exitGame(); go(g.dataset.go); return; }
   if (e.target.closest('[data-close]')) { go('home'); return; }
   const c = e.target.closest('[data-cert]'); if (c) openCert(c.dataset.cert);
 });
@@ -81,7 +73,7 @@ form.addEventListener('submit', async (ev) => {
   try {
     const r = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
     const j = await r.json().catch(() => ({}));
-    if (r.ok && j.ok) { msg.className = 'msg ok'; msg.textContent = 'Thank you. Your message was sent and I will reply by email.'; form.reset(); stage?.avatar.play('Victory'); play('win'); }
+    if (r.ok && j.ok) { msg.className = 'msg ok'; msg.textContent = 'Invite sent! Thank you, I will reply by email.'; form.reset(); stage?.avatar.play('Victory'); stage?.unlock?.('invite'); play('win'); }
     else { msg.className = 'msg err'; msg.textContent = j.error || 'Sorry, the message could not be sent. Please email me directly.'; if (j.fields) $$('[data-err]', form).forEach((s) => { s.textContent = j.fields[s.dataset.err] || ''; }); }
   } catch { msg.className = 'msg err'; msg.textContent = 'Network problem. Please try again, or email me directly.'; }
   finally { btn.disabled = false; btn.textContent = 'Send message'; }
@@ -116,12 +108,12 @@ async function boot3D() {
   body.dataset.tier = tier; body.dataset.mode = '3d';
   $('#home').hidden = false;
   try {
-    const { initTower } = await import('./building/index.js');
-    stage = await initTower({
-      canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar, toast: (h, ms) => toast(h, ms),
-      onSection: (id) => go(id), onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
-      onGame: (k) => launchGame(k, { stage, go, toast }),
-      onPlayStart: () => { $('#home').hidden = true; body.classList.add('in-world'); },
+    const { initGame } = await import('./game/index.js');
+    stage = await initGame({
+      canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar, toast: (h, ms) => toast(h, ms), playSfx: (n) => play(n),
+      onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
+      mountForm: (host) => { const f = $('#contactForm'); if (host && f) host.appendChild(f); },
+      onReady: () => { body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;
         if (why === 'context') { startBasic('the graphics driver stopped responding'); return; }
@@ -157,4 +149,4 @@ if (savedPreference()) { const once = () => { setSound(true); showSound(); remov
 const sheet = $('#menuSheet');
 $('#menuChip').addEventListener('click', () => { sheet.hidden = false; $('#sheetClose').focus(); });
 $('#sheetClose').addEventListener('click', () => { sheet.hidden = true; });
-sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier]')) sheet.hidden = true; });
+sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier],[data-lv],[data-chotu]')) sheet.hidden = true; });

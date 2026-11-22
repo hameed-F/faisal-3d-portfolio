@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2314202b'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='%23e8b25a' font-family='Georgia' font-weight='700'>F</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body data-tier="full" data-theme="dusk">
   <a class="skip" href="#content">Skip to content</a>
@@ -29,13 +29,13 @@
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <div class="sheet" id="menuSheet" role="dialog" aria-label="Menu" hidden>
     <div class="sheet-box">
-      <div class="sheet-head"><b>Go to a floor</b><button id="sheetClose" aria-label="Close menu">×</button></div>
+      <div class="sheet-head"><b>Levels</b><button id="sheetClose" aria-label="Close menu">×</button></div>
       <div class="sheet-grid">
-        <button data-go="about">1 · About</button><button data-go="journey">2 · Journey</button><button data-go="projects">3 · Projects</button><button data-go="skills">4 · Skills</button>
-        <button data-go="achievements">5 · Trophies</button><button data-go="roof">Roof</button><button data-go="lobby">Lobby</button><button data-go="contact">Contact</button>
+        <button data-lv="player">1 · Player</button><button data-lv="quests">2 · Quests</button><button data-lv="library">3 · Library</button><button data-lv="inventory">4 · Inventory</button>
+        <button data-lv="trophies">5 · Trophies</button><button data-lv="multiplayer">6 · Contact</button><button data-chotu>Ask Chotu</button><button data-go="credits">Credits</button>
       </div>
       <div class="sheet-head"><b>View</b></div>
-      <div class="sheet-grid three"><button id="readBtn">📄 Read as a page</button><button data-go="promo">▶ Promo video</button><button data-go="credits">Credits</button></div>
+      <div class="sheet-grid two"><button id="readBtn">📄 Read as a page</button><button data-lv="multiplayer">▶ Promo video</button></div>
       <div class="sheet-head"><b>Quality</b></div>
       <div class="sheet-grid three"><button data-tier="full">Full</button><button data-tier="lite">Lite</button><button data-tier="auto">Auto</button></div>
     </div>
@@ -44,11 +44,11 @@
   <!-- Landing -->
   <section class="title landing" id="home" aria-label="Start">
     <div class="title-inner">
-      <p class="eyebrow">Game developer · interactive 3D</p>
+      <p class="eyebrow">Player one</p>
       <h1>Muhammad<br />Faisal Hameed</h1>
-      <p class="lead" id="tagline"></p>
+      <p class="lead"><b>Game Developer</b> · Unreal Engine 5 · Unity · Three.js<br /><span id="tagline"></span></p>
       <div class="menu">
-        <button class="menu-btn primary" id="startBtn">Enter the tower</button>
+        <button class="menu-btn primary" id="startBtn">▶ Press Start</button>
         <button class="menu-btn" id="plainBtn">Read as a page</button>
       </div>
     </div>
@@ -78,7 +78,7 @@
   </div>
 
   <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true"><button id="lbClose" aria-label="Close">×</button><div id="lbBody"></div></div>
-  <div class="loader" id="loader" role="status"><div class="bar"><i id="loadBar"></i></div><p id="loadMsg">Building the tower…</p></div>
+  <div class="loader" id="loader" role="status"><div class="bar"><i id="loadBar"></i></div><p id="loadMsg">Loading the island…</p></div>
 
   <script type="module" src="/src/main.js"></script>
   <noscript><p style="padding:2rem;color:#fff">This portfolio needs JavaScript. Email: hameedfaisal24@gmail.com · GitHub: github.com/hameed-F</p></noscript>

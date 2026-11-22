@@ -1,42 +1,34 @@
 # PLAN — Muhammad Faisal Hameed · Interactive 3D Portfolio
 
-Status: **APPROVED by the owner (2026-11-22). Concept revised to "The Tower" on the owner's request (see §1).**
+Status: **APPROVED by the owner (2026-11-22). Concept reset to "Player One: Faisal" on the owner's request (see §1).**
 **Timeline: everything today. Nothing is cut up front, including Free Drive and voice chat.** §13 is now only an emergency order, used if something genuinely can't be finished. The owner is told before anything is dropped.
 Facts about the owner come only from `../source/`. Anything missing is listed in §12, never invented.
 
 ---
 
-## 1. Concept: "The Tower" (current, 2026-11-22 night)
+## 1. Concept: "PLAYER ONE: FAISAL" (current, 2026-11-22 night)
 
-> Replaces the earlier Game Night cabin, the open world and the film layer, all scrapped by the owner. Inspiration: Bob the Robber-style cutaway buildings and the owner's reference screenshot.
+> Full reset on the owner's request. Every earlier concept (Game Night cabin, open world, film layer, tower) is scrapped. Only the owner's content and avatar carry over.
 
-A 3D building with its front wall cut away, like a dollhouse. Each floor is one part of the portfolio. You click a room or an object and the avatar walks there himself, taking the lift between floors.
+The portfolio is a **game's level-select map**. One small floating island fits on screen like a diorama, and a winding path links **6 levels**. Tap a level (on the island, or in the level bar at the bottom): the avatar runs along the path, **jumps** onto the level pad, and a game-menu screen opens.
 
-1. **Landing:** a close-up of the avatar on the sidewalk, with his name and tagline. He waves. Two buttons: *Enter the tower* and *Read as a page*.
-2. **Entrance:** the camera pulls back, he walks to the building, jumps up the steps (Jump clip) and enters the lobby. The intro can be skipped with a tap.
-3. **Inside:** click anything to walk there (WASD also works). The floor buttons on the right take the lift. Phones use the same tap-to-walk, so there's no joystick to learn.
-4. **Small interactive props** in every room open a short, clean info card: a title, a meta line and 2 to 4 short lines, with buttons. Yellow diamonds mark things you haven't looked at yet. A tooltip names an object on hover, and **E** uses the nearest one.
-5. **Street life:** pedestrians, a cat, birds, a pastel city skyline, clouds, flower beds and street lamps.
+| # | Level | Landmark on the island | Screen (real HTML, game-styled) |
+|---|---|---|---|
+| 1 | Player | house, bench, flowers | Player card: name, title, tagline, base, guild (NED), CGPA, engines; stat tiles (12 projects, 6 certificates…); "four sides of me"; Download CV, GitHub |
+| 2 | Quest Log | castle gate, book on a pedestal | Main quest (BS CS, progress bar); active quests (Aerox ERP, Brave Believers); completed quests; tap to expand |
+| 3 | Game Library | townhouse, TV, computer, signpost | 12 projects as game covers with engine filters; tap → detail (image, stack, role, summary, what I did, links) |
+| 4 | Inventory | workbench, anvil, toolbox, windmill | Skills as item slots by group (tap → "used in"); **side quest: chess vs my AI** (3 levels) |
+| 5 | Trophy Room | pedestal with a spinning trophy | Certificates as unlocked achievements (scan + Verify link) |
+| 6 | Multiplayer | transmission tower, dish, mailbox | "Send an invite" contact form (Brevo), email/phone/GitHub, promo trailer slot |
 
-### Floors
-| Floor | Room | Interactive props → what happens |
-|---|---|---|
-| L | Lobby | **Chotu at the reception desk** → chatbot · **TV** → promo video · **red phone booth** (rings when you come near) → contact form · sofa → sits (Sit) |
-| 1 | About me | desk + laptop → sits, profile card + Download CV · bookshelf → "four sides of me" tiles · printer → CV card (Throw) · coffee machine → Think |
-| 2 | Journey | chalkboard → education card · timeline wall → 7 milestones · **Snakes & Ladders table** → play vs CPU (milestone squares open cards) |
-| 3 | Projects | **12 screens** with each project's image → project card (role, summary, contributions, links) · arcade cabinet → links to the 3 browser games · NPC gamer |
-| 4 | Skills | 5 pedestals with chess-piece statues (one per skill group) → skill card · **chess table** → play vs AI (3 levels) |
-| 5 | Trophies | 6 framed certificates → card with image + Verify / full size · trophy cup → Victory |
-| R | Roof | trampoline → jumps (Jump ×3) · bench → sits · boombox → Dance |
+**Game layer:** XP bar and player level (saved in the browser), Xbox-style achievement toasts (Press Start, First Steps, Explorer, Game Critic, Snake Whisperer, Party Up, Checkmate!, Paper Trail), a ✓ on each level in the bar once visited. **Chotu** sits on the fountain at the start of the path: tap him (or the button) to chat.
 
-### Avatar clips used (all 12)
-Idle, Walk (sped up for long walks), Wave (landing, arrival), Jump (entrance steps, trampoline), Sit (sofa, desk, bench), Point (screens, frames, boards), Talk (Chotu, phone), Think (coffee, chess AI turn), Throw (printer, arcade, dice), Victory (trophy, wins, ladders, contact sent), Disappointed (losing, snakes), Dance (boombox, standing idle for 20 s).
+**Avatar clips used (all 12):** Idle · Walk (sped up to run along the path) · Jump (landing on a pad) · Wave (title, Player) · Think (Quest Log, chess AI) · Point (Library, project detail) · Throw (Inventory) · Victory (Trophy Room, level-ups, invite sent, chess win) · Talk (Multiplayer) · Sit (idle 14 s on the map) · Disappointed (chess loss) · Dance (all 6 levels explored).
 
-### Dropped from earlier versions
-The film layer (chapter cards, narrator, jazz, Film mode), the open world (forest, hut, board worlds, project houses, minimap, exploration counter), the drivable car, Free Drive, the PS1 table version, and the Explore/Film/Read mode switch. Only the Read page remains as the alternative view.
+**Why it's different from the failed tries:** the whole world fits on one screen (no wandering, no walls, same taps on phone and laptop); information lives in readable game menus, not 3D signboards; real CC0 art (Quaternius, Kenney, etc.) instead of box-built props; one bright pastel style; the avatar is always the hero.
 
 ## 2. Art direction
-Bright, clean and friendly: warm daylight, pastel city, a red and yellow accent palette, flat-shaded low-poly models, a white UI with rounded cards, and the Chakra Petch + Inter fonts. No grain, no neon, no text walls.
+Pastel "toy diorama": blue-to-peach sky, soft sun with shadows (Full), flat-shaded CC0 low-poly props baked into one vertex-coloured mesh, a cream/ink game UI with chunky outlined buttons (Fredoka + Inter), coral / sunflower / teal accents. No grain, no neon, no dark scenes.
 
 ## 3. Avatar (Module 2)
 
@@ -218,11 +210,11 @@ Nothing is cut in advance. If today runs out, drop from the top of this list:
 
 | Module / item | How the concept delivers it | Still open |
 |---|---|---|
-| 1. 3D web portfolio (Home, About, Skills, Projects, Education & Experience, Contact; smooth transitions; responsive) | The Tower: landing = Home; floor 1 About; 2 Journey (education & experience); 3 Projects; 4 Skills; 5 Trophies (achievements); lobby phone = Contact. Avatar walks + lift transitions; Read page; Lite/Basic tiers; phone + laptop layouts | Content gaps below |
+| 1. 3D web portfolio (Home, About, Skills, Projects, Education & Experience, Contact; smooth transitions; responsive) | Level-select island: title = Home; 1 Player (About); 2 Quest Log (Education & experience); 3 Game Library (Projects); 4 Inventory (Skills); 5 Trophy Room (Achievements); 6 Multiplayer (Contact). Run/jump + camera transitions; Read page; Lite/Basic tiers; phone + laptop layouts | Content gaps below |
 | 2. Custom 3D avatar (Blender → GLB, animated) | **Done:** your avatar + all 12 Mixamo clips (incl. SittingIdle, Jump) in one 0.9 MB GLB; every clip used in the tower | — |
-| 3. Promo video (After Effects, 30–60 s, embedded) | Lobby TV opens the embedded player; one-line config (`PROMO_VIDEO_URL` in `src/content.js`) | **You** make the video and give the YouTube link |
-| 4. RAG chatbot + explanation | Chotu the snake at the lobby reception desk (and the floating button); chunk → embed → retrieve → grounded Gemini answer with citations; "How Chotu works" panel | Confirm current Gemini model names at build time |
-| 5. Email/contact (validation, spam protection, env vars, delivery evidence) | Ringing lobby phone booth / menu → form → `/api/contact` → Brevo; honeypot + rate limit | **You** verify the Brevo sender, set Vercel env vars, take the screenshot |
+| 3. Promo video (After Effects, 30–60 s, embedded) | Trailer slot in the Multiplayer level (plays the YouTube embed); one-line config (`PROMO_VIDEO_URL` in `src/content.js`) | **You** make the video and give the YouTube link |
+| 4. RAG chatbot + explanation | Chotu the snake on the fountain at the start of the path (and the floating button); chunk → embed → retrieve → grounded Gemini answer with citations; "How Chotu works" panel | Confirm current Gemini model names at build time |
+| 5. Email/contact (validation, spam protection, env vars, delivery evidence) | Multiplayer level "Send an invite" form → `/api/contact` → Brevo; honeypot + rate limit | **You** verify the Brevo sender, set Vercel env vars, take the screenshot |
 | 6. Deployment + documentation | Vercel from GitHub with preview branches; README, DEVLOG, credits | **You** connect the repo to Vercel |
 | Extra credit | Citations, filtering/search/sort, gestures, mouse-reactive 3D, accessibility, theme, analytics, multilingual (voice optional) | — |
 

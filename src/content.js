@@ -143,5 +143,184 @@ export const certificates = [
 ];
 
 export const credits = [
-  // Add every downloaded asset here AND in asset_inspo/ASSET_LOG.md (name, author, license, URL).
+ {
+  "name": "House",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/L7h0SjZX2K"
+ },
+ {
+  "name": "House",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/oJJIRwv6Bo"
+ },
+ {
+  "name": "Castle Gate",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/tKTchdiQzV"
+ },
+ {
+  "name": "Book",
+  "author": "Alperen",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/JjaLifEZON"
+ },
+ {
+  "name": "Television Vintage",
+  "author": "Kenney",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/aSmz6H8aeu"
+ },
+ {
+  "name": "Computer",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/emxvTSMKnt"
+ },
+ {
+  "name": "Workbench",
+  "author": "Kenney",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/pX3YnfKa6Q"
+ },
+ {
+  "name": "Workbench Anvil",
+  "author": "Kenney",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/bY1pp3kAAb"
+ },
+ {
+  "name": "Toolbox",
+  "author": "CreativeTrio",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/3ImQcIK0Gp"
+ },
+ {
+  "name": "Pedestal",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/wUeoDKnFBF"
+ },
+ {
+  "name": "Trophy",
+  "author": "CreativeTrio",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/fLy8KmmD1t"
+ },
+ {
+  "name": "Transmission Tower",
+  "author": "iPoly3D",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/Xfb0lAPvnh"
+ },
+ {
+  "name": "Satellite Dish",
+  "author": "Kenney",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/IDRrztoAMB"
+ },
+ {
+  "name": "Mailbox",
+  "author": "CreativeTrio",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/2olZ0G8iur"
+ },
+ {
+  "name": "Tree",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/9nvGuZlbpE"
+ },
+ {
+  "name": "Tree",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/i4QMw4L64D"
+ },
+ {
+  "name": "Autumn Tree",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/2lRubrT6Na"
+ },
+ {
+  "name": "Bush",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/ooG6CkLyE8"
+ },
+ {
+  "name": "Flowers",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/dOO6kMDd8L"
+ },
+ {
+  "name": "Rock",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/RtLRqYjfMs"
+ },
+ {
+  "name": "Rock",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/4MUaQTcDdc"
+ },
+ {
+  "name": "Fence",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/e02PFKKhbr"
+ },
+ {
+  "name": "Street Light",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/nFwrlcLvM5"
+ },
+ {
+  "name": "Signpost",
+  "author": "Kenney",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/3U2lj1gpeH"
+ },
+ {
+  "name": "Bench",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/jLxjFxFRpw"
+ },
+ {
+  "name": "Windmill",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/WUbU1Nct2W"
+ },
+ {
+  "name": "Fountain",
+  "author": "Isa Lousberg",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/WHc7dwttlk"
+ },
+ {
+  "name": "Bridge",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/Iw8iXLqVs5"
+ },
+ {
+  "name": "Cloud",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/KdFNOVn1Gf"
+ },
+ {
+  "name": "Sail Boat",
+  "author": "Quaternius",
+  "license": "CC0 1.0",
+  "url": "https://poly.pizza/m/BgSZXwmm7k"
+ }
 ];
