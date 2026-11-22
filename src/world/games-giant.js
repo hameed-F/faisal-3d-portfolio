@@ -112,7 +112,8 @@ export function snakesGiantView(api) {
       st.position.set(pos.x - 2.6, pos.y - 3.6, pos.z - 1.2); st.lookAt(pos.x - 2.6, pos.y, pos.z + 10); b.group.parent.add(st); signs.push(st);
       api.avatar.play('Victory'); api.sfx?.('ladder');
       await tween(0.7, (k) => { st.position.y = pos.y - 3.6 + easeOut(k) * 3.6; });
-      api.gameFollow = { position: pos.clone().add(new THREE.Vector3(-2.4, 1.5, -2)) }; await sleep(3600); api.gameFollow = actor.you;
+      api.gameFollow = { position: pos.clone().add(new THREE.Vector3(-2.4, 1.5, -2)) }; await sleep(900);
+      await api.playCards?.([{ k: `${j.when} · ${j.where}`, t: j.title }, { t: j.text }], 'Journey'); api.gameFollow = actor.you;
     },
     dispose() { signs.forEach((s) => s.parent?.remove(s)); dice.parent?.remove(dice); api.chotuBusy = false; api.avatar.group.position.copy(savedAvatar.pos); api.avatar.group.rotation.y = savedAvatar.rot; api.avatar.setBase('Idle'); },
   };

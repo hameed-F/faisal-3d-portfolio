@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2314202b'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='%23e8b25a' font-family='Georgia' font-weight='700'>F</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body data-tier="full" data-theme="dusk">
   <a class="skip" href="#content">Skip to content</a>
@@ -30,6 +30,7 @@
       <button class="chip" data-go="contact">Contact</button>
     </nav>
     <button class="chip menu-chip" id="menuChip" aria-haspopup="dialog" aria-label="Open menu">☰ Menu</button>
+    <div class="modes" id="modes" role="group" aria-label="Mode"><button data-mode="explore" aria-pressed="true">🎮 Explore</button><button data-mode="film" aria-pressed="false">🎬 Film</button><button data-mode="read" aria-pressed="false">📄 Read</button></div>
     <div class="chips right">
       <button class="chip" id="tierChip" aria-haspopup="dialog">Quality: <b id="tierLabel">Full</b></button>
       <button class="chip" id="themeChip" aria-label="Toggle day and dusk theme">◐</button>
@@ -45,6 +46,8 @@
         <button data-go="about">About</button><button data-go="skills">Skills</button><button data-go="projects">Projects</button><button data-go="journey">Journey</button>
         <button data-go="achievements">Trophies</button><button data-go="promo">Promo</button><button data-go="contact">Contact</button><button data-go="credits">Credits</button>
       </div>
+      <div class="sheet-head"><b>Mode</b></div>
+      <div class="sheet-grid three"><button data-mode="explore">🎮 Explore</button><button data-mode="film">🎬 Film tour</button><button data-mode="read">📄 Read</button></div>
       <div class="sheet-head"><b>Settings</b></div>
       <div class="sheet-grid three"><button data-tier="full">Full quality</button><button data-tier="lite">Lite</button><button data-tier="basic">Text only</button></div>
       <div class="sheet-grid two"><button id="sheetTheme">Day / dusk</button><button id="sheetSound">Sound on / off</button></div>
@@ -59,6 +62,7 @@
       <p class="lead" id="tagline"></p>
       <ul class="menu" id="titleMenu">
         <li><button class="menu-btn primary" id="startBtn">Play</button></li>
+        <li><button class="menu-btn" id="filmBtn">Watch the film</button></li>
         <li><button class="menu-btn" id="plainBtn">Read as a page</button></li>
         <li><button class="menu-btn" id="creditsBtn">Credits</button></li>
       </ul>

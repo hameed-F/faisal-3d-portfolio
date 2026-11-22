@@ -25,6 +25,7 @@ export function initChat({ go, hooks }) {
 
   const bubble = (who, html) => { const d = document.createElement('div'); d.className = `b ${who}`; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; };
   const open = () => {
+    hooks.stage?.spawnChotu?.();
     chat.hidden = false; input.focus();
     if (!log.children.length) bubble('bot', "Hiss-llo! I'm <b>Chotu</b>. Ask me anything about Faisal's projects, skills, studies or experience. I only answer from his portfolio.");
     hooks.stage?.chotu.setMode('listening'); play('chotu');

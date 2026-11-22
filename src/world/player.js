@@ -3,7 +3,7 @@ import { blocked } from './areas.js';
 
 // Third-person controller: the avatar walks/runs where you steer, the camera orbits behind.
 // Desktop: WASD/arrows, Shift = run, drag = look, wheel = zoom.  Phone: left thumb joystick, drag right side to look.
-export function createPlayer({ avatar, camera, colliders: getCols, bounds: getBounds = () => null, dom }) {
+export function createPlayer({ avatar, camera, colliders: getCols, bounds: getBounds = () => null, dom, onBump }) {
   const cols = () => (typeof getCols === 'function' ? getCols() : getCols);
   const body = avatar.group; const keys = new Set();
   const st = { runLock: false, yaw: Math.PI, pitch: 0.32, dist: 7.5, targetDist: 7.5, speed: 0, enabled: false, run: false, moving: false, lockCam: false };
@@ -55,6 +55,7 @@ export function createPlayer({ avatar, camera, colliders: getCols, bounds: getBo
       else if (!blocked(cc, nx, body.position.z, 0.35)) body.position.x = nx; // slide along walls
       else if (!blocked(cc, body.position.x, nz, 0.35)) body.position.z = nz;
       else if (blocked(cc, body.position.x, body.position.z, 0.35)) { body.position.x = nx; body.position.z = nz; } // already overlapping: let the player walk out
+      else { onBump?.(st.speed); st.speed *= 0.3; }
     }
     // animation: Walk clip in place, sped up for running
     const moving = st.speed > 0.4;

@@ -8,22 +8,36 @@ import { loadAvatar } from '../stage/avatar.js';
 import { buildChotu } from '../stage/chotu.js';
 import { psxUniforms } from '../stage/psx.js';
 import { TIERS, FpsGovernor } from '../quality.js';
-import { projects } from '../content.js';
+import { projects, aboutZones, skills, journey, certificates, profile } from '../content.js';
+import { chapter, cards, subtitle, letterbox, pick, isPlaying, stopAll } from '../cinema.js';
+import { setMood, swell } from '../music.js';
+import { ROAD } from './areas.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Red convertible sports car: low, wide, no roof, so you can see who's driving.
 function buildCar() {
   const car = new THREE.Group();
-  const paint = mat('#8a3e2c'); const dark = mat('#1d1d1f'); const chrome = mat('#c9c2b2'); const glass = mat('#2a3a44');
-  car.add(box(1.8, 0.62, 4.1, paint, 0, 0.62, 0), box(1.6, 0.55, 2.2, paint, 0, 1.2, -0.25), box(1.64, 0.42, 2.02, glass, 0, 1.22, -0.25));
-  car.add(box(1.84, 0.18, 0.2, chrome, 0, 0.42, 2.06), box(1.84, 0.18, 0.2, chrome, 0, 0.42, -2.06), box(1.5, 0.1, 1.2, dark, 0, 1.53, -0.25));
-  const lampM = new THREE.MeshBasicMaterial({ color: '#fff2c4' }); const tailM = new THREE.MeshBasicMaterial({ color: '#c42a1a' });
-  car.add(box(0.36, 0.18, 0.06, lampM, -0.6, 0.72, 2.07), box(0.36, 0.18, 0.06, lampM, 0.6, 0.72, 2.07), box(0.3, 0.14, 0.06, tailM, -0.65, 0.72, -2.07), box(0.3, 0.14, 0.06, tailM, 0.65, 0.72, -2.07));
-  const wGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.28, 10); wGeo.rotateZ(Math.PI / 2);
-  const wheels = [[-0.88, 1.35], [0.88, 1.35], [-0.88, -1.35], [0.88, -1.35]].map(([x, z]) => { const w = new THREE.Mesh(wGeo, dark); w.position.set(x, 0.36, z); car.add(w); return w; });
-  const head = new THREE.SpotLight('#ffe2a8', 0, 30, 0.5, 0.6, 1.2); head.position.set(0, 0.8, 1.9); head.target.position.set(0, 0, 12); car.add(head, head.target);
-  shadowy(car); return { car, wheels, head };
+  const paint = mat('#d21f1a'); const dark = mat('#1d1d1f'); const chrome = mat('#d9d4c8'); const seat = mat('#f1e3c4'); const glass = new THREE.MeshLambertMaterial({ color: '#9fc4d6', transparent: true, opacity: 0.45 });
+  car.add(box(1.95, 0.5, 4.3, paint, 0, 0.5, 0));                       // body
+  car.add(box(1.9, 0.18, 1.5, paint, 0, 0.82, 1.35));                  // bonnet
+  car.add(box(1.9, 0.22, 1.1, paint, 0, 0.84, -1.55));                 // boot
+  car.add(box(0.12, 0.3, 1.6, paint, -0.92, 0.88, -0.1), box(0.12, 0.3, 1.6, paint, 0.92, 0.88, -0.1)); // doors
+  car.add(box(1.7, 0.08, 1.4, dark, 0, 0.73, -0.15));                  // cabin floor
+  car.add(box(0.6, 0.5, 0.15, seat, -0.42, 0.98, -0.55), box(0.6, 0.5, 0.15, seat, 0.42, 0.98, -0.55)); // seat backs
+  const ws = box(1.7, 0.42, 0.05, glass, 0, 1.12, 0.55); ws.rotation.x = -0.45; car.add(ws);           // windscreen
+  car.add(box(1.74, 0.05, 0.06, chrome, 0, 1.31, 0.47));
+  const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.025, 6, 14), dark); wheel.position.set(-0.42, 1.05, 0.25); wheel.rotation.x = -1.0; car.add(wheel);
+  car.add(box(1.98, 0.14, 0.18, chrome, 0, 0.36, 2.18), box(1.98, 0.14, 0.18, chrome, 0, 0.36, -2.18));
+  const lampM = new THREE.MeshBasicMaterial({ color: '#fff2c4' }); const tailM = new THREE.MeshBasicMaterial({ color: '#ff2a1a' });
+  for (const x of [-0.65, 0.65]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.06, 10), lampM); l.rotation.x = Math.PI / 2; l.position.set(x, 0.66, 2.16); car.add(l); car.add(box(0.36, 0.1, 0.05, tailM, x, 0.68, -2.16)); }
+  car.add(box(0.8, 0.06, 0.06, mat('#f6d32d'), 0, 0.9, -2.08)); // racing stripe tail
+  car.add(box(0.28, 0.02, 4.0, mat('#ffffff'), 0, 0.76, 0.1));   // racing stripe
+  const wGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.32, 12); wGeo.rotateZ(Math.PI / 2);
+  const wheels = [[-0.95, 1.4], [0.95, 1.4], [-0.95, -1.4], [0.95, -1.4]].map(([x, z]) => { const w = new THREE.Mesh(wGeo, dark); w.position.set(x, 0.4, z); car.add(w); const hub = box(0.34, 0.16, 0.16, chrome); hub.position.set(x * 1.02, 0.4, z); car.add(hub); return w; });
+  const head = new THREE.SpotLight('#ffe2a8', 0, 30, 0.5, 0.6, 1.2); head.position.set(0, 0.7, 2.0); head.target.position.set(0, 0, 12); car.add(head, head.target);
+  shadowy(car); return { car, wheels, head, seat: new THREE.Vector3(-0.42, -0.12, -0.3) };
 }
 
 export async function initWorld({ canvas, tierName, onProgress, onSection, onCert, onChotu, onSlow, onPlayStart, onGame, toast, reducedMotion }) {
@@ -51,24 +65,29 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
   // ---------------- area state ----------------
   let cur = A.outdoor; let fading = false; const state = { mode: 'title', section: 'home' };
   Object.values(A).forEach((a) => { a.group.visible = a === cur; });
-  const player = createPlayer({ avatar, camera, colliders: () => cur.colliders, bounds: () => cur.bounds, dom: canvas });
+  let lastBump = 0;
+  const player = createPlayer({ avatar, camera, colliders: () => cur.colliders, bounds: () => cur.bounds, dom: canvas, onBump: (speed) => { const n = performance.now(); if (speed > 3.5 && n - lastBump > 9000) { lastBump = n; avatar.play('Disappointed'); subtitle(pick('crash'), 2800); api.sfx?.('lose'); } } });
   const car = createCar({ car: C.car, wheels: C.wheels, headlight: C.head, camera, colliders: A.outdoor.colliders, onSpeed: (v) => api.onSpeed?.(v) });
   const fader = document.createElement('div'); fader.className = 'fader'; document.body.appendChild(fader);
-  async function setArea(id, spawn) {
+  async function setArea(id, spawn, opts = {}) {
     if (fading) return; fading = true; player.enable(false);
     fader.classList.add('on'); await sleep(reducedMotion ? 10 : 380);
     cur.group.visible = false; cur = A[id]; cur.group.visible = true;
-    const sp = spawn || cur.spawn; player.teleport(sp.pos.clone(), sp.yaw); chotuPos.copy(sp.pos).add(V(1.4, 0, 1.4));
+    const sp = spawn || cur.spawn; player.teleport(sp.pos.clone(), sp.yaw); if (state.mode === 'cine' || state.mode === 'film') state.mode = 'walk'; chotuPos.copy(sp.pos).add(V(1.4, 0, 1.4));
     player.st.targetDist = cur.bounds ? 4.6 : 7.5; player.st.dist = player.st.targetDist; player.st.pitch = cur.bounds ? 0.42 : 0.32; player.followCamera(0, true);
-    explore.enterArea(id);
+    explore.enterArea(id); setMood(MOODS[id] || 'road');
+    if (CHAPTERS[id] && !opts.noCard) { fader.classList.remove('on'); await chapter(...CHAPTERS[id]); }
     await sleep(60); fader.classList.remove('on'); fading = false;
     if (state.mode === 'walk' && !panelIsOpen()) player.enable(true);
     api.sfx?.('open');
   }
   const panelIsOpen = () => state.section !== 'home';
+  const CHAPTERS = { outdoor: [1, 'The Road', 'a boy, a car, a forest'], hut: [2, 'The Hut', 'where every game is a CV'], projects: [3, 'The Houses', 'twelve things he built'], journey: [4, 'The Ladders', 'up, down, and up again'], about: [5, 'The Garden', 'who is this person?'], skills: [6, 'The Plaza', 'every piece is a skill'], trophy: [7, 'The Trophies', 'paper proof'] };
+  const MOODS = { outdoor: 'road', hut: 'hut', projects: 'board', journey: 'board', about: 'film', skills: 'board', trophy: 'film', house: 'hut' };
 
   // ---------------- exploration HUD ----------------
   const explore = createExplore({
+    onDiscover: () => { if (state.mode === 'walk') { avatar.play('Victory'); subtitle(pick('discover'), 2600); } },
     getPlayer: () => (state.mode === 'car' ? { x: C.car.position.x, z: C.car.position.z, rot: C.car.rotation.y } : { x: avatar.group.position.x, z: avatar.group.position.z, rot: avatar.group.rotation.y }),
     getCar: () => C.car.position, getArea: () => cur.id, hut: HUT, onTravel: (id) => travel(id), sfx: (n) => api.sfx?.(n), toast,
   });
@@ -104,13 +123,14 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
       case 'promo': onSection?.('promo', { fromWorld: true }); break;
       case 'phone': A.hut.phone.ringing = false; phoneAnswered = performance.now(); explore.discover('phone'); avatar.play('Talk'); onSection?.('contact', { fromWorld: true }); break;
       case 'exitBoard': setArea('hut', { pos: V(OFFS.hut, 0, 2.4), yaw: Math.PI }); break;
-      case 'house': { const p = projects.find((x) => x.id === i.id); A.house.dress(p); lastHouse = i.id; await setArea('house'); break; }
+      case 'house': { const p = projects.find((x) => x.id === i.id); A.house.dress(p); lastHouse = i.id; await setArea('house'); await playCards(projectCards(p), p.name); break; }
       case 'exitHouse': { const h = A.projects.houses[lastHouse]; setArea('projects', h ? { pos: h.front.clone(), yaw: h.yaw } : null); break; }
       case 'link': if (A.house.link) window.open(A.house.link, '_blank', 'noopener'); break;
       case 'playSnakes': onGame?.('snakes'); break;
       case 'playChess': onGame?.('chess'); break;
-      case 'aboutPlaque': case 'skillPlaque': inspect(i.plaque); break;
-      case 'cert': onCert?.(i.id); break;
+      case 'aboutPlaque': await playCards(aboutCards(i.id), 'About me'); break;
+      case 'skillPlaque': await playCards(skillCards(i.id), 'Skills'); break;
+      case 'cert': { const c = certificates.find((x) => x.id === i.id); await playCards([{ img: c.image.replace('/certs/', '/certs/thumb/'), k: c.issuer, t: c.title }, ...(c.date ? [{ k: 'Dated', t: c.date }] : []), ...(c.verify ? [{ k: 'Verify online', t: 'coursera.org/verify' }] : [])], 'Trophy Hall'); break; }
       case 'chotu': onChotu?.(); break;
       default: break;
     }
@@ -137,8 +157,57 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
   }
   function endInspect() { state.mode = 'walk'; inspectFrom = null; avatar.group.visible = true; chotu.group.visible = true; player.enable(true); showWalkUI(true); prompt.dataset.key = ''; }
 
-  function enterCar() { state.mode = 'car'; player.enable(false); avatar.group.visible = false; carCol.off = true; car.enter(); explore.discover('car'); showWalkUI(false); explore.show(true); api.sfx?.('open'); }
-  function exitCar() { const p = car.exit(); state.mode = 'walk'; avatar.group.visible = true; carCol.off = false; player.teleport(p, C.car.rotation.y); player.enable(true); showWalkUI(true); }
+  async function enterCar() {
+    state.mode = 'keys'; player.enable(false); showWalkUI(false);
+    const d = C.car.position.clone().sub(avatar.group.position); avatar.group.rotation.y = Math.atan2(d.x, d.z); avatar.play('Throw'); api.sfx?.('click'); // toss the keys
+    await sleep(reducedMotion ? 50 : 1400);
+    state.mode = 'car'; carCol.off = true; car.enter(); explore.discover('car'); explore.show(true); api.sfx?.('open'); avatar.setBase('Idle'); subtitle(pick('car'));
+  }
+  function exitCar() { const p = car.exit(); state.mode = 'walk'; carCol.off = false; player.teleport(p, C.car.rotation.y); player.enable(true); showWalkUI(true); }
+
+  let chotuSpawned = false; let chotuEntering = false;
+  async function spawnChotu() {
+    if (chotuSpawned) return; chotuSpawned = true; chotuEntering = true; chotu.group.visible = true;
+    const fwd = V(0, 0, -1).applyQuaternion(camera.quaternion); const right = V(1, 0, 0).applyQuaternion(camera.quaternion);
+    const base = camera.position.clone().addScaledVector(fwd, 2.4).add(V(0, -0.9, 0)); const t0 = performance.now(); const dur = reducedMotion ? 10 : 1700;
+    chotu.group.scale.setScalar(3.2); subtitle(pick('chotu'), 3200); api.sfx?.('chotu'); chotu.setMode('thinking');
+    await new Promise((res) => { const step = () => { const k = Math.min(1, (performance.now() - t0) / dur); const p = base.clone().addScaledVector(right, (k - 0.5) * 6); p.y += Math.sin(k * Math.PI) * 0.4; chotu.group.position.copy(p); chotu.group.rotation.y = Math.atan2(-right.z, right.x); if (k < 1) requestAnimationFrame(step); else res(); }; step(); });
+    chotu.group.scale.setScalar(2.2); chotuPos.copy(avatar.group.position).add(V(1.4, 0, 1.4)); chotuEntering = false; chotu.setMode('idle');
+  }
+  // info as kinetic title cards (Think while it starts, Talk while it plays)
+  async function playCards(list, label) {
+    if (!list.length) return; const was = state.mode; state.mode = 'cards'; player.enable(false); showWalkUI(false); prompt.hidden = true;
+    avatar.play('Think'); setTimeout(() => avatar.setBase('Talk'), 1200);
+    await cards(list, { label }); avatar.setBase('Idle');
+    state.mode = was === 'cards' ? 'walk' : was; if (state.mode === 'walk') { player.enable(true); showWalkUI(true); }
+  }
+  const phrases = (text) => text.split(/(?<=[.;:])\s+/).flatMap((s) => (s.length > 90 ? s.split(/,\s+/) : [s])).map((s) => s.trim()).filter(Boolean);
+  function aboutCards(id) {
+    if (id === 'profile') return [{ k: profile.location, t: profile.name }, { k: 'Role', t: profile.title }, { k: 'Motto', t: profile.tagline }, { k: 'Studying', t: 'BS Computer Science (Gaming & Animation), NED University · CGPA 3.605/4.00' }, { k: 'Looking for', t: profile.availability }];
+    const z = aboutZones.find((x) => x.id === id); return z ? [{ k: 'About me', t: z.title }, ...phrases(z.text).map((t) => ({ t }))] : [];
+  }
+  function skillCards(piece) { const g = skills.find((x) => x.piece === piece); return g ? [{ k: 'Skill group', t: g.group }, ...g.items.map(([n, d]) => ({ k: 'shown in ' + d, t: n }))] : []; }
+  function projectCards(p) { return [{ img: p.image, k: `${p.stack}${p.year ? ' · ' + p.year : ''}`, t: p.name }, { k: 'Role', t: p.role }, ...phrases(p.summary).map((t) => ({ t })), ...(p.points || []).map((x) => ({ k: 'What I did', t: x.split(':')[0] })), ...(p.links.length ? [{ k: 'Links', t: 'Walk to the arcade cabinet to open ' + p.links.map((l) => l[0].toLowerCase()).join(' / ') }] : [])]; }
+
+  // ---------- menu navigation = a cinematic drive in the convertible ----------
+  let driveN = 0;
+  async function driveTo(target) {
+    if (state.mode === 'cine' || fading) return; const quick = driveN++ > 0;
+    state.mode = 'cine'; player.enable(false); showWalkUI(false); prompt.hidden = true; letterbox(true); setMood('road');
+    if (cur.id !== 'outdoor') { fader.classList.add('on'); await sleep(350); cur.group.visible = false; cur = A.outdoor; cur.group.visible = true; fader.classList.remove('on'); }
+    carCol.off = true; avatar.setBase('Idle'); subtitle(pick('car'), 3500);
+    const dur = reducedMotion ? 300 : quick ? 4200 : 6500; const t0 = performance.now(); let skipped = false;
+    const skip = document.querySelector('.cine-skip'); skip.hidden = false; skip.onclick = () => { skipped = true; };
+    const shots = [(p, f) => p.clone().add(V(f.z * 5, 1.2, -f.x * 5)).addScaledVector(f, 2), (p, f) => p.clone().addScaledVector(f, 9).add(V(0, 1.6, 0)), (p, f) => p.clone().addScaledVector(f, -7).add(V(0, 5.5, 0)), (p, f) => p.clone().add(V(-f.z * 3.4, 0.7, f.x * 3.4)).addScaledVector(f, -1)];
+    await new Promise((res) => { const step = () => { const k = skipped ? 1 : Math.min(1, (performance.now() - t0) / dur); const e = k < 0.85 ? k : 0.85 + (1 - Math.pow(1 - (k - 0.85) / 0.15, 2)) * 0.15; const tt = Math.min(0.999, e);
+      const p = ROAD.getPointAt(tt); const f = ROAD.getTangentAt(tt); C.car.position.copy(p); C.car.rotation.y = Math.atan2(f.x, f.z); C.wheels.forEach((w) => { w.rotation.x += 0.5; });
+      const shot = shots[Math.floor(k * (quick ? 3 : 4)) % shots.length]; camera.position.copy(shot(p, f)); camera.lookAt(p.x, 1.0, p.z); // jump cuts between angles
+      if (k < 1) requestAnimationFrame(step); else res(); }; step(); });
+    skip.hidden = true; C.car.position.set(HUT.x + 4.5, 0, HUT.z + 9); C.car.rotation.y = Math.PI * 0.9; carCol.x = C.car.position.x; carCol.z = C.car.position.z; carCol.off = false;
+    letterbox(false); state.mode = 'walk';
+    await setArea(target === 'outdoor' ? 'outdoor' : target, target === 'outdoor' ? { pos: V(HUT.x, 0, HUT.z + 7.4), yaw: 0 } : undefined);
+    if (state.mode === 'walk') { player.enable(true); showWalkUI(true); avatar.play('Wave'); }
+  }
 
   // landing: avatar next to the car, camera in front
   player.teleport(A.outdoor.spawn.pos.clone(), 0); avatar.group.rotation.y = 0.3;
@@ -149,14 +218,14 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
     avatar.play('Wave'); await sleep(reducedMotion ? 100 : 2300);
     state.mode = 'walk'; player.st.yaw = avatar.group.rotation.y; player.followCamera(0.016); player.enable(true); showWalkUI(true);
     help.hidden = false; setTimeout(() => { help.hidden = true; }, 9000);
-    toast?.('<b>Head to the hut</b> · walk, or take the car (E). The map in the corner shows the way.', 6500);
+    subtitle(pick('start'), 4200); setTimeout(() => toast?.('<b>Head to the hut</b> · walk, or take the car (E). The map in the corner shows the way.', 6000), 4300);
   }
   function teleportTo(id) {
-    const map = { about: 'about', skills: 'skills', projects: 'projects', journey: 'journey', achievements: 'trophy', contact: 'hut', promo: 'hut' };
+    const map = { about: 'about', skills: 'skills', projects: 'projects', journey: 'journey', achievements: 'trophy', hut: 'hut', outdoor: 'outdoor' };
     const target = map[id]; if (!target) return;
     if (state.mode === 'title' || state.mode === 'intro') { state.mode = 'walk'; onPlayStart?.(); }
     if (state.mode === 'car') exitCar();
-    if (cur.id !== target) setArea(target); explore.discover(target);
+    if (cur.id !== target) driveTo(target); explore.discover(target);
   }
 
   // ---------------- games ----------------
@@ -191,7 +260,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
   // ---------------- frame loop ----------------
   const governor = new FpsGovernor({ threshold: tier.name === 'Lite' ? 22 : 40, onSlow: (fps) => { if (pr > minPr + 0.01) { pr = Math.max(minPr, pr - 0.25); resize(); governor.reset(); return; } onSlow?.(fps, tier); } });
   canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); onSlow?.(0, tier, 'context'); });
-  const clock = new THREE.Clock(); let running = true; let last = 0; const chotuPos = V(2.2, 0, 48); const tmp = V(0, 0, 0); let ringT = 0;
+  const clock = new THREE.Clock(); let running = true; let last = 0; const chotuPos = V(2.2, 0, 48); const tmp = V(0, 0, 0); let ringT = 0; let idleT = 0; let dancing = false; let lastPointed = null; let lastPointT = 0;
   function frame(now) {
     if (!running) return; requestAnimationFrame(frame);
     if (now - last < 1000 / tier.maxFps - 1) return; last = now;
@@ -204,6 +273,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
       if (state.mode === 'intro') { const p = avatar.group.position; camera.lookAt(p.x, 1.3, p.z); }
       else if (state.mode === 'walk') player.update(dt);
       else if (state.mode === 'car') car.update(dt);
+      else if (state.mode === 'cine') { /* driven by driveTo */ }
       else if (state.mode === 'inspect' && inspectFrom) { inspectFrom.t = Math.min(1, inspectFrom.t + dt / 0.8); const k = 1 - Math.pow(1 - inspectFrom.t, 3); camera.position.lerpVectors(inspectFrom.pos, inspectFrom.to, k); const q0 = inspectFrom.q.clone(); camera.lookAt(inspectFrom.look); const q1 = camera.quaternion.clone(); camera.quaternion.copy(q0).slerp(q1, k); }
       else if (state.mode === 'game' && gameCam) {
         camFrom.t = Math.min(1, camFrom.t + dt / (reducedMotion ? 0.01 : 1.0)); const k = 1 - Math.pow(1 - camFrom.t, 3);
@@ -212,7 +282,9 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
       }
     }
     // Chotu follows you but never goes through walls, boards or trees
-    if (!api.chotuBusy) {
+    if (!chotuSpawned) chotu.group.visible = false;
+    else if (chotuEntering) { /* animated by spawnChotu */ }
+    else if (!api.chotuBusy) {
       const target = state.mode === 'car' ? C.car.position : avatar.group.position;
       tmp.copy(target).add(V(Math.sin(avatar.group.rotation.y + 2.4) * 1.6, 0, Math.cos(avatar.group.rotation.y + 2.4) * 1.6));
       if (state.mode !== 'title') {
@@ -222,7 +294,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
       }
       const onBoard = ['journey', 'about', 'skills'].includes(cur.id) && Math.abs(chotuPos.x - OFFS[cur.id]) < 11 && Math.abs(chotuPos.z) < 11;
       chotu.group.position.set(chotuPos.x, onBoard ? 0.33 : 0.05, chotuPos.z);
-      const look = target.clone().sub(chotuPos); chotu.group.rotation.y = Math.atan2(-look.z, look.x); chotu.group.visible = state.mode !== 'car' && state.mode !== 'inspect';
+      const look = target.clone().sub(chotuPos); chotu.group.rotation.y = Math.atan2(-look.z, look.x); chotu.group.visible = state.mode !== 'inspect';
     }
     if (!carCol.off) { carCol.x = C.car.position.x; carCol.z = C.car.position.z; }
     // the avatar stands on top of the giant boards
@@ -236,6 +308,13 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
       if (key !== prompt.dataset.key) { prompt.dataset.key = key; near = best; if (state.mode === 'car') { prompt.hidden = false; prompt.innerHTML = '<kbd>E</kbd> Get out of the car'; } else if (best) { prompt.hidden = false; prompt.innerHTML = `<kbd>E</kbd> ${PROMPTS[best.kind](best)}`; } else prompt.hidden = true; }
     } else if (state.mode !== 'inspect' && !prompt.hidden) { prompt.hidden = true; prompt.dataset.key = ''; }
     explore.update(dt, t, state.mode === 'walk' ? near : null, state.mode);
+    // idle for 10 s -> he dances (and the band plays louder)
+    if (state.mode === 'walk' && player.st.speed < 0.05 && !panelIsOpen()) { idleT += dt; if (idleT > 10 && !dancing) { dancing = true; avatar.setBase('Dance'); swell(true); subtitle(pick('dance'), 3200); } }
+    else { idleT = 0; if (dancing) { dancing = false; swell(false); if (state.mode === 'walk' && !player.st.moving) avatar.setBase('Idle'); } }
+    // point at things you can interact with (once per thing, not too often)
+    if (state.mode === 'walk' && near && near.kind !== 'chotu' && near !== lastPointed && performance.now() - lastPointT > 6000 && player.st.speed < 0.3) { lastPointed = near; lastPointT = performance.now(); avatar.group.rotation.y = Math.atan2(near.pos.x - ap.x, near.pos.z - ap.z); avatar.play('Point'); }
+    // the avatar rides in the car's seat
+    if (state.mode === 'car' || state.mode === 'cine') { const s = C.seat.clone(); C.car.localToWorld(s); ap.copy(s); avatar.group.rotation.y = C.car.rotation.y; }
     if (renderer.shadowMap.enabled) { W.sun.position.set(ap.x - 30, 26, ap.z + 22); W.sun.target.position.set(ap.x, 0, ap.z); }
     W.sky.position.copy(camera.position);
     avatar.update(dt, tier.avatarHz); chotu.update(dt, t);
@@ -246,7 +325,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
   requestAnimationFrame(frame);
 
   const api = {
-    startPlay, teleportTo, focusGame, endGame, setArea, setGameClick: (f) => { gameClick = f; },
+    startPlay, teleportTo, driveTo, spawnChotu, playCards, focusGame, endGame, setArea, get chotuSpawned() { return chotuSpawned; }, setGameClick: (f) => { gameClick = f; },
     focusSection: (id, opts = {}) => { state.section = id; if (!opts.fromWorld) teleportTo(id); if (state.mode === 'walk') { player.enable(false); runBtn.hidden = true; joyHint.hidden = true; } explore.show(false); },
     closePanel: () => { state.section = 'home'; if (state.mode === 'walk') { player.enable(true); showWalkUI(true); } },
     skipIntro: () => startPlay(),

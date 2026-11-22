@@ -13,7 +13,7 @@ const PLACES = [
 const AREA_NAMES = { outdoor: 'The Forest', hut: 'The Hut', projects: 'Project Street', journey: 'Snakes & Ladders', about: 'Ludo Garden', skills: 'Chess Plaza', trophy: 'Trophy Hall', house: 'Project House' };
 const AREA_SUB = { outdoor: 'Find the hut', hut: 'Click a board on the table to jump in', projects: 'Every house is one project', journey: 'Roll the giant dice to play', about: 'Read the plaques', skills: 'Statues = skill groups', trophy: 'Certificates on the walls', house: 'Read the walls · arcade = link' };
 
-export function createExplore({ getPlayer, getCar, getArea, hut, onTravel, sfx, toast }) {
+export function createExplore({ getPlayer, getCar, getArea, hut, onTravel, sfx, toast, onDiscover }) {
   let found = new Set(); try { found = new Set(JSON.parse(localStorage.getItem('explored2') || '[]')); } catch { /* private mode */ }
   const save = () => { try { localStorage.setItem('explored2', JSON.stringify([...found])); } catch { /* ignore */ } };
 
@@ -61,7 +61,7 @@ export function createExplore({ getPlayer, getCar, getArea, hut, onTravel, sfx, 
     ctx.fillStyle = '#fff'; ctx.font = '600 12px sans-serif'; ctx.fillText(`${Math.round(dist)} m to the hut`, c, s - 12);
   }
   function discover(id) {
-    if (found.has(id)) return false; found.add(id); save(); refresh(); sfx?.('ladder');
+    if (found.has(id)) return false; found.add(id); save(); refresh(); sfx?.('ladder'); onDiscover?.(id);
     const pl = PLACES.find((q) => q.id === id); if (pl) toast?.(`<b>Discovered: ${pl.name}</b> · ${found.size}/${PLACES.length} explored${found.size === PLACES.length ? '<br>🎉 You explored everything!' : ''}`, 4200);
     return true;
   }

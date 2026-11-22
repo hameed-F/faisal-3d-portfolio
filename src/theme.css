@@ -190,3 +190,34 @@ form.contact input:focus,form.contact textarea:focus{border-color:var(--amber);o
 .minimap[hidden]{display:none}
 .fader{position:fixed;inset:0;z-index:65;background:#06090c;opacity:0;pointer-events:none;transition:opacity .35s ease}
 .fader.on{opacity:1}
+
+/* ===== the film layer (Godard palette) ===== */
+.cine{position:fixed;inset:0;z-index:60;pointer-events:none}
+.cine-bar{position:absolute;left:0;right:0;height:0;background:#000;transition:height .5s ease}
+.cine-bar.top{top:0}.cine-bar.bot{bottom:0}
+.cine.lb .cine-bar{height:11vh}
+.cine-card{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;text-align:center;gap:.6rem;padding:2rem;background:var(--bg);color:var(--fg);pointer-events:auto;cursor:pointer}
+.cine-card[hidden]{display:none}
+.cine-card.out{opacity:0;transition:opacity .3s}
+.cine-card small{font:700 clamp(.8rem,2vw,1rem) var(--display);letter-spacing:.35em;text-transform:uppercase;opacity:.85}
+.cine-card b{font:700 clamp(2.2rem,8vw,6.2rem) 'Anton','Chakra Petch',Impact,sans-serif;line-height:.95;text-transform:uppercase;max-width:14ch;letter-spacing:.01em}
+.cine-card i{font:italic 400 clamp(1rem,2.6vw,1.4rem) Georgia,serif;opacity:.9;max-width:36ch}
+.cine-card.chap b{animation:jump .9s steps(3) 1}
+@keyframes jump{0%{transform:translateX(-6vw) scale(1.08)}50%{transform:translateX(3vw)}100%{transform:none}}
+.cine-card.kin{background:var(--bg)}
+.cine-card.kin b{font-size:clamp(1.6rem,5.4vw,4rem);max-width:20ch;text-transform:none}
+.cine-card.kin.in b{animation:punch .45s cubic-bezier(.2,1.6,.4,1) 1}
+@keyframes punch{from{transform:scale(1.25);opacity:0;letter-spacing:.1em}to{transform:none;opacity:1}}
+.cine-card.kin img{max-width:min(520px,80vw);max-height:32vh;border:6px solid var(--fg);box-shadow:12px 12px 0 rgba(0,0,0,.35);margin-bottom:.4rem;object-fit:cover}
+.cine-card em{position:absolute;bottom:calc(1.2rem + var(--safe-b));font:400 .8rem var(--body);opacity:.6;font-style:normal;letter-spacing:.1em}
+.kin-label{position:absolute;top:calc(1.2rem + env(safe-area-inset-top,0px));left:1.2rem;font:700 .75rem var(--display);letter-spacing:.25em;text-transform:uppercase;opacity:.8}
+.cine-sub{position:absolute;left:50%;bottom:calc(13vh + var(--safe-b));transform:translateX(-50%);max-width:min(760px,92vw);text-align:center;font:italic 500 clamp(1rem,2.4vw,1.35rem) Georgia,serif;color:#f6d32d;text-shadow:0 2px 0 #000,0 0 18px rgba(0,0,0,.8);animation:rise .3s ease}
+.cine-sub[hidden]{display:none}.cine-sub.out{opacity:0;transition:opacity .4s}
+.cine-skip{position:absolute;right:1rem;top:calc(1rem + env(safe-area-inset-top,0px));z-index:2;background:#111;color:#f6d32d;border:2px solid #f6d32d;border-radius:0;padding:.45rem .9rem;font:700 .85rem var(--display);letter-spacing:.12em;pointer-events:auto}
+.cine-skip[hidden]{display:none}
+/* mode switch */
+.modes{display:inline-flex;border:1px solid rgba(255,255,255,.2);border-radius:8px;overflow:hidden}
+.modes button{background:rgba(14,20,27,.72);color:#eef1f4;border:0;padding:.38rem .6rem;font:600 .78rem var(--display);letter-spacing:.04em}
+.modes button[aria-pressed="true"]{background:#e2231a;color:#fff}
+@media (max-width:1180px){ #quickmenu{display:none} .menu-chip{display:inline-block} .hud{justify-content:space-between} }
+@media (max-width:860px){ .modes{display:none} }

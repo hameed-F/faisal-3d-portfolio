@@ -26,3 +26,12 @@
 - Board worlds: Project Street (12 houses; each house interior shows the project poster, info and contributions on the walls; arcade cabinet opens the link), Snakes & Ladders (milestone signs rise out of the squares; Victory on ladders, Disappointed on snakes, slide along snake bodies), Ludo garden (about-me plaques, E to read up close), Chess plaza (skill statues + plaques, play vs AI), Trophy hall (framed certificates with captions). Old telephone in the hut rings when you come near and opens the contact form.
 - Bugs fixed: car only spun (it collided with its own hit-box; now skipped while driving) → test drove 8 m in 2.5 s; phone movement (canvas lacked touch-action:none so the browser ate drags) → touch test moved 8 m. Chotu and the avatar now respect walls, boards, trees; indoors the camera pulls closer instead of clipping.
 - Measured (hut, Full): 31 draw calls, 32.6k triangles.
+
+## 2026-11-22 (night): "FAISAL: a film in 7 chapters"
+- Godard-style film layer: chapter title cards (red/blue/yellow), letterbox during cut-scenes, narrator subtitles (spoken when sound is on), kinetic info cards replace reading plaques/walls.
+- Procedural jazz (drums, walking bass, e-piano) via Web Audio, mood per chapter; no audio files.
+- Red convertible (no roof, avatar visible in the seat); menu navigation = cinematic drive along the road with jump cuts (skippable).
+- Chotu hidden until the first tap, then slithers across the camera.
+- Modes: Explore / Film (hands-free tour of all chapters) / Read.
+- Animations: Throw (car keys, dice), Victory (discover, ladders), Point (near interactables), Disappointed (crash, snakes), Dance (idle 10 s, music swells), Think+Talk (info cards), Wave (arrival), Walk/Idle.
+- Measured (house interior, Full): 33 draw calls, 33k triangles. Normalized repo line endings to LF (.gitattributes).

@@ -165,6 +165,8 @@ async function boot3D() {
 
 $('#chotu').hidden = false;
 initChat({ go, hooks });
+import('./cinema.js').then(({ setNarrationVoice }) => setNarrationVoice(() => soundOn()));
+import('./music.js').then(({ music }) => music(true));
 $('#startBtn').addEventListener('click', () => { $('#home').hidden = true; stage?.startPlay(); });
 $('#creditsBtn').addEventListener('click', () => { go('credits'); });
 if (tier === 'basic') startBasic(det.reasons[0]); else boot3D();
@@ -185,3 +187,17 @@ $('#sheetClose').addEventListener('click', () => { sheet.hidden = true; });
 sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier]')) sheet.hidden = true; });
 $('#sheetTheme').addEventListener('click', () => { $('#themeChip').click(); });
 $('#sheetSound').addEventListener('click', () => { soundChip.click(); });
+
+// ---------- modes: Explore / Film / Read ----------
+import('./world/tour.js').then(({ playTour, stopTour, tourRunning }) => {
+  const setPressed = (m) => document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  async function setMode(m) {
+    if (m === 'read') { if (tourRunning()) stopTour(); enterPageMode(); window.scrollTo(0, 0); setPressed('read'); return; }
+    if (body.dataset.mode === 'page') { location.hash = ''; location.reload(); return; }
+    if (!stage) return;
+    if (m === 'film') { if (tourRunning()) return; setPressed('film'); $('#home').hidden = true; go('home'); if (stage.phase === 'title') { introDone = true; body.classList.add('in-world'); } stage.player.enable(false); await playTour(stage, { onEnd: () => { setPressed('explore'); if (stage.phase === 'walk' || stage.phase === 'title') { stage.skipIntro?.(); stage.player.enable(true); } } }); }
+    else { if (tourRunning()) stopTour(); setPressed('explore'); if (stage.phase === 'title') { $('#home').hidden = true; stage.startPlay(); } }
+  }
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) { $('#menuSheet').hidden = true; setMode(b.dataset.mode); } });
+  $('#filmBtn').addEventListener('click', () => setMode('film'));
+});

@@ -63,7 +63,10 @@ export function stopEngine() { if (engine) { engine.g.gain.setTargetAtTime(0, ct
 export function setEnabled(on) {
   enabled = on; try { localStorage.setItem('sound', on ? '1' : '0'); } catch { /* ignore */ }
   if (on) { ensure(); ctx.resume(); startAmbience(); sfx.open(); } else if (ctx) { stopAmbience(); stopEngine(); }
+  onToggle.forEach((f) => f(on));
 }
 export const isEnabled = () => enabled;
+export const onToggle = [];
 export function play(name) { if (enabled && ctx && sfx[name]) sfx[name](); }
 export function savedPreference() { try { return localStorage.getItem('sound') === '1'; } catch { return false; } }
+export function audioCtx() { if (!enabled) return null; ensure(); return { ctx, master }; }
