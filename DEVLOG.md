@@ -47,3 +47,9 @@
 - 30 CC0 models (Quaternius, Kenney, CreativeTrio, iPoly3D, Isa Lousberg, Alperen) via Poly Pizza, packed by scripts/pack-props.mjs into public/models/props.glb (476 kB, textures stripped, meshopt). Logged in asset_inspo/ASSET_LOG.md and credited on the site.
 - Static island + props baked into one vertex-coloured mesh at load. Measured (overview, Full, headless Intel UHD): 57 draw calls, ~84k triangles. Game chunk 34.6 kB gz; three.js 148 kB gz.
 - Removed the tower code (src/building).
+
+## 2026-11-22 (night 3): "Faisal's Portfolio Run"
+- Owner rejected the island; asked for a Mario-like platformer. Built an original retro side-scroller (src/run/): 6 zones, </> code blocks → cards, bugs to stomp, commits, trophies (certificates), chess arcade, mailbox (contact), TV (promo), SHIP IT rocket → course clear. Chotu reimagined as a hovering TV robot. Retro loading + title screens, HUD, stage select, phone D-pad.
+- Explained to the owner that Nintendo's actual Mario look/characters can't be copied; the game is genre-inspired and original.
+- Measured (Full, headless Intel UHD): 36 draw calls, ~59k triangles. Run chunk 35 kB gz; all art procedural (no model downloads). Removed the island version and props.glb.
+- Waiting on the owner's documentary-edit image (attachment did not reach this session).

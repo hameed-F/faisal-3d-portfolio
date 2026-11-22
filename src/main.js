@@ -1,6 +1,6 @@
 import './style.css';
 import './theme.css';
-import './game/game.css';
+import './run/run.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
@@ -35,11 +35,11 @@ export function go(id) {
   if (OVERLAY.includes(id)) { $('#' + id).scrollTop = 0; play('open'); }
 }
 function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }); $('#home').hidden = true; }
-export function enterPageMode() { body.dataset.mode = 'page'; const f = $('#contactForm'); if (f && !$('#contact').contains(f)) $('#contact').appendChild(f); showAllForPage(); $('#chotu').hidden = false; document.querySelectorAll('.p1hud,.p1dock,.p1scr,.p1tip,.ach-toast').forEach((e) => { e.hidden = true; }); }
+export function enterPageMode() { body.dataset.mode = 'page'; const f = $('#contactForm'); if (f && !$('#contact').contains(f)) $('#contact').appendChild(f); showAllForPage(); $('#chotu').hidden = false; document.querySelectorAll('.rhud,.rpad,.rprompt,.rcard,.rach,.rfin').forEach((e) => { e.hidden = true; }); }
 
 document.addEventListener('click', (e) => {
   const gm = e.target.closest('[data-game]'); if (gm) { launchGame(gm.dataset.game === 'chess' ? 'chess' : 'snakes', { stage, go, toast }); return; }
-  const lv = e.target.closest('[data-lv]'); if (lv && !lv.closest('.p1dock')) { if (stage && body.dataset.mode === '3d') { if (stage.phase === 'title') { $('#home').hidden = true; stage.startPlay().then(() => stage.goLevel(lv.dataset.lv)); } else stage.goLevel(lv.dataset.lv); } else go({ player: 'about', quests: 'journey', library: 'projects', inventory: 'skills', trophies: 'achievements', multiplayer: 'contact' }[lv.dataset.lv]); return; }
+  const zn = e.target.closest('[data-zone]'); if (zn) { const i = +zn.dataset.zone; if (stage && body.dataset.mode === '3d') { $('#home').hidden = true; go('home'); stage.warp(i); } else go(['about', 'journey', 'projects', 'skills', 'achievements', 'contact'][i]); return; }
   if (e.target.closest('[data-chotu]')) { hooks.openChat?.(); return; }
   const g = e.target.closest('[data-go]');
   if (g) { if (isGameActive()) exitGame(); go(g.dataset.go); return; }
@@ -108,11 +108,11 @@ async function boot3D() {
   body.dataset.tier = tier; body.dataset.mode = '3d';
   $('#home').hidden = false;
   try {
-    const { initGame } = await import('./game/index.js');
-    stage = await initGame({
+    const { initRun } = await import('./run/index.js');
+    stage = await initRun({
       canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar, toast: (h, ms) => toast(h, ms), playSfx: (n) => play(n),
       onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
-      mountForm: (host) => { const f = $('#contactForm'); if (host && f) host.appendChild(f); },
+      onContact: () => go('contact'), onPromo: () => go('promo'), onChess: () => launchGame('chess', { stage, go, toast }),
       onReady: () => { body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;
@@ -122,7 +122,7 @@ async function boot3D() {
       },
     });
     hooks.stage = stage; stage.sfx = play;
-    loadBar(1, 'Ready'); setTimeout(() => $('#loader').classList.add('done'), 250);
+    loadBar(1, 'READY'); setTimeout(() => $('#loader').classList.add('done'), Math.max(300, 1600 - performance.now()));
     if (det.reasons.length && tier === 'lite' && !det.manual) toast(`<b>Lite mode</b> is on (${det.reasons[0]}). <button data-tier="full">Switch to Full</button>`, 7000);
   } catch (err) { console.error(err); startBasic('the 3D scene could not start'); }
 }
@@ -149,4 +149,4 @@ if (savedPreference()) { const once = () => { setSound(true); showSound(); remov
 const sheet = $('#menuSheet');
 $('#menuChip').addEventListener('click', () => { sheet.hidden = false; $('#sheetClose').focus(); });
 $('#sheetClose').addEventListener('click', () => { sheet.hidden = true; });
-sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier],[data-lv],[data-chotu]')) sheet.hidden = true; });
+sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier],[data-zone],[data-chotu]')) sheet.hidden = true; });

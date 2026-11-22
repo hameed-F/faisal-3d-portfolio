@@ -6,29 +6,23 @@ Facts about the owner come only from `../source/`. Anything missing is listed in
 
 ---
 
-## 1. Concept: "PLAYER ONE: FAISAL" (current, 2026-11-22 night)
+## 1. Concept: "FAISAL'S PORTFOLIO RUN" (current, 2026-11-22 night)
 
-> Full reset on the owner's request. Every earlier concept (Game Night cabin, open world, film layer, tower) is scrapped. Only the owner's content and avatar carry over.
+> Owner asked for a classic side-scrolling platformer. It is an **original** retro platformer in that genre (no Nintendo characters, art, blocks, pipes or levels are copied). Every earlier concept is scrapped.
 
-The portfolio is a **game's level-select map**. One small floating island fits on screen like a diorama, and a winding path links **6 levels**. Tap a level (on the island, or in the level bar at the bottom): the avatar runs along the path, **jumps** onto the level pad, and a game-menu screen opens.
-
-| # | Level | Landmark on the island | Screen (real HTML, game-styled) |
-|---|---|---|---|
-| 1 | Player | house, bench, flowers | Player card: name, title, tagline, base, guild (NED), CGPA, engines; stat tiles (12 projects, 6 certificates…); "four sides of me"; Download CV, GitHub |
-| 2 | Quest Log | castle gate, book on a pedestal | Main quest (BS CS, progress bar); active quests (Aerox ERP, Brave Believers); completed quests; tap to expand |
-| 3 | Game Library | townhouse, TV, computer, signpost | 12 projects as game covers with engine filters; tap → detail (image, stack, role, summary, what I did, links) |
-| 4 | Inventory | workbench, anvil, toolbox, windmill | Skills as item slots by group (tap → "used in"); **side quest: chess vs my AI** (3 levels) |
-| 5 | Trophy Room | pedestal with a spinning trophy | Certificates as unlocked achievements (scan + Verify link) |
-| 6 | Multiplayer | transmission tower, dish, mailbox | "Send an invite" contact form (Brevo), email/phone/GitHub, promo trailer slot |
-
-**Game layer:** XP bar and player level (saved in the browser), Xbox-style achievement toasts (Press Start, First Steps, Explorer, Game Critic, Snake Whisperer, Party Up, Checkmate!, Paper Trail), a ✓ on each level in the bar once visited. **Chotu** sits on the fountain at the start of the path: tap him (or the button) to chat.
-
-**Avatar clips used (all 12):** Idle · Walk (sped up to run along the path) · Jump (landing on a pad) · Wave (title, Player) · Think (Quest Log, chess AI) · Point (Library, project detail) · Throw (Inventory) · Victory (Trophy Room, level-ups, invite sent, chess win) · Talk (Multiplayer) · Sit (idle 14 s on the map) · Disappointed (chess loss) · Dance (all 6 levels explored).
-
-**Why it's different from the failed tries:** the whole world fits on one screen (no wandering, no walls, same taps on phone and laptop); information lives in readable game menus, not 3D signboards; real CC0 art (Quaternius, Kenney, etc.) instead of box-built props; one bright pastel style; the avatar is always the hero.
+One long level with 6 zones: **About me → Journey → Projects → Skills → Trophies → Contact**. The avatar is the player (run, jump, head-butt blocks).
+- **`</>` code blocks**: hit from below → a retro dialog card pops out (profile, about, CV, education, each journey step, 12 projects with image + links, 5 skill groups).
+- **Journey** is a staircase: each step is a milestone.
+- **Bugs** 🐞 patrol: stomp = "BUG FIXED +100"; touching one = knockback + Disappointed (no deaths).
+- **Commits** (gems) to collect; **trophies** = the 6 certificates (collect → card with Verify).
+- **Side quest**: arcade cabinet → chess vs my AI (3 levels). **Mailbox** → contact form. **TV** → promo video. **SHIP IT rocket** at the end → launch, COURSE CLEAR screen (score, blocks, trophies, bugs, time) with Send invite / Promo / CV / Play again.
+- **Chotu** reimagined as a hovering TV-head robot that follows the player (pixel face, "..." when thinking); tap it or the 🤖 button to chat.
+- **Retro loading screen** ("STAGE 1-1", lives ×∞, block progress bar) and **title screen** (logo, PRESS START, READ AS A PAGE).
+- HUD: SCORE · COMMITS · ZONE · TIME. Stage select in the menu (recruiter shortcut). Achievements toasts. Phone: D-pad + A button + USE.
+- Avatar clips: Idle, Walk (speed-scaled), Jump, Point (cards), Victory (skills, trophies, ship), Disappointed (bug hit), Think (chess), Throw (mailbox), Talk (Chotu), Wave (start), Dance (idle 9 s), Sit (idle 18 s).
 
 ## 2. Art direction
-Pastel "toy diorama": blue-to-peach sky, soft sun with shadows (Full), flat-shaded CC0 low-poly props baked into one vertex-coloured mesh, a cream/ink game UI with chunky outlined buttons (Fredoka + Inter), coral / sunflower / teal accents. No grain, no neon, no dark scenes.
+Bright retro: sky blue, pixel-art 16×16 textures (grass, dirt, stone, gold code blocks) with crisp nearest filtering, low-poly hills, trees, bushes and flowers in a 2.5D diorama, chunky "Press Start 2P" pixel font for UI headings with Inter for readable body text, navy dialog boxes with white pixel borders. All art is generated in code (no downloads).
 
 ## 3. Avatar (Module 2)
 
