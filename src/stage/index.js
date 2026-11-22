@@ -114,7 +114,18 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
   }
   function skipIntro() { if (state.phase === 'drive' || state.phase === 'arrive' || state.phase === 'enter' || state.phase === 'title') toHub(true); }
 
+  function focusGame(key) {
+    if (state.phase !== 'hub' && state.phase !== 'game') toHub(true);
+    state.phase = 'game'; state.section = 'game'; panelOpen = false;
+    const p = worldPos(world.boards[key]); const port = portrait();
+    const back = key === 'skills' ? 0.36 : 0.4; const up = key === 'skills' ? 0.5 : 0.62;
+    moveTo(p.clone().add(V(0, up * (port ? 1.5 : 1), back * (port ? 1.15 : 1))), p.clone().add(V(0, 0, port ? 0.02 : 0.06)), 1.0, port ? 60 : 50);
+    const w = innerWidth; const h = innerHeight; camera.setViewOffset(w, h, 0, (port ? 150 : 70), w, h);
+    if (hovered) { hovered.scale.setScalar(hovered.userData.baseScale || 1); hovered = null; canvas.style.cursor = 'default'; }
+  }
+  function endGame() { gameClick = null; state.phase = 'hub'; state.section = 'home'; panelOpen = false; applyViewOffset(); const [p, t, f] = hubShot(); moveTo(p, t, 1.0, f); }
   function focusSection(id) {
+    if (state.phase === 'game') return;
     if (state.phase !== 'hub') toHub(true);
     state.section = id; panelOpen = id !== 'home';
     if (id === 'home') { const [p, t, f] = hubShot(); moveTo(p, t, 1.0, f); applyViewOffset(); return; }
@@ -151,10 +162,17 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
       canvas.style.cursor = hovered ? 'pointer' : 'default';
     }
   }
-  let downAt = null;
+  let downAt = null; let gameClick = null;
   canvas.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; });
   canvas.addEventListener('pointerup', (e) => {
     if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 8) return;
+    if (state.phase === 'game') {
+      if (!gameClick) return;
+      const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      for (const b of Object.values(world.boards)) { const hit = ray.intersectObject(b, true)[0]; if (hit) { gameClick({ board: b, local: b.worldToLocal(hit.point.clone()) }); break; } }
+      return;
+    }
     if (state.phase !== 'hub') { if (state.phase !== 'title') skipIntro(); return; }
     const h = pick(e); if (!h) return;
     if (h.chotu) { onChotu?.(); return; }
@@ -223,7 +241,8 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
   addEventListener('keydown', (e) => { if (['drive', 'arrive', 'enter'].includes(state.phase) && !e.repeat) skipIntro(); });
 
   return {
-    startDrive, skipIntro, toHub, focusSection, setTier,
+    startDrive, skipIntro, toHub, focusSection, setTier, focusGame, endGame,
+    setGameClick: (f) => { gameClick = f; }, sfx: null,
     setTheme: (t) => world.setTheme(t),
     closePanel: () => { panelOpen = false; state.section = 'home'; applyViewOffset(); if (state.phase === 'hub') { const [p, t, f] = hubShot(); moveTo(p, t, 1.0, f); } },
     avatar, chotu, world, scene, camera, psx, get phase() { return state.phase; }, get fps() { return governor.fps; },

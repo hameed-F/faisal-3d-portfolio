@@ -186,3 +186,22 @@ form.contact textarea{min-height:130px;resize:vertical}
 .hudbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .hudbar select,.hudbar button{font:inherit;padding:.4rem .7rem;border:2px solid #22160d;border-radius:10px;background:#fff8e8;color:#22160d;font-weight:600}
 .hudbar button.go{background:#22160d;color:#f3ead8}
+
+/* Game HUD */
+.gamehud{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(.8rem + var(--safe-b));z-index:30;width:min(640px,calc(100vw - 1rem));background:rgba(243,234,216,.96);color:#22160d;border:2px solid #22160d;border-radius:14px;padding:.6rem .8rem;box-shadow:0 12px 40px rgba(0,0,0,.45),5px 5px 0 rgba(0,0,0,.25);display:grid;gap:.45rem}
+.gamehud[hidden]{display:none}
+.gh-top{display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap}
+.gh-title{font-family:var(--display);font-weight:400;font-size:1.05rem;color:#5a2f19}
+.gh-status{font-size:.9rem;flex:1;min-width:12rem}
+.gh-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.gh-extra{margin-right:auto;font-size:.85rem}
+.gh-btn{font:inherit;font-weight:600;padding:.45rem .8rem;border:2px solid #22160d;border-radius:10px;background:#fff8e8;color:#22160d}
+.gh-btn.go{background:#22160d;color:#f3ead8}
+.gh-btn:disabled{opacity:.55;cursor:wait}
+.gh-level select{font:inherit;padding:.3rem .5rem;border:2px solid #22160d;border-radius:8px;background:#fff8e8;color:#22160d}
+.gh-key{display:inline-flex;gap:.35rem;align-items:center}
+.dot{display:inline-block;width:.8rem;height:.8rem;border-radius:50%;border:2px solid #22160d}.dot.you{background:#2f6f8f}.dot.cpu{background:#c8553d}
+.gh-board:empty{display:none}
+.gh-canvas{width:min(360px,100%);aspect-ratio:1;display:block;margin:0 auto;border:2px solid #22160d;border-radius:8px;touch-action:manipulation}
+body[data-tier="basic"] .gamehud,body[data-mode="page"] .gamehud{top:4rem;bottom:auto;max-height:calc(100vh - 5rem);overflow:auto}
+body.in-game #chotu{display:none}

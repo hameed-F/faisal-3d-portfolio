@@ -47,13 +47,13 @@ export function chessTex(size) {
   const [c, g] = canvas(size); const m = size * 0.06; const s = (size - 2 * m) / 8;
   g.fillStyle = BOARD_EDGE; g.fillRect(0, 0, size, size);
   g.fillStyle = '#8a5a34'; g.fillRect(m * 0.4, m * 0.4, size - m * 0.8, size - m * 0.8);
-  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) { g.fillStyle = (x + y) % 2 ? '#5a3418' : '#e6cf9f'; g.fillRect(m + x * s, m + y * s, s, s); }
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) { g.fillStyle = (x + y) % 2 ? '#4a2a12' : '#c79a62'; g.fillRect(m + x * s, m + y * s, s, s); }
   return tex(c);
 }
 
 // Snakes & Ladders: 10x10, boustrophedon numbering from bottom-left
-export const SNAKES = { 17: 7, 54: 34, 62: 19, 64: 60, 87: 36, 93: 73, 95: 75, 98: 79 };
-export const LADDERS = { 1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 51: 67, 72: 91, 80: 99 };
+import { SNAKES, LADDERS } from '../games/snakes.js';
+export { SNAKES, LADDERS };
 export function cellXY(n, size, m) { // returns centre of square n (1..100) in canvas px
   const s = (size - 2 * m) / 10; const i = n - 1; const row = Math.floor(i / 10); let col = i % 10; if (row % 2) col = 9 - col;
   return [m + col * s + s / 2, size - m - row * s - s / 2, s];

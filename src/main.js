@@ -2,6 +2,7 @@ import './style.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
+import { launchGame, isGameActive, exitGame } from './games/launch.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -42,7 +43,8 @@ export function go(id) {
 function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }); $('#home').hidden = true; }
 
 document.addEventListener('click', (e) => {
-  const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }
+  const gm = e.target.closest('[data-game]'); if (gm) { launchGame(gm.dataset.game === 'chess' ? 'chess' : 'snakes', { stage, go, toast }); return; }
+  const g = e.target.closest('[data-go]'); if (g) { if (isGameActive()) exitGame(); go(g.dataset.go); return; }
   if (e.target.closest('[data-close]')) { go('home'); return; }
   const c = e.target.closest('[data-cert]'); if (c) openCert(c.dataset.cert);
 });
