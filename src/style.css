@@ -221,3 +221,9 @@ body.in-game #chotu{display:none}
 @media (pointer:fine){.dh-pad,.dh-pedals{display:none}}
 @media (pointer:coarse){.dh-help{display:none}}
 body.in-world .title{display:none}
+
+.chat-head .ic{background:none;border:0;color:#c9bfa9;padding:0 .2rem;display:grid;place-items:center}
+.chat-head .ic[aria-pressed="true"]{color:#e8b25a}
+.chat-form .ic{background:#fff8e8!important;color:#22160d!important;border:2px solid #22160d!important;display:grid;place-items:center;padding:0 .55rem!important}
+.chat-form .ic.on{background:#c8553d!important;color:#fff!important;animation:pulse2 1s infinite}
+@keyframes pulse2{50%{opacity:.6}}

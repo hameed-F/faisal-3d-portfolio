@@ -1,3 +1,4 @@
+import { play } from '../audio.js';
 // Starts a game in 3D (on the cabin table) or, without WebGL, as a 2D board in the HUD.
 let active = null;
 export function isGameActive() { return !!active; }
@@ -13,7 +14,7 @@ export async function launchGame(kind, { stage, go, toast }) {
     let view;
     if (stage) { const { snakes3DView } = await import('../stage/games3d.js'); stage.focusGame('journey'); view = snakes3DView(stage); }
     else { const { snakesTex } = await import('../stage/textures.js'); view = snakes2DView(snakesTex(360, [1, 21, 28, 51, 72, 80, 100]).image); }
-    active = createSnakes({ view, toast, onExit: done, onEnd: (won) => stage?.avatar.play(won ? 'Victory' : 'Disappointed') });
+    active = createSnakes({ view, toast, onExit: done, onEnd: (won) => { play(won ? 'win' : 'lose'); stage?.avatar.play(won ? 'Victory' : 'Disappointed'); } });
   } else if (kind === 'chess') {
     const { createChess, chess2DView } = await import('./chess.js');
     let view;
@@ -22,7 +23,7 @@ export async function launchGame(kind, { stage, go, toast }) {
     active = createChess({
       view, onExit: done,
       onThink: (on) => { if (on) stage?.avatar.play('Think'); else stage?.avatar.play('Idle'); },
-      onEnd: (won, level) => { if (won === true) stage?.avatar.play(level === 'hard' ? 'Dance' : 'Victory'); else if (won === false) stage?.avatar.play('Disappointed'); },
+      onEnd: (won, level) => { if (won !== null) play(won ? 'win' : 'lose'); if (won === true) stage?.avatar.play(level === 'hard' ? 'Dance' : 'Victory'); else if (won === false) stage?.avatar.play('Disappointed'); },
     });
   }
 }

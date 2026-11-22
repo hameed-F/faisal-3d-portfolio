@@ -1,10 +1,20 @@
 // Chotu chat panel (works in 3D, Lite and the text-only page).
+import { canListen, canSpeak, listen, speak, stopSpeaking } from './voice.js';
+import { play } from './audio.js';
 const $ = (s) => document.querySelector(s);
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function initChat({ go, hooks }) {
   const chat = $('#chat'); const log = $('#chatLog'); const form = $('#chatForm'); const input = $('#chatInput');
-  const history = []; let busy = false;
+  const history = []; let busy = false; let speakOn = false; let rec = null;
+  const mic = $('#micBtn'); const spk = $('#speakBtn');
+  if (canListen) { mic.hidden = false; mic.addEventListener('click', () => {
+    if (rec) { rec.stop(); return; }
+    stopSpeaking(); mic.classList.add('on'); input.placeholder = 'Listening… speak now';
+    rec = listen({ onResult: (t) => { input.value = t; }, onError: (err) => { input.placeholder = err === 'not-allowed' ? 'Microphone permission was blocked.' : 'Could not hear you. Try again.'; },
+      onEnd: (finalText) => { rec = null; mic.classList.remove('on'); input.placeholder = 'Ask about projects, skills, experience…'; if (finalText.trim()) { speakOn = speakOn || canSpeak; spk.setAttribute('aria-pressed', String(speakOn)); form.requestSubmit(); } } });
+  }); }
+  if (canSpeak) { spk.hidden = false; spk.addEventListener('click', () => { speakOn = !speakOn; spk.setAttribute('aria-pressed', String(speakOn)); if (!speakOn) stopSpeaking(); }); }
 
   $('#ragInfo').innerHTML = `<ol>
     <li><b>Collect:</b> my profile, projects, skills, journey and certificates are split into 47 small passages ("chunks"), each tagged with where it came from.</li>
@@ -17,9 +27,9 @@ export function initChat({ go, hooks }) {
   const open = () => {
     chat.hidden = false; input.focus();
     if (!log.children.length) bubble('bot', "Hiss-llo! I'm <b>Chotu</b>. Ask me anything about Faisal's projects, skills, studies or experience. I only answer from his portfolio.");
-    hooks.stage?.chotu.setMode('listening');
+    hooks.stage?.chotu.setMode('listening'); play('chotu');
   };
-  const close = () => { chat.hidden = true; hooks.stage?.chotu.setMode('idle'); };
+  const close = () => { chat.hidden = true; stopSpeaking(); hooks.stage?.chotu.setMode('idle'); };
   hooks.openChat = open;
   $('#chotuBtn').addEventListener('click', () => (chat.hidden ? open() : close()));
   $('#chatClose').addEventListener('click', close);
@@ -27,7 +37,7 @@ export function initChat({ go, hooks }) {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault(); const q = input.value.trim(); if (!q || busy) return;
-    busy = true; input.value = ''; bubble('me', esc(q));
+    busy = true; input.value = ''; bubble('me', esc(q)); play('send');
     const wait = bubble('bot', '<i>Chotu is thinking…</i>');
     hooks.stage?.chotu.setMode('thinking'); hooks.stage?.avatar.play('Think');
     try {
@@ -38,7 +48,8 @@ export function initChat({ go, hooks }) {
       wait.innerHTML = esc(j.answer).replace(/\[(\d+)\]/g, '<sup>[$1]</sup>')
         + (shown.length ? `<div class="src">${shown.map((s) => `<button data-sec="${esc(s.section)}" title="relevance ${s.score}">[${s.n}] ${esc(s.title)}</button>`).join('')}</div>` : '');
       history.push({ role: 'user', text: q }, { role: 'bot', text: j.answer }); history.splice(0, Math.max(0, history.length - 6));
-      hooks.stage?.chotu.setMode('answer'); hooks.stage?.avatar.play('Talk');
+      hooks.stage?.chotu.setMode('answer'); hooks.stage?.avatar.play('Talk'); play('chotu');
+      if (speakOn) speak(j.answer);
       setTimeout(() => hooks.stage?.avatar.play('Idle'), 3500);
     } catch (err) {
       wait.innerHTML = esc(err.message || 'Something went wrong.'); hooks.stage?.chotu.setMode('idle'); hooks.stage?.avatar.play('Idle');

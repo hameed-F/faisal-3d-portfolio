@@ -3,6 +3,7 @@ import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
 import { launchGame, isGameActive, exitGame } from './games/launch.js';
+import { setEnabled as setSound, isEnabled as soundOn, play, setScene, setEngine, savedPreference } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -150,6 +151,8 @@ async function boot3D() {
     stage.setTheme(body.dataset.theme); nav.onTheme = (t) => stage.setTheme(t);
     nav.onChange.push((id) => { if (id === 'home') stage.closePanel(); else stage.focusSection(id); });
     hooks.stage = stage;
+    stage.sfx = play; stage.onSpeed = (v) => (v === null ? setEngine(null) : setEngine(v));
+    stage.world.onInterior = (inside) => setScene(inside ? 'inside' : 'outside');
     loadBar(1, 'Ready'); setTimeout(() => $('#loader').classList.add('done'), 250);
     if (det.reasons.length && tier === 'lite' && !det.manual) toast(`<b>Lite mode</b> is on (${det.reasons[0]}). <button data-tier="full">Switch to Full</button>`, 8000);
     const start = location.hash.slice(1);
@@ -171,3 +174,10 @@ $('#driveBtn').addEventListener('click', () => {
 if (tier === 'basic') startBasic(det.reasons[0]); else boot3D();
 document.addEventListener('visibilitychange', () => stage?.pause(document.hidden));
 window.__app = { go, toast, hooks, store, nav, get stage() { return stage; } };
+
+// ---------- sound ----------
+const soundChip = $('#soundChip');
+const showSound = () => { soundChip.textContent = soundOn() ? '♪ on' : '♪ off'; soundChip.setAttribute('aria-pressed', String(soundOn())); };
+soundChip.addEventListener('click', () => { setSound(!soundOn()); showSound(); });
+if (savedPreference()) { const once = () => { setSound(true); showSound(); removeEventListener('pointerdown', once); }; addEventListener('pointerdown', once); } // browsers need a tap first
+nav.onChange.push((id) => play(id === 'home' ? 'close' : 'open'));

@@ -265,10 +265,11 @@ export function buildWorld(scene, tier) {
 
   // Only one "half" of the world is drawn at a time: outside OR inside the cabin.
   const outdoor = [sky, ground, roadMesh, trunks, crowns, rocks, car, cabin, porchLight, post, sign, ...signs.map((s) => s.group)];
-  const setInterior = (inside) => { outdoor.forEach((o) => { o.visible = !inside; }); room.visible = inside; scene.fog.near = inside ? 30 : 14; };
+  const api = {};
+  const setInterior = (inside) => { outdoor.forEach((o) => { o.visible = !inside; }); room.visible = inside; scene.fog.near = inside ? 30 : 14; api.onInterior?.(inside); };
   const setDensity = (frac) => { trunks.count = crowns.count = Math.max(1, Math.floor(placed * frac)); rocks.count = Math.max(1, Math.floor(tier.rocks * frac)); };
   update.push((time, dt, camera) => { if (camera) sky.position.copy(camera.position); });
-  return { treesXZ, signs, setInterior, setDensity, clickables, update, car, carState, placeCarOnRoad, boards, room, cabin, setTheme, lamp, porchLight, sun, hemi, dice, tv };
+  return Object.assign(api, { treesXZ, signs, setInterior, setDensity, clickables, update, car, carState, placeCarOnRoad, boards, room, cabin, setTheme, lamp, porchLight, sun, hemi, dice, tv });
 }
 
 // helper used by other modules (e.g. games) to get a psx material

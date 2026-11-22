@@ -3,7 +3,7 @@ import { LAYOUT } from './world.js';
 
 // Arcade driving: keyboard (WASD / arrows) or on-screen touch pedals.
 // Drive up to a signpost and press E (or tap the prompt) to open that section.
-export function createFreeDrive({ world, camera, cam, onSection, onCabin, onExit }) {
+export function createFreeDrive({ world, camera, cam, onSection, onCabin, onExit, onSpeed }) {
   const car = world.car; const keys = new Set(); const touch = { up: 0, down: 0, left: 0, right: 0 };
   const st = { speed: 0, heading: car.rotation.y, active: false, near: null };
   const grid = new Map(); const CELL = 6; // spatial hash of tree trunks for collisions
@@ -29,7 +29,7 @@ export function createFreeDrive({ world, camera, cam, onSection, onCabin, onExit
 
   function activate() { if (!st.near) return; const n = st.near; stop(false); if (n === 'cabin') onCabin(); else onSection(n); }
   function start() { st.active = true; st.speed = 0; st.heading = car.rotation.y; ui.hidden = false; keys.clear(); }
-  function stop(toTitle) { st.active = false; ui.hidden = true; prompt.hidden = true; keys.clear(); Object.keys(touch).forEach((k) => { touch[k] = 0; }); if (toTitle) onExit(); }
+  function stop(toTitle) { onSpeed?.(null); st.active = false; ui.hidden = true; prompt.hidden = true; keys.clear(); Object.keys(touch).forEach((k) => { touch[k] = 0; }); if (toTitle) onExit(); }
 
   const fwd = new THREE.Vector3(); const camPos = new THREE.Vector3(); const camTgt = new THREE.Vector3();
   function collide(x, z) {
@@ -48,7 +48,7 @@ export function createFreeDrive({ world, camera, cam, onSection, onCabin, onExit
     fwd.set(Math.sin(st.heading), 0, Math.cos(st.heading));
     const nx = car.position.x + fwd.x * st.speed * dt; const nz = car.position.z + fwd.z * st.speed * dt;
     if (collide(nx, nz)) { st.speed *= -0.35; } else { car.position.x = nx; car.position.z = nz; }
-    car.rotation.y = st.heading;
+    car.rotation.y = st.heading; onSpeed?.(st.speed);
     world.carState.wheels.forEach((w) => { w.rotation.x += st.speed * dt * 2.8; });
     // chase camera
     camPos.copy(car.position).addScaledVector(fwd, -6.2).add(new THREE.Vector3(0, 2.6, 0)); camTgt.copy(car.position).addScaledVector(fwd, 4).add(new THREE.Vector3(0, 0.9, 0));

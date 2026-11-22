@@ -90,7 +90,7 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
     clearTimers(); state.phase = 'free'; world.setInterior(false); panelOpen = false; applyViewOffset(); cam.to = null;
     world.placeCarOnRoad(0.03); placeAvatar(LAYOUT.avatarDoor, 0.4); avatar.setBase('Idle');
     camera.fov = 58; camera.updateProjectionMatrix();
-    if (!free) free = createFreeDrive({ world, camera, cam, onSection: (id) => onSection?.(id), onCabin: () => arrive(true), onExit: () => { toTitle(); onTitle?.(); } });
+    if (!free) free = createFreeDrive({ world, camera, cam, onSection: (id) => onSection?.(id), onCabin: () => arrive(true), onExit: () => { toTitle(); onTitle?.(); }, onSpeed: (v) => api.onSpeed?.(v) });
     free.start(); return true;
   }
   function startDrive() {
@@ -253,7 +253,7 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
   requestAnimationFrame(frame);
   addEventListener('keydown', (e) => { if (['drive', 'arrive', 'enter'].includes(state.phase) && !e.repeat) skipIntro(); });
 
-  return {
+  const api = {
     startDrive, startFreeDrive, skipIntro, toHub, focusSection, setTier, focusGame, endGame,
     setGameClick: (f) => { gameClick = f; }, sfx: null,
     setTheme: (t) => world.setTheme(t),
@@ -262,4 +262,5 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
     pause: (v) => { running = !v; if (running) { clock.getDelta(); requestAnimationFrame(frame); } },
     info: () => psx.renderer.info,
   };
+  return api;
 }
