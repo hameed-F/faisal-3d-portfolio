@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { buildScene, ZONES } from './scene.js';
 import { createPlayer } from './player.js';
 import { createCar } from './car.js';
+import { createExplore } from './explore.js';
 import { loadAvatar } from '../stage/avatar.js';
 import { buildChotu } from '../stage/chotu.js';
 import { psxUniforms } from '../stage/psx.js';
@@ -9,7 +10,7 @@ import { TIERS, FpsGovernor } from '../quality.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
-export async function initWorld({ canvas, tierName, onProgress, onSection, onCert, onProject, onAbout, onChotu, onSlow, onPlayStart, reducedMotion }) {
+export async function initWorld({ canvas, tierName, onProgress, onSection, onCert, onProject, onAbout, onChotu, onSlow, onPlayStart, toast, reducedMotion }) {
   psxUniforms.uSnap.value = 0; // the PS1 wobble is gone in the new look
   let tier = TIERS[tierName];
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: tier.name === 'Full', powerPreference: 'high-performance', stencil: false });
@@ -38,6 +39,14 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
   const player = createPlayer({ avatar, camera, colliders: w.colliders, dom: canvas });
   const car = createCar({ car: w.car, wheels: w.carWheels, headlight: w.headlight, camera, colliders: w.colliders, onSpeed: (v) => api.onSpeed?.(v) });
 
+  const explore = createExplore({ scene, world: w,
+    getPlayer: () => (state.mode === 'car' ? { x: w.car.position.x, z: w.car.position.z, rot: w.car.rotation.y } : { x: avatar.group.position.x, z: avatar.group.position.z, rot: avatar.group.rotation.y }),
+    getCar: () => w.car.position, onTravel: (id) => { teleportTo(id); }, sfx: (n) => api.sfx?.(n), toast });
+  // mobile: run toggle + joystick hint
+  const runBtn = document.createElement('button'); runBtn.className = 'run-btn'; runBtn.hidden = true; runBtn.setAttribute('aria-pressed', 'false'); runBtn.textContent = 'RUN'; document.body.appendChild(runBtn);
+  runBtn.addEventListener('click', () => { player.st.runLock = !player.st.runLock; runBtn.setAttribute('aria-pressed', String(player.st.runLock)); });
+  const joyHint = document.createElement('div'); joyHint.className = 'joy-hint'; joyHint.hidden = true; joyHint.innerHTML = '<i></i><span>drag to walk</span>'; document.body.appendChild(joyHint);
+  const showWalkUI = (v) => { runBtn.hidden = !v; joyHint.hidden = !v; explore.show(v || state.mode === 'car'); };
   // ---------------- interaction prompt ----------------
   const prompt = document.createElement('button'); prompt.className = 'act-prompt'; prompt.hidden = true; document.body.appendChild(prompt);
   const help = document.createElement('div'); help.className = 'ctrl-help'; help.hidden = true;
@@ -62,20 +71,20 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
 
   // ---------------- modes ----------------
   const state = { mode: 'title', section: 'home' };
-  function enterCar() { state.mode = 'car'; player.enable(false); avatar.group.visible = false; carCollider.r = 0; car.enter(); api.sfx?.('open'); }
-  function exitCar() { const p = car.exit(); state.mode = 'walk'; avatar.group.visible = true; carCollider.r = 1.7; player.teleport(p, w.car.rotation.y); player.enable(true); }
+  function enterCar() { state.mode = 'car'; player.enable(false); avatar.group.visible = false; carCollider.r = 0; car.enter(); api.sfx?.('open'); explore.discover('car'); showWalkUI(false); explore.show(true); }
+  function exitCar() { const p = car.exit(); state.mode = 'walk'; avatar.group.visible = true; carCollider.r = 1.7; player.teleport(p, w.car.rotation.y); player.enable(true); showWalkUI(true); }
 
   // title: slow orbit around the plaza, avatar idling by the fire
   player.teleport(V(-0.6, 0, 0.8), Math.PI * 0.85);
   function startPlay() {
     if (state.mode !== 'title') return;
-    state.mode = 'walk'; player.faceCameraBehind(); player.enable(true); help.hidden = false; setTimeout(() => { help.hidden = true; }, 9000);
+    state.mode = 'walk'; player.faceCameraBehind(); player.enable(true); showWalkUI(true); help.hidden = false; setTimeout(() => { help.hidden = true; }, 9000);
     avatar.play('Wave'); onPlayStart?.();
   }
   function teleportTo(id) {
     const z = ZONES[id]; if (!z) return;
     if (state.mode === 'car') exitCar();
-    if (state.mode === 'title') { state.mode = 'walk'; player.enable(true); onPlayStart?.(); }
+    if (state.mode === 'title') { state.mode = 'walk'; player.enable(true); showWalkUI(true); onPlayStart?.(); }
     const dir = z.pad.clone().normalize(); const spot = z.pad.clone().addScaledVector(dir, -2.2);
     player.teleport(spot, Math.atan2(dir.x, dir.z));
     api.sfx?.('ladder');
@@ -84,7 +93,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
   // games: the board view takes over the camera
   let gameCam = null; let gameClick = null;
   function focusGame(key) {
-    state.mode = 'game'; player.enable(false); prompt.hidden = true;
+    state.mode = 'game'; player.enable(false); prompt.hidden = true; showWalkUI(false); explore.show(false);
     const b = w.boards[key]; const c = b.group.position;
     const port = innerHeight > innerWidth;
     if (key === 'journey') gameCam = { pos: c.clone().add(V(0, port ? 30 : 22, port ? 14 : 15)), tgt: c.clone().add(V(0, 0, 1)), follow: true };
@@ -92,7 +101,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
     camFrom = { pos: camera.position.clone(), q: camera.quaternion.clone(), t: 0 };
   }
   let camFrom = null; const followTgt = V(0, 0, 0);
-  function endGame() { gameClick = null; gameCam = null; api.gameFollow = null; state.mode = 'walk'; player.enable(true); }
+  function endGame() { gameClick = null; gameCam = null; api.gameFollow = null; state.mode = 'walk'; player.enable(true); showWalkUI(true); }
 
   // ---------------- input for games ----------------
   const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2(); let downAt = null;
@@ -150,6 +159,7 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
         else prompt.hidden = true;
       }
     } else if (!prompt.hidden) { prompt.hidden = true; prompt.dataset.key = ''; }
+    explore.update(dt, t, near, state.mode);
     // keep the sun's shadow box around the player
     if (renderer.shadowMap.enabled) { const p = avatar.group.position; w.sun.position.set(p.x - 30, 26, p.z + 22); w.sun.target.position.set(p.x, 0, p.z); }
     avatar.update(dt, tier.avatarHz); chotu.update(dt, t);
@@ -161,13 +171,13 @@ export async function initWorld({ canvas, tierName, onProgress, onSection, onCer
 
   const api = {
     startPlay, teleportTo, focusGame, endGame, setGameClick: (f) => { gameClick = f; },
-    focusSection: (id, opts = {}) => { state.section = id; if (!opts.fromWorld && ZONES[id] && state.mode !== 'game') teleportTo(id); if (state.mode === 'walk') player.enable(false); },
-    closePanel: () => { state.section = 'home'; if (state.mode === 'walk' || (state.mode !== 'title' && state.mode !== 'car' && state.mode !== 'game')) player.enable(true); },
+    focusSection: (id, opts = {}) => { state.section = id; if (!opts.fromWorld && ZONES[id] && state.mode !== 'game') teleportTo(id); if (ZONES[id]) explore.discover(id); if (state.mode === 'walk') { player.enable(false); runBtn.hidden = true; joyHint.hidden = true; } explore.show(false); },
+    closePanel: () => { state.section = 'home'; if (state.mode === 'walk') { player.enable(true); showWalkUI(true); } },
     skipIntro: () => startPlay(),
     setTier: (name) => { tier = TIERS[name]; w.setDensity?.(name === 'lite' ? 0.4 : 1); pr = name === 'lite' ? Math.min(dpr, 1) : Math.min(dpr, 1.5); resize(); governor.threshold = name === 'lite' ? 22 : 40; governor.reset(); },
     setTheme: (t) => w.setTheme(t),
     pause: (v) => { running = !v; if (running) { clock.getDelta(); requestAnimationFrame(frame); } },
-    avatar, chotu, world: w, scene, camera, renderer, player, boards: w.boards,
+    explore, avatar, chotu, world: w, scene, camera, renderer, player, boards: w.boards,
     get phase() { return state.mode; }, get fps() { return governor.fps; }, info: () => renderer.info, sfx: null, onSpeed: null, stats: null,
   };
   return api;

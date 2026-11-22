@@ -5,7 +5,7 @@ import { blocked } from './scene.js';
 // Desktop: WASD/arrows, Shift = run, drag = look, wheel = zoom.  Phone: left thumb joystick, drag right side to look.
 export function createPlayer({ avatar, camera, colliders, dom }) {
   const body = avatar.group; const keys = new Set();
-  const st = { yaw: Math.PI, pitch: 0.32, dist: 7.5, targetDist: 7.5, speed: 0, enabled: false, run: false, moving: false, lockCam: false };
+  const st = { runLock: false, yaw: Math.PI, pitch: 0.32, dist: 7.5, targetDist: 7.5, speed: 0, enabled: false, run: false, moving: false, lockCam: false };
   const joy = { x: 0, y: 0, id: null, ox: 0, oy: 0 };
   const look = { id: null, x: 0, y: 0 };
   const camTarget = new THREE.Vector3(); const camPos = new THREE.Vector3(); const move = new THREE.Vector3();
@@ -40,7 +40,7 @@ export function createPlayer({ avatar, camera, colliders, dom }) {
     if (keys.has('a') || keys.has('arrowleft')) ix -= 1; if (keys.has('d') || keys.has('arrowright')) ix += 1;
     ix += joy.x; iz += joy.y;
     const mag = Math.min(1, Math.hypot(ix, iz));
-    const want = mag > 0.12 ? (st.run ? 5.6 : 2.4) * Math.max(mag, 0.5) : 0;
+    const want = mag > 0.12 ? (st.run || st.runLock ? 5.6 : 2.4) * Math.max(mag, 0.5) : 0;
     st.speed += (want - st.speed) * Math.min(1, dt * 8);
     if (mag > 0.12) {
       const ang = Math.atan2(ix, iz) + st.yaw; // camera-relative (yaw points from player to camera)

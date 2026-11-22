@@ -140,6 +140,7 @@ async function boot3D() {
       onSection: (id, o) => { fromWorldNav = !!o?.fromWorld; go(id); }, onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
       onProject: (id) => { go('projects'); hooks.focusProject?.(id); },
       onAbout: (id) => { go('about'); hooks.focusAbout?.(id); },
+      toast: (h, ms) => toast(h, ms),
       onPlayStart: () => { introDone = true; $('#home').hidden = true; body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;
@@ -177,3 +178,11 @@ const showSound = () => { soundChip.textContent = soundOn() ? '♪ on' : '♪ of
 soundChip.addEventListener('click', () => { setSound(!soundOn()); showSound(); });
 if (savedPreference()) { const once = () => { setSound(true); showSound(); removeEventListener('pointerdown', once); }; addEventListener('pointerdown', once); } // browsers need a tap first
 nav.onChange.push((id) => play(id === 'home' ? 'close' : 'open'));
+
+// ---------- phone menu sheet ----------
+const sheet = $('#menuSheet');
+$('#menuChip').addEventListener('click', () => { sheet.hidden = false; $('#sheetClose').focus(); });
+$('#sheetClose').addEventListener('click', () => { sheet.hidden = true; });
+sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier]')) sheet.hidden = true; });
+$('#sheetTheme').addEventListener('click', () => { $('#themeChip').click(); });
+$('#sheetSound').addEventListener('click', () => { soundChip.click(); });

@@ -18,3 +18,5 @@
 - Rendering: native resolution, no post-processing, ACES tone mapping, soft shadows (Full only), dynamic pixel ratio (lowers resolution a little before switching tier). Lite = fewer trees, no shadows, 30 fps cap; never blurry.
 - Measured (Intel UHD, headless, Full, plaza): ~85 draw calls, ~84k triangles, pixel ratio 1. New world chunk 34 kB gz (plus three.js).
 - Live check after keys: /api/chat 200 in 2.2 s; /api/contact sent a test message (Brevo accepted, HTTP 200). Improved chunks (stack in contribution chunks + one chunk per engine group, 52 chunks) and top-5 retrieval; 'Three.js games' now returns all three.
+- Exploration: 8 places tracked (localStorage), zone-arrival banners, 'Discovered' toasts + sound, minimap with player arrow, full map (M / tap) with fast travel, beacons over unexplored zones, highlight ring under the nearest interactable.
+- Phone: menu sheet replaces the chip row under 860 px, title moved to the bottom, joystick hint, RUN toggle, big tap-to-interact button, panels as bottom sheets; minimap hides while a panel is open.

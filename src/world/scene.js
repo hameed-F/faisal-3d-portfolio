@@ -25,12 +25,12 @@ export function buildScene(scene, tier) {
   const hi = tier.name === 'Full';
 
   // ---------- sky, fog, light ----------
-  const skyCols = { dusk: ['#22355a', '#c98a62', '#f3cf8a'], day: ['#5f9ccf', '#bfe0f0', '#f6efd8'] };
+  const skyCols = { dusk: ['#2a3d63', '#b9805f', '#f3cf8a'], day: ['#5f9ccf', '#bfe0f0', '#f6efd8'] };
   const sky = new THREE.Mesh(new THREE.SphereGeometry(300, 24, 12), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false,
     uniforms: { top: { value: C(skyCols.dusk[0]) }, mid: { value: C(skyCols.dusk[1]) }, sun: { value: C(skyCols.dusk[2]) } },
     vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform vec3 top; uniform vec3 mid; uniform vec3 sun; varying vec3 vP; void main(){ float h = vP.y; vec3 c = mix(mid, top, smoothstep(0.02, 0.55, h)); float s = pow(max(dot(normalize(vec3(-0.6,0.18,0.5)), vP), 0.0), 24.0); c = mix(c, sun, s*0.9); gl_FragColor = vec4(c, 1.0); }',
+    fragmentShader: 'uniform vec3 top; uniform vec3 mid; uniform vec3 sun; varying vec3 vP; void main(){ float h = vP.y; vec3 c = mix(mid, top, smoothstep(-0.02, 0.32, h)); float s = pow(max(dot(normalize(vec3(-0.6,0.18,0.5)), vP), 0.0), 24.0); c = mix(c, sun, s*0.9); gl_FragColor = vec4(c, 1.0); }',
   }));
   scene.add(sky);
   scene.fog = new THREE.Fog(C('#5b5a63'), 45, 150);

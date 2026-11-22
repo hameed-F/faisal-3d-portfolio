@@ -29,6 +29,7 @@
       <button class="chip" data-go="promo">Promo</button>
       <button class="chip" data-go="contact">Contact</button>
     </nav>
+    <button class="chip menu-chip" id="menuChip" aria-haspopup="dialog" aria-label="Open menu">☰ Menu</button>
     <div class="chips right">
       <button class="chip" id="tierChip" aria-haspopup="dialog">Quality: <b id="tierLabel">Full</b></button>
       <button class="chip" id="themeChip" aria-label="Toggle day and dusk theme">◐</button>
@@ -37,6 +38,18 @@
   </header>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <div class="sheet" id="menuSheet" role="dialog" aria-label="Menu" hidden>
+    <div class="sheet-box">
+      <div class="sheet-head"><b>Go to</b><button id="sheetClose" aria-label="Close menu">×</button></div>
+      <div class="sheet-grid">
+        <button data-go="about">About</button><button data-go="skills">Skills</button><button data-go="projects">Projects</button><button data-go="journey">Journey</button>
+        <button data-go="achievements">Trophies</button><button data-go="promo">Promo</button><button data-go="contact">Contact</button><button data-go="credits">Credits</button>
+      </div>
+      <div class="sheet-head"><b>Settings</b></div>
+      <div class="sheet-grid three"><button data-tier="full">Full quality</button><button data-tier="lite">Lite</button><button data-tier="basic">Text only</button></div>
+      <div class="sheet-grid two"><button id="sheetTheme">Day / dusk</button><button id="sheetSound">Sound on / off</button></div>
+    </div>
+  </div>
 
   <!-- Title screen -->
   <section class="title" id="home" aria-label="Start">
