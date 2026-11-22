@@ -136,6 +136,7 @@ async function boot3D() {
     stage = await initStage({
       canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar,
       onSection: (id) => go(id), onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
+      onTitle: () => { introDone = false; $('#home').hidden = false; body.classList.remove('in-world'); },
       onIntroDone: () => { introDone = true; $('#home').hidden = true; body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;
@@ -163,8 +164,9 @@ initChat({ go, hooks });
 $('#startBtn').addEventListener('click', () => { $('#home').hidden = true; stage?.startDrive(); });
 $('#creditsBtn').addEventListener('click', () => { stage?.skipIntro(); go('credits'); });
 $('#driveBtn').addEventListener('click', () => {
-  if (stage?.startFreeDrive) { $('#home').hidden = true; stage.startFreeDrive(); }
-  else toast('Free Drive is being built right now. Check back soon.');
+  if (!stage) { toast('Free Drive needs the 3D version. <button data-tier="full">Switch to Full</button>'); return; }
+  if (stage.startFreeDrive()) $('#home').hidden = true;
+  else toast('Free Drive is switched off in <b>Lite mode</b> to keep things smooth. <button data-tier="full">Switch to Full</button>');
 });
 if (tier === 'basic') startBasic(det.reasons[0]); else boot3D();
 document.addEventListener('visibilitychange', () => stage?.pause(document.hidden));

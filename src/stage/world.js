@@ -89,13 +89,13 @@ export function buildWorld(scene, tier) {
   const crowns = new THREE.InstancedMesh(crown, psxMat({ color: C('#ffffff') }), nTrees);
   const mtx = new THREE.Matrix4(); const q = new THREE.Quaternion(); const sc = new THREE.Vector3(); const p = new THREE.Vector3();
   const treePalette = ['#2f4a33', '#3a5236', '#28403a', '#41573a', '#334a2e'].map(C);
-  let placed = 0; let guard = 0;
+  let placed = 0; let guard = 0; const treesXZ = [];
   while (placed < nTrees && guard++ < nTrees * 30) {
     const a = TX.rand(0, Math.PI * 2); const r = 10 + Math.pow(TX.rand(0, 1), 0.7) * 95; const x = Math.cos(a) * r; const z = Math.sin(a) * r;
     if (distRoad(x, z) < 4.2 || (Math.abs(x) < 9 && z > -8 && z < 14) || Math.hypot(x - 46, z - 78) < 13) continue;
     const s = TX.rand(0.75, 1.5); const y = 0; q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), TX.rand(0, 6.28));
     sc.set(s, s * TX.rand(0.9, 1.25), s); p.set(x, y - 0.1, z); mtx.compose(p, q, sc);
-    trunks.setMatrixAt(placed, mtx); crowns.setMatrixAt(placed, mtx); crowns.setColorAt(placed, treePalette[placed % treePalette.length]); placed++;
+    trunks.setMatrixAt(placed, mtx); crowns.setMatrixAt(placed, mtx); crowns.setColorAt(placed, treePalette[placed % treePalette.length]); treesXZ.push(x, z); placed++;
   }
   trunks.count = crowns.count = placed; scene.add(trunks, crowns);
   const rockGeo = new THREE.DodecahedronGeometry(0.6, 0); const rocks = new THREE.InstancedMesh(rockGeo, psxMat({ color: C('#5d5a52') }), tier.rocks);
@@ -148,6 +148,16 @@ export function buildWorld(scene, tier) {
   cabin.add(box(0.7, 2.0, 0.7, psxMat({ color: C('#5d5a52') }), 2.4, CH + 1.4, -1.2));
   const porchLight = new THREE.PointLight(C('#ffb45a'), 6, 9, 1.6); porchLight.position.set(0, 2.5, CD / 2 + 0.9); scene.add(porchLight);
   // signpost by the road
+  // Free Drive signposts: one per section, in clearings beside the road
+  const signs = [];
+  const signPostM = psxMat({ color: C('#4a3222') });
+  [['ABOUT', 'about', 0.12, 1], ['SKILLS', 'skills', 0.3, -1], ['PROJECTS', 'projects', 0.48, 1], ['JOURNEY', 'journey', 0.64, -1], ['TROPHIES', 'achievements', 0.8, 1]].forEach(([label, section, t, sideK]) => {
+    const p0 = ROAD.getPointAt(t); const tg = ROAD.getTangentAt(t); const n = new THREE.Vector3(-tg.z, 0, tg.x).multiplyScalar(sideK * 3.6);
+    const g = new THREE.Group(); g.position.set(p0.x + n.x, 0, p0.z + n.z); g.rotation.y = Math.atan2(tg.x, tg.z) + (sideK > 0 ? -Math.PI / 2 : Math.PI / 2) * 0.6;
+    g.add(box(0.14, 2.0, 0.14, signPostM, 0, 1.0, 0)); const pl = box(1.9, 0.5, 0.07, psxMat({ map: TX.signTex(label + '  ▸', 256, 64, '#5a2f19') }), 0, 1.75, 0); g.add(pl);
+    const lampS = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 4), new THREE.MeshBasicMaterial({ color: '#ffd27a' })); lampS.position.set(0, 2.1, 0); g.add(lampS);
+    scene.add(g); signs.push({ label, section, pos: g.position.clone(), group: g });
+  });
   const signM = psxMat({ map: TX.signTex('CABIN  ▸') }); const post = box(0.12, 1.6, 0.12, psxMat({ color: C('#4a3222') }), 6.2, 0.8, 11.5); scene.add(post);
   const sign = box(1.5, 0.38, 0.06, signM, 6.2, 1.5, 11.5); sign.rotation.y = -0.6; scene.add(sign);
 
@@ -254,11 +264,11 @@ export function buildWorld(scene, tier) {
   for (let s = 0; s < 3; s++) for (let i = 0; i < 7; i++) { const h = TX.rand(0.22, 0.32); bk.add(box(0.24, h, 0.1, psxMat({ color: C(bookCols[(i + s) % 6]) }), -0.02, 0.35 + s * 0.55 + h / 2, -0.45 + i * 0.14)); }
 
   // Only one "half" of the world is drawn at a time: outside OR inside the cabin.
-  const outdoor = [sky, ground, roadMesh, trunks, crowns, rocks, car, cabin, porchLight, post, sign];
+  const outdoor = [sky, ground, roadMesh, trunks, crowns, rocks, car, cabin, porchLight, post, sign, ...signs.map((s) => s.group)];
   const setInterior = (inside) => { outdoor.forEach((o) => { o.visible = !inside; }); room.visible = inside; scene.fog.near = inside ? 30 : 14; };
   const setDensity = (frac) => { trunks.count = crowns.count = Math.max(1, Math.floor(placed * frac)); rocks.count = Math.max(1, Math.floor(tier.rocks * frac)); };
   update.push((time, dt, camera) => { if (camera) sky.position.copy(camera.position); });
-  return { setInterior, setDensity, clickables, update, car, carState, placeCarOnRoad, boards, room, cabin, setTheme, lamp, porchLight, sun, hemi, dice, tv };
+  return { treesXZ, signs, setInterior, setDensity, clickables, update, car, carState, placeCarOnRoad, boards, room, cabin, setTheme, lamp, porchLight, sun, hemi, dice, tv };
 }
 
 // helper used by other modules (e.g. games) to get a psx material

@@ -3,12 +3,13 @@ import { PsxRenderer } from './psx.js';
 import { buildWorld, LAYOUT, ROAD } from './world.js';
 import { loadAvatar } from './avatar.js';
 import { buildChotu } from './chotu.js';
+import { createFreeDrive } from './freedrive.js';
 import { TIERS, FpsGovernor } from '../quality.js';
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
-export async function initStage({ canvas, tierName, onProgress, onSection, onCert, onChotu, onSlow, onIntroDone, reducedMotion }) {
+export async function initStage({ canvas, tierName, onProgress, onSection, onCert, onChotu, onSlow, onIntroDone, onTitle, reducedMotion }) {
   let tier = TIERS[tierName];
   const psx = new PsxRenderer(canvas, tier);
   const scene = new THREE.Scene();
@@ -83,6 +84,15 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
     camera.position.copy(c).addScaledVector(f, 7.5).addScaledVector(r, 4.2 + sway).add(V(0, 1.35 + Math.sin(time * 0.4) * 0.08, 0));
     cam.tgt.copy(c).addScaledVector(f, 0.8).add(V(0, 0.75, 0)); camera.fov = 46; camera.updateProjectionMatrix();
   }
+  let free = null;
+  function startFreeDrive() {
+    if (!tier.freeDrive) return false;
+    clearTimers(); state.phase = 'free'; world.setInterior(false); panelOpen = false; applyViewOffset(); cam.to = null;
+    world.placeCarOnRoad(0.03); placeAvatar(LAYOUT.avatarDoor, 0.4); avatar.setBase('Idle');
+    camera.fov = 58; camera.updateProjectionMatrix();
+    if (!free) free = createFreeDrive({ world, camera, cam, onSection: (id) => onSection?.(id), onCabin: () => arrive(true), onExit: () => { toTitle(); onTitle?.(); } });
+    free.start(); return true;
+  }
   function startDrive() {
     if (state.phase !== 'title') return;
     if (!tier.drive) { state.phase = 'drive'; applyViewOffset(); arrive(true); return; }
@@ -106,6 +116,7 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
     state.walk = { from: start, to: LAYOUT.avatarHub.clone(), t: 0, dur: 1.6 };
   }
   function toHub(immediate = false) {
+    if (free?.active) free.stop(false);
     clearTimers(); state.phase = 'hub'; world.setInterior(true); state.walk = null; setFade(1);
     world.placeCarOnRoad(1);
     placeAvatar(LAYOUT.avatarHub, -0.5); avatar.setBase('Idle'); applyViewOffset();
@@ -209,6 +220,8 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
       camera.position.lerp(pos, Math.min(1, dt * 3)); cam.tgt.lerp(tgt, Math.min(1, dt * 4));
       world.carState.wheels.forEach((w) => { w.rotation.x += dt * 14 * (1 - t * 0.8); });
       if (t >= 1) arrive();
+    } else if (state.phase === 'free') {
+      free?.update(dt);
     } else if (state.phase === 'title') {
       titleShot(time);
     }
@@ -228,7 +241,7 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
     }
     if (fadeAnim) { fadeAnim.t = Math.min(1, fadeAnim.t + dt / fadeAnim.dur); setFade(fadeAnim.from + (fadeAnim.to - fadeAnim.from) * fadeAnim.t); if (fadeAnim.t >= 1) { const r = fadeAnim.res; fadeAnim = null; r(); } }
     // headlights only matter outside
-    const outside = state.phase === 'title' || state.phase === 'drive' || state.phase === 'arrive';
+    const outside = state.phase === 'title' || state.phase === 'drive' || state.phase === 'arrive' || state.phase === 'free';
     world.carState.head.visible = outside; world.carState.beam.visible = outside;
 
     avatar.update(dt, tier.avatarHz);
@@ -241,7 +254,7 @@ export async function initStage({ canvas, tierName, onProgress, onSection, onCer
   addEventListener('keydown', (e) => { if (['drive', 'arrive', 'enter'].includes(state.phase) && !e.repeat) skipIntro(); });
 
   return {
-    startDrive, skipIntro, toHub, focusSection, setTier, focusGame, endGame,
+    startDrive, startFreeDrive, skipIntro, toHub, focusSection, setTier, focusGame, endGame,
     setGameClick: (f) => { gameClick = f; }, sfx: null,
     setTheme: (t) => world.setTheme(t),
     closePanel: () => { panelOpen = false; state.section = 'home'; applyViewOffset(); if (state.phase === 'hub') { const [p, t, f] = hubShot(); moveTo(p, t, 1.0, f); } },

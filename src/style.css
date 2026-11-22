@@ -205,3 +205,19 @@ form.contact textarea{min-height:130px;resize:vertical}
 .gh-canvas{width:min(360px,100%);aspect-ratio:1;display:block;margin:0 auto;border:2px solid #22160d;border-radius:8px;touch-action:manipulation}
 body[data-tier="basic"] .gamehud,body[data-mode="page"] .gamehud{top:4rem;bottom:auto;max-height:calc(100vh - 5rem);overflow:auto}
 body.in-game #chotu{display:none}
+
+/* Free Drive HUD */
+.drivehud{position:fixed;inset:0;z-index:25;pointer-events:none}
+.drivehud[hidden]{display:none}
+.drivehud>*{pointer-events:auto}
+.dh-help{position:absolute;top:calc(3.6rem + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(20,32,43,.8);color:#f3ead8;border:1.5px solid rgba(243,234,216,.35);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;white-space:nowrap}
+.dh-prompt{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);background:var(--accent);color:#22160d;border:2px solid #22160d;border-radius:12px;padding:.7rem 1.1rem;font-weight:700;box-shadow:4px 4px 0 #22160d;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.05)}}
+.dh-pad,.dh-pedals{position:absolute;bottom:calc(1rem + var(--safe-b));display:flex;gap:.6rem}
+.dh-pad{left:1rem}.dh-pedals{right:1rem}
+.dh-pad button,.dh-pedals button{width:4.2rem;height:4.2rem;border-radius:16px;border:2px solid #22160d;background:rgba(243,234,216,.9);color:#22160d;font-size:1.5rem;touch-action:none;user-select:none;-webkit-user-select:none}
+.dh-pad button.on,.dh-pedals button.on{background:var(--accent)}
+.dh-exit{position:absolute;right:1rem;top:calc(3.6rem + env(safe-area-inset-top,0px));background:#22160d;color:#f3ead8;border:0;border-radius:10px;padding:.45rem .8rem;font-weight:600}
+@media (pointer:fine){.dh-pad,.dh-pedals{display:none}}
+@media (pointer:coarse){.dh-help{display:none}}
+body.in-world .title{display:none}
