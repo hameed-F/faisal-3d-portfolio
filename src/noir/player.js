@@ -30,7 +30,7 @@ export function createPlayer({ avatar, camera, colliders, dom }) {
   });
   const up = (e) => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; joyEl.hidden = true; st.run = false; } if (e.pointerId === look.id) look.id = null; };
   addEventListener('pointerup', up); addEventListener('pointercancel', up);
-  dom.addEventListener('wheel', (e) => { if (!st.enabled) return; st.targetDist = THREE.MathUtils.clamp(st.targetDist + e.deltaY * 0.006, 3.5, 14); }, { passive: true });
+  dom.addEventListener('wheel', (e) => { if (!st.enabled) return; st.targetDist = THREE.MathUtils.clamp(st.targetDist + e.deltaY * 0.01, 9, 22); }, { passive: true });
 
   function update(dt) {
     if (!st.enabled) return;
@@ -43,7 +43,7 @@ export function createPlayer({ avatar, camera, colliders, dom }) {
     if (mag > 0.12) st.auto = null; // manual input cancels auto-walk
     else if (st.auto) { worldAng = Math.atan2(st.auto.x, st.auto.z); mag = 1; }
     const fast = st.run || (st.auto && st.auto.run);
-    const want = mag > 0.12 ? (fast ? 5.6 : 2.4) * Math.max(mag, 0.5) : 0;
+    const want = mag > 0.12 ? (fast ? 6.6 : 3.2) * Math.max(mag, 0.5) : 0;
     st.speed += (want - st.speed) * Math.min(1, dt * 8);
     if (mag > 0.12) {
       const ang = worldAng ?? (Math.atan2(ix, iz) + st.yaw); // camera-relative (yaw points from player to camera)
@@ -67,6 +67,7 @@ export function createPlayer({ avatar, camera, colliders, dom }) {
   function followCamera(dt, snap = false) {
     st.dist += (st.targetDist - st.dist) * Math.min(1, dt * 6);
     camTarget.set(body.position.x, body.position.y + 1.45, body.position.z);
+    if (st.ahead) { camTarget.x -= Math.sin(st.yaw) * st.ahead; camTarget.z -= Math.cos(st.yaw) * st.ahead; }
     camPos.set(camTarget.x + Math.sin(st.yaw) * Math.cos(st.pitch) * st.dist, camTarget.y + Math.sin(st.pitch) * st.dist, camTarget.z + Math.cos(st.yaw) * Math.cos(st.pitch) * st.dist);
     camPos.y = Math.max(camPos.y, 0.6);
     if (snap) camera.position.copy(camPos); else camera.position.lerp(camPos, Math.min(1, dt * 10));

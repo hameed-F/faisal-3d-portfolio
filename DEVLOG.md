@@ -61,3 +61,10 @@
 - New concept: a silent-film night street (src/noir/). Restored the third-person controller (player.js) and added auto-walk. Added uSilent to the PS1 post shader. Skill Slice swipe game (slice.js). Projector-robot Chotu. Removed the snake greeting from chat.js.
 - Tested with Playwright (Edge headless, 1280x720 and 390x844 touch): all 7 places reached by auto-walk in 5.4 to 8.6 s (incl. intertitle), chess opens and exits, trailer and contact open, chat opens, day/night and silent toggles work, 0 console errors. FPS on this laptop (Intel UHD, headless): ~57.
 - Kept the retro STAGE 1-1 loader (now titled MIDNIGHT REEL). src/run/ (platformer) removed.
+
+### 2026-11-22 (night): Midnight Reel round 2
+- Owner feedback: "too blurry and hard to navigate, not very fun; drop chess and Snakes & Ladders".
+- Sharp: the PS1 low-res pass is off for this concept. The renderer now draws at the screen's real resolution (pixel ratio up to 2 on Full, 1 on Lite) with 4x MSAA on Full, no vertex snap, no dither, almost no grain. Fog pushed back (38 to 120 m).
+- Navigation: fixed high camera that shows the whole plaza (no camera dragging needed). Click/tap anywhere to walk there (a ring marks the spot), tap a building or the bottom dock to go in. Auto-walk always runs; first visit plays a short title card, later visits open straight away. Measured arrivals 3.9 to 6.0 s from across the plaza.
+- Fun: 18 golden film reels to collect (counter top-left, Victory every 6, Dance + "That's a wrap!" at 18); pigeons peck and scatter when you run at them. The Penny Arcade now launches Skill Slice directly (skills list inside it).
+- Removed chess, Snakes & Ladders, src/games, stage/games3d.js, stage/textures.js, stage/chotu.js and the chess.js dependency; Read-mode panels no longer mention them.

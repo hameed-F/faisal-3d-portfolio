@@ -12,13 +12,14 @@ Facts about the owner come only from `../source/`. Anything missing is listed in
 
 A silent film starring Faisal, set on one city block at night. You walk him around a small rainy plaza; every building is one part of the portfolio.
 - **Opening**: the loader, then a black-and-white title card ("Midnight Reel, starring Muhammad Faisal Hameed"). On *Roll film* he waves, an intertitle plays, and colour floods in.
+- **Round 2 (owner feedback):** sharp native-resolution render with MSAA; fixed high camera over the plaza; click/tap anywhere to walk; 18 golden film reels to collect; pigeons that scatter.
 - **Navigation that can't fail**: tap any building, its floating label, or a sign in the bottom dock, and he walks there by himself (gets round lamps/benches; if ever stuck, an iris wipe takes him there). WASD/arrows + Shift run + Space jump on laptop; left-thumb joystick + drag to look on phones. Near a door: "press E / tap to enter".
 - **Buildings** (each opens with a silent-film intertitle and a "reel" dialog):
   - *Extra! Extra!* newspaper kiosk → About me (newspaper layout, CV, GitHub, email)
   - *The Picture House* cinema → 12 projects as film posters → detail (image, role, points, links). Documentary edit uses the owner's frame.
   - *The Academy* → Journey as a film strip
   - *Trophies & Pawn* → certificates (thumbnails, full size, Verify)
-  - *The Penny Arcade* → **Skill Slice** (swipe film cans to cut out skills, avoid dynamite), chess vs my engine, Snakes & Ladders, plus a plain skills list
+  - *The Penny Arcade* → **Skill Slice** (swipe film cans to cut out skills, avoid dynamite), with a plain skills list inside. Chess and Snakes & Ladders were dropped at the owner's request.
   - *Telephone booth* → contact form (Brevo) · *Billboard* → promo video placeholder
 - **Chotu** is a tiny film-projector robot that hovers behind his shoulder (reels spin faster while thinking, lens beam while answering). Tap him or the projector button to chat.
 - **Day / night** toggle (iris wipe) and **Silent film** toggle (sepia, flicker, scratches, dust in the PS1 post shader).

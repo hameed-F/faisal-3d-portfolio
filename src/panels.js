@@ -2,7 +2,6 @@ import { CONFIG, profile, aboutZones, skills, journey, projects, certificates, c
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const GROUP_COLORS = { Unreal: '#2f6f8f', Unity: '#8a3a1c', 'Three.js': '#5b8a5a', Systems: '#6a5aa0', Motion: '#c88a1c' };
-const GLYPH = { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞' };
 const closeBtn = '<button class="close" data-close aria-label="Close panel">×</button>';
 
 export function youtubeId(url) {
@@ -14,7 +13,7 @@ export function renderAll(hooks = {}) {
   hooks.focusAbout = (id) => { const el = document.getElementById('zone-' + id); if (el) { setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); } };
   document.getElementById('tagline').textContent = profile.tagline;
 
-  // ABOUT (Ludo home zones)
+  // ABOUT
   document.getElementById('about').innerHTML = `${closeBtn}
     <h2>About me</h2><p class="sub">${esc(profile.title)} · ${esc(profile.location)}</p>
     <p>${esc(profile.summary)}</p>
@@ -23,13 +22,11 @@ export function renderAll(hooks = {}) {
       <a class="btn alt" href="${profile.github}" target="_blank" rel="noopener">GitHub</a>
       <a class="btn alt" href="${profile.framer}" target="_blank" rel="noopener">Earlier portfolio</a></div>`;
 
-  // SKILLS (chess)
+  // SKILLS
   document.getElementById('skills').innerHTML = `${closeBtn}
-    <h2>Skills &amp; technologies</h2><p class="sub">Each chess piece is a skill group.</p>
-    <div class="pieces">${skills.map((g) => `<div class="skill"><h3><span class="glyph" aria-hidden="true">${GLYPH[g.piece]}</span>${esc(g.group)}</h3>
-      <ul>${g.items.map(([n, d]) => `<li>${esc(n)} <span>· ${esc(d)}</span></li>`).join('')}</ul></div>`).join('')}</div>
-    <div class="chess-cta"><b>Play chess against my AI.</b> Easy, medium or hard.
-      <div class="row"><button class="btn" data-game="chess">Play chess</button></div></div>`;
+    <h2>Skills &amp; technologies</h2><p class="sub">What I work with, and where I used it.</p>
+    <div class="pieces">${skills.map((g) => `<div class="skill"><h3>${esc(g.group)}</h3>
+      <ul>${g.items.map(([n, d]) => `<li>${esc(n)} <span>· ${esc(d)}</span></li>`).join('')}</ul></div>`).join('')}</div>`;
 
   // PROJECTS
   const groups = [...new Set(projects.map((p) => p.group))];
@@ -65,12 +62,10 @@ export function renderAll(hooks = {}) {
     const el = document.getElementById('card-' + id); if (el) { setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); el.classList.add('flash'); el.querySelector('details')?.setAttribute('open', ''); setTimeout(() => el.classList.remove('flash'), 1800); } };
   hooks.setProjectGroup = (g) => { state.g = g || ''; root.querySelectorAll('.gbtn').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === state.g))); draw(); };
 
-  // JOURNEY (Snakes & Ladders)
+  // JOURNEY
   document.getElementById('journey').innerHTML = `${closeBtn}
-    <h2>Education &amp; experience</h2><p class="sub">Each square on the Snakes &amp; Ladders board is a step of my journey.</p>
-    <ol class="timeline">${journey.map((j) => `<li><div class="when">${esc(j.when)}</div><h3>${esc(j.title)}</h3><div class="where">${esc(j.where)}</div><p>${esc(j.text)}</p></li>`).join('')}</ol>
-    <div class="chess-cta"><b>Play Snakes &amp; Ladders against the computer.</b>
-      <div class="row"><button class="btn" data-game="snakes">Play Snakes &amp; Ladders</button></div></div>`;
+    <h2>Education &amp; experience</h2><p class="sub">My studies and work, in order.</p>
+    <ol class="timeline">${journey.map((j) => `<li><div class="when">${esc(j.when)}</div><h3>${esc(j.title)}</h3><div class="where">${esc(j.where)}</div><p>${esc(j.text)}</p></li>`).join('')}</ol>`;
 
   // ACHIEVEMENTS (trophy shelf)
   document.getElementById('achievements').innerHTML = `${closeBtn}
@@ -107,7 +102,7 @@ export function renderAll(hooks = {}) {
   document.getElementById('credits').innerHTML = `${closeBtn}
     <h2>Credits</h2>
     <p>Avatar: 3D character customised in Blender (skin tone, rig, animation set); animations from Mixamo. Original base-model credit: to be added (see the owner's notes).</p>
-    <p>Built with Three.js, Vite, chess.js and Google Gemini; hosted on Vercel. Fonts: Bowlby One and Inter (SIL OFL).</p>
+    <p>Built with Three.js, Vite and Google Gemini; hosted on Vercel. Fonts: Limelight, Press Start 2P and Inter (SIL OFL).</p>
     ${credits.length ? `<ul>${credits.map((c) => `<li>${esc(c.name)} by ${esc(c.author)} (${esc(c.license)}) <a href="${c.url}" target="_blank" rel="noopener">source</a></li>`).join('')}</ul>` : '<p>3D props: built for this site. No third-party models are used yet; every one added will be listed here.</p>'}`;
 }
 

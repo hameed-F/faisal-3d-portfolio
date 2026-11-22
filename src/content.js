@@ -32,7 +32,7 @@ export const aboutZones = [
     text: 'Game Development, Gameplay Programming, and Interactive 3D roles and internships.' },
 ];
 
-// Skills: one chess piece per category.
+// Skills, by group.
 export const skills = [
   { piece: 'king', group: 'Game engines & 3D web', items: [
     ['Unreal Engine 5 (Blueprints & C++)', 'Light Up The House; CEGA Unreal Engine certification'],

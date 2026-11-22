@@ -4,7 +4,7 @@ import { skills } from '../content.js';
 const short = (n) => n.replace(/\s*\(.*?\)\s*/g, ' ').replace(/\s+&\s+/g, ' & ').trim();
 export function startSlice({ onEnd, sfx = () => {}, lite = false }) {
   const all = skills.flatMap((g) => g.items.map(([n, w]) => ({ name: short(n), full: n, where: w, group: g.group })));
-  const wrap = document.createElement('div'); wrap.className = 'slice'; wrap.innerHTML = `<canvas></canvas><div class="sl-hud"><span class="sl-score">0 / ${all.length}</span><span class="sl-lives">✦✦✦</span><span class="sl-time">60</span><button class="sl-x" aria-label="Quit">✕</button></div><div class="sl-got" aria-live="polite"></div><div class="sl-start"><div><p class="it-orn">❦</p><h2>Skill Slice</h2><p>Swipe across the film cans to cut out my skills.<br/>Leave the dynamite alone. Three sparks and you're out.</p><button class="rb p sl-go">Roll film ▸</button></div></div>`;
+  const wrap = document.createElement('div'); wrap.className = 'slice'; wrap.innerHTML = `<canvas></canvas><div class="sl-hud"><span class="sl-score">0 / ${all.length}</span><span class="sl-lives">✦✦✦</span><span class="sl-time">60</span><button class="sl-x" aria-label="Quit">✕</button></div><div class="sl-got" aria-live="polite"></div><div class="sl-start"><div><p class="it-orn">❦</p><h2>Skill Slice</h2><p>Swipe across the film cans to cut out my skills.<br/>Leave the dynamite alone. Three sparks and you're out.</p><div class="reel-acts" style="justify-content:center"><button class="rb p sl-go">Play ▸</button><button class="rb sl-x2">Back to the street</button></div><details class="skill-list"><summary>Just show me the skills list</summary>${skills.map((g) => `<h3>${g.group}</h3><ul>${g.items.map(([n, w]) => `<li><b>${n}</b> <span>${w}</span></li>`).join('')}</ul>`).join('')}</details></div></div>`;
   document.body.appendChild(wrap);
   const cv = wrap.querySelector('canvas'); const g = cv.getContext('2d'); const dpr = Math.min(devicePixelRatio || 1, lite ? 1 : 1.5);
   const $ = (s) => wrap.querySelector(s);
@@ -67,7 +67,7 @@ export function startSlice({ onEnd, sfx = () => {}, lite = false }) {
     s.querySelector('.sl-go').onclick = begin; s.querySelector('.sl-x2').onclick = quit; onEnd?.(n, all.length, false);
   }
   function quit() { cancelAnimationFrame(raf); removeEventListener('resize', resize); wrap.remove(); onEnd?.(got.size, all.length, true); }
-  $('.sl-go').onclick = begin; $('.sl-x').onclick = quit;
+  $('.sl-go').onclick = begin; $('.sl-x').onclick = quit; $('.sl-x2').onclick = quit;
   raf = requestAnimationFrame(frame);
   return { quit };
 }

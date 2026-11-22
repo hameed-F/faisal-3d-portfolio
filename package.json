@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@google/genai": "^3.6.1",
-    "chess.js": "^1.4.0",
     "three": "^0.170.0"
   },
   "devDependencies": {

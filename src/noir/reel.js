@@ -1,5 +1,5 @@
 // MIDNIGHT REEL: the HTML layer. Intertitle cards, iris wipes, and the "reels" (dialogs) each building opens.
-import { profile, aboutZones, skills, journey, projects, certificates } from '../content.js';
+import { profile, aboutZones, journey, projects, certificates } from '../content.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $ = (s, r = document) => r.querySelector(s);
@@ -57,12 +57,6 @@ export function openReel(kind, api = {}) {
     html = frame('The Daily Reel · Extra! Extra!', profile.name, `<p class="paper-dek">${esc(profile.title)} · ${esc(profile.location)}</p><p class="paper-lede">${esc(profile.tagline)}</p>
       <div class="paper-cols">${aboutZones.map((z) => `<div><h3>${esc(z.title)}</h3><p>${esc(z.text)}</p></div>`).join('')}</div>
       <div class="reel-acts"><a class="rb p" href="${profile.resume}" download>Download CV</a><a class="rb" href="${profile.github}" target="_blank" rel="noopener">GitHub ↗</a><a class="rb" href="mailto:${profile.email}">Email</a><button class="rb" data-reel-go="contact">Phone booth (contact form)</button></div>`, 'paper');
-  } else if (kind === 'arcade') {
-    html = frame('Penny Arcade · One coin per play', 'Pick a cabinet', `<div class="cabs">
-      <button class="cab" data-play="slice"><span class="cab-scr">✂</span><b>Skill Slice</b><span>Swipe the flying film cans to slice out my skills. Mind the dynamite.</span></button>
-      <button class="cab" data-play="chess"><span class="cab-scr">♞</span><b>Chess</b><span>Play my own chess engine. Three levels.</span></button>
-      <button class="cab" data-play="snakes"><span class="cab-scr">⚄</span><b>Snakes & Ladders</b><span>Race me up the board of my journey.</span></button></div>
-      <details class="skill-list"><summary>Just show me the skills list</summary>${skills.map((g) => `<h3>${esc(g.group)}</h3><ul>${g.items.map(([n, w]) => `<li><b>${esc(n)}</b> <span>${esc(w)}</span></li>`).join('')}</ul>`).join('')}</details>`);
   }
   e.innerHTML = html; e.hidden = false; e.scrollTop = 0; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop');
   const body = $('.reel-body', e);

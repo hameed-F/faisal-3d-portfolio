@@ -94,7 +94,7 @@ export class PsxRenderer {
       vertexShader: POST_VS, fragmentShader: POST_FS, depthTest: false, depthWrite: false,
       uniforms: {
         tScene: { value: this.rt.texture }, uLowRes: { value: new THREE.Vector2(4, 4) }, uTime: { value: 0 },
-        uGrain: { value: 0.07 }, uDither: { value: 1 }, uVignette: { value: 0.55 },
+        uGrain: { value: 0.07 }, uDither: { value: 1 }, uVignette: { value: 0.32 },
         uShadowTint: { value: new THREE.Color(0.86, 0.98, 1.06) }, uHighTint: { value: new THREE.Color(1.06, 1.0, 0.9) }, uFade: { value: 1 }, uSilent: { value: 0 },
       },
     });
@@ -113,6 +113,13 @@ export class PsxRenderer {
   }
   resize() {
     const w = window.innerWidth; const h = window.innerHeight;
+    if (this.tier.native) { // sharp mode: render at the screen's real resolution with MSAA, 1:1 post pass
+      const pr = Math.min(window.devicePixelRatio || 1, this.tier.maxPR || 2);
+      this.renderer.setPixelRatio(pr); this.renderer.setSize(w, h, false);
+      const W = Math.round(w * pr); const H = Math.round(h * pr);
+      this.rt.samples = this.tier.msaa || 0; this.rt.setSize(W, H);
+      this.post.uniforms.uLowRes.value.set(W, H); psxUniforms.uSnapRes.value.set(W, H); this.aspect = w / h; return;
+    }
     // Final canvas: cheap blit only, so a modest pixel ratio is enough
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.setSize(w, h, false);

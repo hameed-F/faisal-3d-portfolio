@@ -4,7 +4,6 @@ import './noir/noir.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
-import { launchGame, isGameActive, exitGame } from './games/launch.js';
 import { setEnabled as setSound, isEnabled as soundOn, play, savedPreference } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -38,11 +37,10 @@ function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }
 export function enterPageMode() { body.dataset.mode = 'page'; const f = $('#contactForm'); if (f && !$('#contact').contains(f)) $('#contact').appendChild(f); showAllForPage(); $('#chotu').hidden = false; document.querySelectorAll('.nhud,.nlabels,.reel').forEach((e) => { e.hidden = true; }); }
 
 document.addEventListener('click', (e) => {
-  const gm = e.target.closest('[data-game]'); if (gm) { launchGame(gm.dataset.game === 'chess' ? 'chess' : 'snakes', { stage, go, toast }); return; }
   const zn = e.target.closest('[data-zone]'); if (zn) { const i = +zn.dataset.zone; if (stage && body.dataset.mode === '3d') { $('#home').hidden = true; go('home'); stage.warp(i); } else go(['about', 'journey', 'projects', 'skills', 'achievements', 'contact'][i]); return; }
   if (e.target.closest('[data-chotu]')) { hooks.openChat?.(); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (isGameActive()) exitGame(); go(g.dataset.go); return; }
+  if (g) { go(g.dataset.go); return; }
   if (e.target.closest('[data-close]')) { go('home'); return; }
   const c = e.target.closest('[data-cert]'); if (c) openCert(c.dataset.cert);
 });
@@ -112,7 +110,7 @@ async function boot3D() {
     stage = await initNoir({
       canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar, toast: (h, ms) => toast(h, ms), playSfx: (n) => play(n),
       onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
-      onContact: () => go('contact'), onPromo: () => go('promo'), onGame: (k) => launchGame(k === 'chess' ? 'chess' : 'snakes', { stage, go, toast }),
+      onContact: () => go('contact'), onPromo: () => go('promo'),
       onReady: () => { body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;

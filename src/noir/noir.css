@@ -206,9 +206,6 @@ body.in-world .chotu{bottom:calc(4.6rem + var(--safe-b))}
 .toast{background:#14110e;color:var(--paper);border:1px solid var(--gold);border-radius:2px;bottom:calc(5.4rem + var(--safe-b))}
 .toast button{background:var(--gold);border-radius:2px}
 body.silent .nhud .nchip,body.silent .ndock{filter:grayscale(1)}
-.gamehud{background:#14110e!important;color:var(--paper)!important;border:1px solid var(--gold)!important;border-radius:2px!important}
-.gamehud .gh-btn{border-radius:2px;background:transparent;color:var(--paper);border:1px solid rgba(239,228,200,.45)}
-.gamehud .gh-btn.go{background:var(--gold);color:var(--ink);border-color:var(--gold)}
 .chat{background:#14110e;color:var(--paper);border:1px solid var(--gold);border-radius:2px}
 .chat-head{background:#0b0a09;color:var(--paper);border-bottom:1px solid rgba(201,162,74,.4)}
 .chat-head b{font:400 1.1rem var(--deco)}
@@ -219,3 +216,9 @@ body.silent .nhud .nchip,body.silent .ndock{filter:grayscale(1)}
 .chat-form button{background:var(--gold);color:var(--ink);border-radius:2px}
 .chat-form .ic{background:#0b0a09!important;color:var(--paper)!important;border:1px solid rgba(239,228,200,.35)!important}
 .rag{color:var(--dim)}
+
+.ncount{pointer-events:none;color:var(--gold2)}
+.ncount.bump{animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.25);background:var(--gold);color:var(--ink)}}
+.sl-start .skill-list{text-align:left;margin-top:1rem}
+@media (max-width:760px){ .nchips{max-width:calc(100vw - 10.5rem);flex-wrap:wrap} .nchip{padding:.5rem .55rem;font-size:11px} }

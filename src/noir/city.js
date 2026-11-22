@@ -39,7 +39,7 @@ export function buildCity(scene, tier) {
   // ---------- lights (night defaults; setDay() changes them) ----------
   const hemi = new THREE.HemisphereLight('#4a5a7a', '#1a1612', 0.9); scene.add(hemi);
   const moon = new THREE.DirectionalLight('#9fb4e0', 0.75); moon.position.set(-20, 30, 10); scene.add(moon);
-  scene.fog = new THREE.Fog('#0d1018', 14, 62);
+  scene.fog = new THREE.Fog('#0d1018', 38, 120);
   const sky = new THREE.Mesh(new THREE.SphereGeometry(200, 16, 10), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, uniforms: { top: { value: new THREE.Color('#05070d') }, bot: { value: new THREE.Color('#1c2232') } }, vertexShader: 'varying float h; void main(){ h = normalize(position).y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }', fragmentShader: 'uniform vec3 top; uniform vec3 bot; varying float h; void main(){ gl_FragColor = vec4(mix(bot, top, smoothstep(0.0, 0.5, h)), 1.0); }' }));
   sky.frustumCulled = false; scene.add(sky);
   const moonDisc = new THREE.Mesh(new THREE.CircleGeometry(5, 16), new THREE.MeshBasicMaterial({ color: '#f1ead2', fog: false })); moonDisc.position.set(-60, 70, -120); moonDisc.lookAt(0, 0, 0); scene.add(moonDisc);
@@ -55,7 +55,7 @@ export function buildCity(scene, tier) {
   const side = tex(32, 32, (g, w, h) => { g.fillStyle = '#6b6862'; g.fillRect(0, 0, w, h); g.fillStyle = '#58554f'; g.fillRect(0, 0, w, 1); g.fillRect(0, 0, 1, h); noise(g, w, h, ['#757169', '#5f5c56'], 120); }, [60, 2]);
   boxM(120, 0.18, 2.4, M({ map: side }), 0, 0.09, 15);
   // puddles (night reflections: cheap emissive patches)
-  const puddles = []; [[-6, 6], [5, 3], [-11, -4], [9, -7], [1, 11], [-2, 19], [14, 22]].forEach(([x, z]) => { const p = at(new THREE.Mesh(new THREE.CircleGeometry(1 + rnd() * 1.2, 10), new THREE.MeshBasicMaterial({ color: '#1e2a40', transparent: true, opacity: 0.75 })), x, 0.03, z); p.rotation.x = -Math.PI / 2; p.scale.set(1.4, 1, 1); puddles.push(p); });
+  const puddles = []; [[-6, 6], [5, 3], [-11, -4], [9, -7], [1, 11], [-2, 19], [14, 22]].forEach(([x, z]) => { const p = at(new THREE.Mesh(new THREE.CircleGeometry(1 + rnd() * 1.2, 10), new THREE.MeshBasicMaterial({ color: '#1e2a40', transparent: true, opacity: 0.45, depthWrite: false })), x, 0.03, z); p.rotation.x = -Math.PI / 2; p.scale.set(1.4, 1, 1); puddles.push(p); });
 
   // ---------- buildings ----------
   const brickRed = (lit) => tex(64, 128, facade('#5a2e24', '#3a1d17', lit));
@@ -121,7 +121,7 @@ export function buildCity(scene, tier) {
     g.add(Object.assign(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 4.2, 6), M({ color: '#16171b' })), {}).translateY(2.1));
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.42, 0.32), new THREE.MeshBasicMaterial({ color: '#ffd28a' })); head.position.y = 4.25; g.add(head);
     const cap = new THREE.Mesh(new THREE.ConeGeometry(0.36, 0.3, 4), M({ color: '#16171b' })); cap.position.y = 4.6; cap.rotation.y = Math.PI / 4; g.add(cap);
-    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.2, 16), new THREE.MeshBasicMaterial({ color: '#ffcf8a', transparent: true, opacity: 0.085, depthWrite: false })); pool.rotation.x = -Math.PI / 2; pool.position.y = 0.04; g.add(pool);
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.2, 16), new THREE.MeshBasicMaterial({ color: '#ffcf8a', transparent: true, opacity: 0.05, depthWrite: false })); pool.rotation.x = -Math.PI / 2; pool.position.y = 0.04; g.add(pool);
     if (i < (hi ? 5 : 2)) { const L = new THREE.PointLight('#ffc27a', 18, 11, 1.6); L.position.set(x, 4.0, z); scene.add(L); lampLights.push(L); }
     cols.push({ x, z, r: 0.25 }); lampHeads.push(head, pool);
   });
@@ -148,7 +148,7 @@ export function buildCity(scene, tier) {
   function setDay(day) {
     hemi.color.set(day ? '#dfe4ea' : '#4a5a7a'); hemi.groundColor.set(day ? '#6a5a48' : '#1a1612'); hemi.intensity = day ? 1.5 : 0.9;
     moon.color.set(day ? '#fff1dc' : '#9fb4e0'); moon.intensity = day ? 1.6 : 0.75;
-    scene.fog.color.set(day ? '#c8bea8' : '#0d1018'); scene.fog.near = day ? 30 : 14; scene.fog.far = day ? 120 : 62;
+    scene.fog.color.set(day ? '#c8bea8' : '#0d1018'); scene.fog.near = day ? 50 : 38; scene.fog.far = day ? 160 : 120;
     sky.material.uniforms.top.value.set(day ? '#5d84b8' : '#05070d'); sky.material.uniforms.bot.value.set(day ? '#e3d3b2' : '#1c2232');
     moonDisc.visible = !day; lampLights.forEach((l) => { l.intensity = day ? 0 : 18; }); lampHeads.forEach((h) => { h.visible = !day || h.geometry.type !== 'CircleGeometry'; });
     rain.visible = !day; puddles.forEach((p) => { p.material.color.set(day ? '#5a6370' : '#1e2a40'); });
