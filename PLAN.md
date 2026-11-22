@@ -1,48 +1,46 @@
 # PLAN — Muhammad Faisal Hameed · Interactive 3D Portfolio
 
-Status: **APPROVED by the owner (2026-11-22).** Building has started.
+Status: **APPROVED by the owner (2026-11-22). Concept revised to "The Tower" on the owner's request (see §1).**
 **Timeline: everything today. Nothing is cut up front, including Free Drive and voice chat.** §13 is now only an emergency order, used if something genuinely can't be finished. The owner is told before anything is dropped.
 Facts about the owner come only from `../source/`. Anything missing is listed in §12, never invented.
 
 ---
 
-## 1. Concept: "Game Night"
+## 1. Concept: "The Tower" (current, 2026-11-22 night)
 
-The portfolio is a small game you play through.
+> Replaces the earlier Game Night cabin, the open world and the film layer, all scrapped by the owner. Inspiration: Bob the Robber-style cutaway buildings and the owner's reference screenshot.
 
-1. **Title screen.** A dusk forest behind a retro game menu: name, tagline, and **Start Game / Free Drive / Quick Menu / Options (Lite mode, sound, theme) / Credits**.
-2. **The drive (cut-scene, skippable).** The camera follows a car along a forest road at dusk, with headlights on. Your name and tagline appear as roadside signs. This takes about 8 seconds and can be skipped with any key or tap.
-3. **The cabin.** The car pulls up to a cabin with warm windows. **Your avatar waves at the door** (the Waving clip), then the camera goes inside.
-4. **The game table (the hub).** A table under a warm lamp holds the board games. Each board is one section. Click or tap a board and the camera flies to it, and an HTML panel slides in with that section's content. **Back** returns to the table, and the **Quick Menu** (always visible) jumps to any section directly.
-5. **Free Drive (optional mode).** Steer the car around the forest yourself, on keyboard or with touch buttons on phones. Signposts in clearings lead to each section. It's off in Lite mode, and it's the first feature cut if time runs short.
+A 3D building with its front wall cut away, like a dollhouse. Each floor is one part of the portfolio. You click a room or an object and the avatar walks there himself, taking the lift between floors.
 
-**Why it works:** it feels like a game and an exploration, but a recruiter or the teacher can still reach any section in one click, and all text is real HTML (sharp, readable, searchable, accessible).
+1. **Landing:** a close-up of the avatar on the sidewalk, with his name and tagline. He waves. Two buttons: *Enter the tower* and *Read as a page*.
+2. **Entrance:** the camera pulls back, he walks to the building, jumps up the steps (Jump clip) and enters the lobby. The intro can be skipped with a tap.
+3. **Inside:** click anything to walk there (WASD also works). The floor buttons on the right take the lift. Phones use the same tap-to-walk, so there's no joystick to learn.
+4. **Small interactive props** in every room open a short, clean info card: a title, a meta line and 2 to 4 short lines, with buttons. Yellow diamonds mark things you haven't looked at yet. A tooltip names an object on hover, and **E** uses the nearest one.
+5. **Street life:** pedestrians, a cat, birds, a pastel city skyline, clouds, flower beds and street lamps.
 
-### Board → section mapping
-| Object on the table / in the cabin | Section (brief, Module 1) | Content source | Interactive |
-|---|---|---|---|
-| Title screen + drive + avatar at door | **Home**: name, intro, profile | `profile.md` | Avatar greets; skip button |
-| **Ludo board**: four colored home zones | **About Me**: who I am, what I build, what I'm doing now, what I'm looking for | `profile.md` | Tap a zone to open it |
-| **Chess board**: each piece type is a skill group | **Skills & technologies** | `profile.md` skills table | Tap a piece; **play chess vs AI** |
-| **Property board** (original design, not Monopoly): 12 properties, color group = engine | **Projects & achievements** gallery (5 featured, 7 compact) | `projects.md`, `links.md`, project images | Filter by color group, search, sort |
-| **Snakes & Ladders board**: squares are milestones, ladders are big steps | **Education & experience** (NED, KDA, Aerox ERP, Brave Believers, GGJ 2026) | `profile.md` | **Play vs CPU**; tap squares |
-| **Trophy shelf** on the cabin wall: one framed certificate or small trophy per credential | **Achievements / certificates** (6 credentials + KDA letter) | `certificates.md`, certificate images | Tap a frame: lightbox with the scan + verify link |
-| **Old CRT TV** in the corner | **Promo video** (Module 3) | YouTube link in config (placeholder for now) | Tap to play |
-| **Mailbox / rotary phone** by the door | **Contact** (Module 5) | `profile.md` | Opens the contact form |
-| **Chotu the snake**, always on screen | **RAG chatbot** (Module 4) | chunks built from `source/` | Tap to chat |
+### Floors
+| Floor | Room | Interactive props → what happens |
+|---|---|---|
+| L | Lobby | **Chotu at the reception desk** → chatbot · **TV** → promo video · **red phone booth** (rings when you come near) → contact form · sofa → sits (Sit) |
+| 1 | About me | desk + laptop → sits, profile card + Download CV · bookshelf → "four sides of me" tiles · printer → CV card (Throw) · coffee machine → Think |
+| 2 | Journey | chalkboard → education card · timeline wall → 7 milestones · **Snakes & Ladders table** → play vs CPU (milestone squares open cards) |
+| 3 | Projects | **12 screens** with each project's image → project card (role, summary, contributions, links) · arcade cabinet → links to the 3 browser games · NPC gamer |
+| 4 | Skills | 5 pedestals with chess-piece statues (one per skill group) → skill card · **chess table** → play vs AI (3 levels) |
+| 5 | Trophies | 6 framed certificates → card with image + Verify / full size · trophy cup → Victory |
+| R | Roof | trampoline → jumps (Jump ×3) · bench → sits · boombox → Dance |
 
-## 2. Art direction: "Dusk retro", light version
+### Avatar clips used (all 12)
+Idle, Walk (sped up for long walks), Wave (landing, arrival), Jump (entrance steps, trampoline), Sit (sofa, desk, bench), Point (screens, frames, boards), Talk (Chotu, phone), Think (coffee, chess AI turn), Throw (printer, arcade, dice), Victory (trophy, wins, ladders, contact sent), Disappointed (losing, snakes), Dance (boombox, standing idle for 20 s).
 
-- **Palette:** muted teal and deep blue for outdoors, amber and warm wood indoors, cream for UI panels. Accent: one warm orange. **No neon, no bloom, no glowing outlines.**
-- **Lighting:** dusk sky gradient + fog outdoors; headlights and warm cabin windows are the only strong lights. Interior is warm and well lit so text and boards read clearly on phones. Lighting is **baked** into textures wherever possible (cheap and good-looking).
-- **Retro treatment (light):** low-poly models, small pixel-sharp textures (nearest filtering), subtle film grain and vignette, and the 3D drawn at a slightly lower resolution and scaled up (looks retro *and* is faster). Lite mode lowers the resolution further and drops grain.
-- **UI:** game-menu style. Chunky display font for headings, a clean readable font for body text, cream panels with a thin dark outline, HUD-style chips (section name, Lite mode toggle, sound, menu).
-- **Fonts:** the three reference fonts (Nimbus, Monfem, Humankind) are commercial. We'll pick a free (OFL) display font with a similar feel. Decided in phase 1 from 2–3 samples.
-- **Consistency rule:** every downloaded model gets the same palette and material treatment (recolored or retextured in Blender if needed), so nothing looks pasted in.
+### Dropped from earlier versions
+The film layer (chapter cards, narrator, jazz, Film mode), the open world (forest, hut, board worlds, project houses, minimap, exploration counter), the drivable car, Free Drive, the PS1 table version, and the Explore/Film/Read mode switch. Only the Read page remains as the alternative view.
+
+## 2. Art direction
+Bright, clean and friendly: warm daylight, pastel city, a red and yellow accent palette, flat-shaded low-poly models, a white UI with rounded cards, and the Chakra Petch + Inter fonts. No grain, no neon, no text walls.
 
 ## 3. Avatar (Module 2)
 
-**Status: DONE (2026-11-22).** `avatar/export/avatar.glb` is **0.85 MB**, with all 10 clips, and it was tested in a real Three.js page with no loading errors.
+**Status: DONE (2026-11-22).** `avatar/export/avatar.glb` is **0.9 MB**, with all 12 clips (SittingIdle → `Sit`, Jump added later the same day), and it was tested in a real Three.js page with no loading errors.
 
 What was done (source `avatar/blend/sunnywithmaterialandrigged.blend` is untouched; all work is in `avatar/blend/avatar_work.blend`):
 1. Rig checked: `mixamorig:` skeleton, 65 bones. All 10 Mixamo FBX clips matched every bone.
@@ -220,11 +218,11 @@ Nothing is cut in advance. If today runs out, drop from the top of this list:
 
 | Module / item | How the concept delivers it | Still open |
 |---|---|---|
-| 1. 3D web portfolio (Home, About, Skills, Projects, Education & Experience, Contact; smooth transitions; responsive) | Game Night: title, drive and cabin = Home; Ludo = About; Chess = Skills; Property board = Projects; Snakes & Ladders = Education & experience; Trophy shelf = certificates; Mailbox = Contact. Camera flights + panels; Lite and Basic tiers; mobile layout | Font choice; content gaps below |
-| 2. Custom 3D avatar (Blender → GLB, animated) | **Done:** your avatar + all 10 Mixamo clips in one 0.85 MB GLB, every clip used on the site; follows the mouse | — |
-| 3. Promo video (After Effects, 30–60 s, embedded) | CRT TV in the cabin plays it; one-line config | **You** make the video and give the YouTube link |
-| 4. RAG chatbot + explanation | Chotu the snake; chunk → embed → retrieve → grounded Gemini answer with citations; "How Chotu works" panel | Confirm current Gemini model names at build time |
-| 5. Email/contact (validation, spam protection, env vars, delivery evidence) | Mailbox form → `/api/contact` → Brevo; honeypot + rate limit | **You** verify the Brevo sender, set Vercel env vars, take the screenshot |
+| 1. 3D web portfolio (Home, About, Skills, Projects, Education & Experience, Contact; smooth transitions; responsive) | The Tower: landing = Home; floor 1 About; 2 Journey (education & experience); 3 Projects; 4 Skills; 5 Trophies (achievements); lobby phone = Contact. Avatar walks + lift transitions; Read page; Lite/Basic tiers; phone + laptop layouts | Content gaps below |
+| 2. Custom 3D avatar (Blender → GLB, animated) | **Done:** your avatar + all 12 Mixamo clips (incl. SittingIdle, Jump) in one 0.9 MB GLB; every clip used in the tower | — |
+| 3. Promo video (After Effects, 30–60 s, embedded) | Lobby TV opens the embedded player; one-line config (`PROMO_VIDEO_URL` in `src/content.js`) | **You** make the video and give the YouTube link |
+| 4. RAG chatbot + explanation | Chotu the snake at the lobby reception desk (and the floating button); chunk → embed → retrieve → grounded Gemini answer with citations; "How Chotu works" panel | Confirm current Gemini model names at build time |
+| 5. Email/contact (validation, spam protection, env vars, delivery evidence) | Ringing lobby phone booth / menu → form → `/api/contact` → Brevo; honeypot + rate limit | **You** verify the Brevo sender, set Vercel env vars, take the screenshot |
 | 6. Deployment + documentation | Vercel from GitHub with preview branches; README, DEVLOG, credits | **You** connect the repo to Vercel |
 | Extra credit | Citations, filtering/search/sort, gestures, mouse-reactive 3D, accessibility, theme, analytics, multilingual (voice optional) | — |
 

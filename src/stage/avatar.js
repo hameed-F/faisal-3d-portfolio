@@ -4,7 +4,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { psxify } from './psx.js';
 import { blobShadowTex } from './textures.js';
 
-const LOOPS = new Set(['Idle', 'Walk', 'Talk', 'Think', 'Dance']);
+const LOOPS = new Set(['Idle', 'Walk', 'Talk', 'Think', 'Dance', 'Sit']);
 
 export async function loadAvatar(url, onProgress) {
   const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));

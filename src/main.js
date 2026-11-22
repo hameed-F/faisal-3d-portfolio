@@ -1,10 +1,11 @@
 import './style.css';
 import './theme.css';
+import './building/tower.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
 import { launchGame, isGameActive, exitGame } from './games/launch.js';
-import { setEnabled as setSound, isEnabled as soundOn, play, setScene, setEngine, savedPreference } from './audio.js';
+import { setEnabled as setSound, isEnabled as soundOn, play, savedPreference } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -12,61 +13,51 @@ const body = document.body;
 const hooks = {};
 renderAll(hooks);
 
-// ---------- tiny helpers ----------
 const store = {
   get: (k, d) => { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
 };
-export function toast(html, ms = 7000) {
+export function toast(html, ms = 6000) {
   const t = $('#toast'); t.innerHTML = html; t.hidden = false;
   clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, ms);
 }
 
-// ---------- navigation between sections ----------
+// ---------- HTML panels (contact, promo, credits in 3D; everything in Read mode) ----------
 const PANELS = ['about', 'skills', 'projects', 'journey', 'achievements', 'promo', 'contact', 'credits'];
-let current = 'home';
-export const nav = { onChange: [] };
-let introDone = false;
+const OVERLAY = ['promo', 'contact', 'credits']; // panels that open on top of the 3D tower
+let stage = null;
 export function go(id) {
-  if (id !== 'home' && !PANELS.includes(id)) return;
-  current = id;
-  $$('#quickmenu .chip').forEach((c) => c.classList.toggle('active', c.dataset.go === id));
   if (body.dataset.mode === 'page' || body.dataset.tier === 'basic') {
-    if (id !== 'home') $('#' + id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    else window.scrollTo({ top: 0, behavior: 'smooth' });
-  } else {
-    $('#home').hidden = !(id === 'home' && !introDone);
-    PANELS.forEach((p) => { $('#' + p).hidden = p !== id; });
-    if (id !== 'home') $('#' + id).scrollTop = 0;
+    if (id === 'home' || !PANELS.includes(id)) window.scrollTo({ top: 0, behavior: 'smooth' }); else $('#' + id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
   }
-  if (location.hash.slice(1) !== id) history.replaceState(null, '', id === 'home' ? location.pathname + location.search : '#' + id);
-  nav.onChange.forEach((f) => f(id));
+  PANELS.forEach((p) => { $('#' + p).hidden = p !== id || !OVERLAY.includes(id); });
+  if (OVERLAY.includes(id)) { $('#' + id).scrollTop = 0; play('open'); }
 }
 function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }); $('#home').hidden = true; }
+export function enterPageMode() { body.dataset.mode = 'page'; showAllForPage(); $('#chotu').hidden = false; $$('.floors,.act-prompt,.ctrl-help,.floor-banner,.icard').forEach((e) => { e.hidden = true; }); }
 
 document.addEventListener('click', (e) => {
   const gm = e.target.closest('[data-game]'); if (gm) { launchGame(gm.dataset.game === 'chess' ? 'chess' : 'snakes', { stage, go, toast }); return; }
-  const g = e.target.closest('[data-go]'); if (g) { if (isGameActive()) exitGame(); const id = g.dataset.go; if (stage && body.dataset.mode === '3d' && ['about', 'skills', 'projects', 'journey', 'achievements'].includes(id)) { go('home'); stage.teleportTo(id); return; } go(id); return; }
+  const g = e.target.closest('[data-go]');
+  if (g) {
+    if (isGameActive()) exitGame();
+    const id = g.dataset.go;
+    if (stage && body.dataset.mode === '3d') {
+      if (id === 'contact') { stage.goSection('lobby'); go('contact'); return; }
+      if (OVERLAY.includes(id)) { go(id); return; }
+      if (id === 'home') return;
+      go('home'); $('#home').hidden = true; stage.goSection(id); return;
+    }
+    go(id); return;
+  }
   if (e.target.closest('[data-close]')) { go('home'); return; }
   const c = e.target.closest('[data-cert]'); if (c) openCert(c.dataset.cert);
 });
 $('#lbClose').addEventListener('click', () => { $('#lightbox').hidden = true; });
 $('#lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') $('#lightbox').hidden = true; });
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { if (!$('#lightbox').hidden) $('#lightbox').hidden = true; else if (current !== 'home' && body.dataset.mode !== 'page') go('home'); }
-});
-
-// ---------- theme ----------
-const applyTheme = (t) => { body.dataset.theme = t; store.set('theme', t); document.querySelector('meta[name=theme-color]').content = t === 'day' ? '#cfe0e6' : '#14202b'; nav.onTheme?.(t); };
-applyTheme(store.get('theme', 'dusk'));
-$('#themeChip').addEventListener('click', () => applyTheme(body.dataset.theme === 'day' ? 'dusk' : 'day'));
-
-// ---------- "read as a page" / basic mode ----------
-export function enterPageMode() {
-  body.dataset.mode = 'page'; showAllForPage();
-  $('#chotu').hidden = false;
-}
-$('#plainBtn').addEventListener('click', () => { enterPageMode(); window.scrollTo(0, 0); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('#lightbox').hidden) $('#lightbox').hidden = true; else if (body.dataset.mode !== 'page') go('home'); } });
+body.dataset.theme = 'day';
 
 // ---------- contact form ----------
 const form = $('#contactForm');
@@ -90,7 +81,7 @@ form.addEventListener('submit', async (ev) => {
   try {
     const r = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
     const j = await r.json().catch(() => ({}));
-    if (r.ok && j.ok) { msg.className = 'msg ok'; msg.textContent = 'Thank you. Your message was sent and I will reply by email.'; form.reset(); hooks.onContactSent?.(); }
+    if (r.ok && j.ok) { msg.className = 'msg ok'; msg.textContent = 'Thank you. Your message was sent and I will reply by email.'; form.reset(); stage?.avatar.play('Victory'); play('win'); }
     else { msg.className = 'msg err'; msg.textContent = j.error || 'Sorry, the message could not be sent. Please email me directly.'; if (j.fields) $$('[data-err]', form).forEach((s) => { s.textContent = j.fields[s.dataset.err] || ''; }); }
   } catch { msg.className = 'msg err'; msg.textContent = 'Network problem. Please try again, or email me directly.'; }
   finally { btn.disabled = false; btn.textContent = 'Send message'; }
@@ -101,103 +92,69 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const det = detectTier();
 const qp = new URLSearchParams(location.search).get('q'); // ?q=lite|full|basic for testing
 let tier = TIERS[qp] ? qp : det.tier;
-let stage = null; let fromWorldNav = false;
-const tierLabel = () => { $('#tierLabel').textContent = TIERS[tier].name; };
 const loadBar = (f, m) => { $('#loadBar').style.width = Math.round(f * 100) + '%'; if (m) $('#loadMsg').textContent = m; };
 
 function startBasic(reason) {
-  body.dataset.tier = 'basic'; tier = 'basic'; tierLabel();
+  body.dataset.tier = 'basic'; tier = 'basic';
   enterPageMode(); $('#loader').classList.add('done');
   if (reason) toast(`Showing the text version because ${reason}. <button data-tier="full">Try 3D</button>`, 9000);
 }
-
 function setTier(t, manual = false) {
   if (t === tier) return;
   if (manual) saveTier(t);
-  if (t === 'basic' || tier === 'basic') { if (!manual) saveTier(t); location.reload(); return; }
-  tier = t; body.dataset.tier = t; tierLabel(); stage?.setTier(t);
+  if (t === 'basic' || tier === 'basic') { location.reload(); return; }
+  tier = t; body.dataset.tier = t; stage?.setTier(t);
+  toast(`Quality: <b>${TIERS[t].name}</b>`, 2000);
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-tier]'); if (!b) return;
   const t = b.dataset.tier; if (t === 'auto') { clearSavedTier(); location.reload(); return; }
-  setTier(t, true); $('#toast').hidden = true;
-});
-$('#tierChip').addEventListener('click', () => {
-  toast('Quality: <button data-tier="full">Full</button><button data-tier="lite">Lite</button><button data-tier="basic">Text only</button><button data-tier="auto">Auto</button>', 10000);
+  setTier(t, true);
 });
 
 async function boot3D() {
-  body.dataset.tier = tier; body.dataset.mode = '3d'; tierLabel();
+  body.dataset.tier = tier; body.dataset.mode = '3d';
   $('#home').hidden = false;
-  let switchedOnLoad = false;
-  const slowLoad = setTimeout(() => {
-    if (tier === 'full' && !det.manual && !qp) { tier = 'lite'; switchedOnLoad = true; body.dataset.tier = 'lite'; tierLabel(); toast('Loading slowly, so I switched to <b>Lite mode</b>. <button data-tier="full">Back to Full</button>'); }
-  }, 6000);
   try {
-    const { initWorld } = await import('./world/index.js');
-    stage = await initWorld({
-      canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar,
-      onSection: (id, o) => { fromWorldNav = !!o?.fromWorld; go(id); }, onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
+    const { initTower } = await import('./building/index.js');
+    stage = await initTower({
+      canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar, toast: (h, ms) => toast(h, ms),
+      onSection: (id) => go(id), onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
       onGame: (k) => launchGame(k, { stage, go, toast }),
-      toast: (h, ms) => toast(h, ms),
-      onPlayStart: () => { introDone = true; $('#home').hidden = true; body.classList.add('in-world'); },
+      onPlayStart: () => { $('#home').hidden = true; body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;
         if (why === 'context') { startBasic('the graphics driver stopped responding'); return; }
-        if (tier === 'full') { setTier('lite'); toast(`<b>Lite mode is on.</b> The full version was running slowly on this device (${fps | 0} fps), so I lowered the detail. <button data-tier="full">Switch back</button>`, 10000); }
-        else if (tier === 'lite' && fps < 14) { toast(`This device is struggling with 3D (${fps | 0} fps). <button data-tier="basic">Use the text version</button>`, 12000); }
+        if (tier === 'full') { setTier('lite'); toast(`<b>Lite mode is on</b> to keep things smooth (${fps | 0} fps). <button data-tier="full">Switch back</button>`, 9000); }
+        else if (tier === 'lite' && fps < 14) toast(`This device is struggling with 3D. <button id="toRead">Read as a page</button>`, 12000);
       },
     });
-    clearTimeout(slowLoad);
-    if (switchedOnLoad) stage.setTier('lite');
-    stage.setTheme(body.dataset.theme); nav.onTheme = (t) => stage.setTheme(t);
-    nav.onChange.push((id) => { if (id === 'home') stage.closePanel(); else stage.focusSection(id, { fromWorld: fromWorldNav }); fromWorldNav = false; });
-    hooks.stage = stage;
-    stage.sfx = play; stage.onSpeed = (v) => (v === null ? setEngine(null) : setEngine(v));
+    hooks.stage = stage; stage.sfx = play;
     loadBar(1, 'Ready'); setTimeout(() => $('#loader').classList.add('done'), 250);
-    if (det.reasons.length && tier === 'lite' && !det.manual) toast(`<b>Lite mode</b> is on (${det.reasons[0]}). <button data-tier="full">Switch to Full</button>`, 8000);
-    const start = location.hash.slice(1);
-    if (PANELS.includes(start)) go(start);
-  } catch (err) {
-    clearTimeout(slowLoad); console.error(err); startBasic('the 3D scene could not start');
-  }
+    if (det.reasons.length && tier === 'lite' && !det.manual) toast(`<b>Lite mode</b> is on (${det.reasons[0]}). <button data-tier="full">Switch to Full</button>`, 7000);
+  } catch (err) { console.error(err); startBasic('the 3D scene could not start'); }
 }
 
 $('#chotu').hidden = false;
 initChat({ go, hooks });
-import('./cinema.js').then(({ setNarrationVoice }) => setNarrationVoice(() => soundOn()));
-import('./music.js').then(({ music }) => music(true));
+const readMode = () => { enterPageMode(); window.scrollTo(0, 0); $('#menuSheet').hidden = true; };
 $('#startBtn').addEventListener('click', () => { $('#home').hidden = true; stage?.startPlay(); });
-$('#creditsBtn').addEventListener('click', () => { go('credits'); });
+$('#plainBtn').addEventListener('click', readMode);
+$('#readBtn').addEventListener('click', readMode);
+document.addEventListener('click', (e) => { if (e.target.id === 'toRead') readMode(); });
+$('#brandChip').addEventListener('click', () => { if (body.dataset.mode === 'page') { location.reload(); } });
 if (tier === 'basic') startBasic(det.reasons[0]); else boot3D();
 document.addEventListener('visibilitychange', () => stage?.pause(document.hidden));
-window.__app = { go, toast, hooks, store, nav, get stage() { return stage; } };
+window.__app = { go, toast, hooks, store, get stage() { return stage; } };
 
 // ---------- sound ----------
 const soundChip = $('#soundChip');
 const showSound = () => { soundChip.textContent = soundOn() ? '♪ on' : '♪ off'; soundChip.setAttribute('aria-pressed', String(soundOn())); };
 soundChip.addEventListener('click', () => { setSound(!soundOn()); showSound(); });
-if (savedPreference()) { const once = () => { setSound(true); showSound(); removeEventListener('pointerdown', once); }; addEventListener('pointerdown', once); } // browsers need a tap first
-nav.onChange.push((id) => play(id === 'home' ? 'close' : 'open'));
+if (savedPreference()) { const once = () => { setSound(true); showSound(); removeEventListener('pointerdown', once); }; addEventListener('pointerdown', once); }
 
-// ---------- phone menu sheet ----------
+// ---------- menu sheet ----------
 const sheet = $('#menuSheet');
 $('#menuChip').addEventListener('click', () => { sheet.hidden = false; $('#sheetClose').focus(); });
 $('#sheetClose').addEventListener('click', () => { sheet.hidden = true; });
 sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-go],[data-tier]')) sheet.hidden = true; });
-$('#sheetTheme').addEventListener('click', () => { $('#themeChip').click(); });
-$('#sheetSound').addEventListener('click', () => { soundChip.click(); });
-
-// ---------- modes: Explore / Film / Read ----------
-import('./world/tour.js').then(({ playTour, stopTour, tourRunning }) => {
-  const setPressed = (m) => document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
-  async function setMode(m) {
-    if (m === 'read') { if (tourRunning()) stopTour(); enterPageMode(); window.scrollTo(0, 0); setPressed('read'); return; }
-    if (body.dataset.mode === 'page') { location.hash = ''; location.reload(); return; }
-    if (!stage) return;
-    if (m === 'film') { if (tourRunning()) return; setPressed('film'); $('#home').hidden = true; go('home'); if (stage.phase === 'title') { introDone = true; body.classList.add('in-world'); } stage.player.enable(false); await playTour(stage, { onEnd: () => { setPressed('explore'); if (stage.phase === 'walk' || stage.phase === 'title') { stage.skipIntro?.(); stage.player.enable(true); } } }); }
-    else { if (tourRunning()) stopTour(); setPressed('explore'); if (stage.phase === 'title') { $('#home').hidden = true; stage.startPlay(); } }
-  }
-  document.addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) { $('#menuSheet').hidden = true; setMode(b.dataset.mode); } });
-  $('#filmBtn').addEventListener('click', () => setMode('film'));
-});

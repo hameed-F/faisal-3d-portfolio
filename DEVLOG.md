@@ -35,3 +35,9 @@
 - Modes: Explore / Film (hands-free tour of all chapters) / Read.
 - Animations: Throw (car keys, dice), Victory (discover, ladders), Point (near interactables), Disappointed (crash, snakes), Dance (idle 10 s, music swells), Think+Talk (info cards), Wave (arrival), Walk/Idle.
 - Measured (house interior, Full): 33 draw calls, 33k triangles. Normalized repo line endings to LF (.gitattributes).
+
+## 2026-11-22 (late night): "The Tower"
+- Owner scrapped the film/open-world version. Rebuilt as a cutaway multi-floor building (src/building/): landing close-up on the avatar → walks in, jumps the steps → lobby. Click anything to walk there; floor buttons take the lift. Floors: Lobby (Chotu desk, promo TV, ringing phone booth, sofa), About, Journey (+ Snakes & Ladders table), Projects (12 screens, arcade), Skills (statues + chess table), Trophies, Roof (trampoline, bench, boombox). Short info cards replace long text. NPC walkers, cat, birds, pastel city.
+- Avatar: added SittingIdle (Sit) and Jump, in place; 12 clips, 0.9 MB (meshopt).
+- Static building + street merged into one vertex-coloured mesh. Measured (lobby, Full, headless Intel UHD): 36 draw calls, 42k triangles. Building chunk 37.6 kB gz.
+- Removed scrapped modules: src/world/*, cinema.js, music.js, stage/index.js, stage/world.js, stage/freedrive.js.
