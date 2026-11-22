@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { blocked } from './scene.js';
+import { blocked } from './areas.js';
 
 // Arcade car the avatar can get into (E) and out of (E again).
 export function createCar({ car, wheels, headlight, camera, colliders, onSpeed }) {
@@ -32,7 +32,7 @@ export function createCar({ car, wheels, headlight, camera, colliders, onSpeed }
     exit() { st.active = false; pad.hidden = true; onSpeed?.(null); keys.clear(); Object.keys(touch).forEach((k) => { touch[k] = 0; }); headlight.intensity = 0;
       // a free spot beside the driver's door
       const side = new THREE.Vector3(Math.cos(st.heading), 0, -Math.sin(st.heading));
-      for (const s of [1.9, -1.9, 3, -3]) { const p = car.position.clone().addScaledVector(side, s); if (!blocked(colliders, p.x, p.z, 0.4)) return p; }
+      for (const s of [2.7, -2.7, 3.6, -3.6]) { const p = car.position.clone().addScaledVector(side, s); if (!blocked(colliders, p.x, p.z, 0.4)) return p; }
       return car.position.clone().addScaledVector(fwd, -3.5);
     },
   };

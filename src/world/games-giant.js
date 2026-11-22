@@ -3,6 +3,7 @@ import { makePiece, diceMaterials, FACE_UP } from '../stage/games3d.js';
 import { frToSq } from '../games/chess.js';
 import { SNAKES, LADDERS } from '../games/snakes.js';
 import { mat } from './materials.js';
+import { plaqueTex, standee } from './plaque.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const tween = (dur, fn) => new Promise((res) => { const t0 = performance.now(); const step = (now) => { const k = Math.min(1, (now - t0) / (dur * 1000)); fn(k); if (k < 1) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); });
@@ -76,7 +77,7 @@ export function snakesGiantView(api) {
   const face = (who, target) => { const d = target.clone().sub(actor[who].position); if (who === 'you') actor.you.rotation.y = Math.atan2(d.x, d.z); else actor.cpu.rotation.y = Math.atan2(-d.z, d.x); };
   // giant dice
   const dice = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), diceMaterials()); dice.castShadow = true; dice.visible = false; b.group.parent.add(dice);
-  const savedAvatar = { pos: api.avatar.group.position.clone(), rot: api.avatar.group.rotation.y };
+  const savedAvatar = { pos: api.avatar.group.position.clone(), rot: api.avatar.group.rotation.y }; const signs = [];
   return {
     reset(p) { place('you', p.you); place('cpu', p.cpu); face('you', toWorld(1)); api.avatar.setBase('Idle'); api.gameFollow = actor.you; },
     async rollDice(v, who) {
@@ -106,6 +107,13 @@ export function snakesGiantView(api) {
       });
       if (who === 'you') { api.avatar.setBase('Idle'); if (kind === 'snake') api.avatar.play('Disappointed'); else api.avatar.play('Victory'); }
     },
-    dispose() { dice.parent?.remove(dice); api.chotuBusy = false; api.avatar.group.position.copy(savedAvatar.pos); api.avatar.group.rotation.y = savedAvatar.rot; api.avatar.setBase('Idle'); },
+    async milestone(n, j, count) { // a sign rises out of the square with that step of the journey
+      const pos = toWorld(n); const st = standee(plaqueTex([{ k: `Journey · step ${count} of 7 · ${j.when}` }, { h: j.title }, { t: j.where }, { t: j.text }]), 4.2, 2.6, '#5a2f19');
+      st.position.set(pos.x - 2.6, pos.y - 3.6, pos.z - 1.2); st.lookAt(pos.x - 2.6, pos.y, pos.z + 10); b.group.parent.add(st); signs.push(st);
+      api.avatar.play('Victory'); api.sfx?.('ladder');
+      await tween(0.7, (k) => { st.position.y = pos.y - 3.6 + easeOut(k) * 3.6; });
+      api.gameFollow = { position: pos.clone().add(new THREE.Vector3(-2.4, 1.5, -2)) }; await sleep(3600); api.gameFollow = actor.you;
+    },
+    dispose() { signs.forEach((s) => s.parent?.remove(s)); dice.parent?.remove(dice); api.chotuBusy = false; api.avatar.group.position.copy(savedAvatar.pos); api.avatar.group.rotation.y = savedAvatar.rot; api.avatar.setBase('Idle'); },
   };
 }

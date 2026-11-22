@@ -30,6 +30,7 @@ export const sfx = {
   win() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, 0.14, 'square', 0.08, null, i * 0.11)); },
   lose() { [392, 330, 262].forEach((f, i) => tone(f, 0.22, 'triangle', 0.09, null, i * 0.18)); },
   chotu() { burst(0.25, 6000, 0.08, 0, 2); tone(1400, 0.08, 'sine', 0.04, 1800, 0.05); },
+  ring() { for (let i = 0; i < 8; i++) { tone(1320, 0.05, 'square', 0.05, null, i * 0.07); tone(1100, 0.05, 'square', 0.05, null, i * 0.07 + 0.035); } },
   send() { tone(660, 0.07, 'square', 0.06); tone(990, 0.1, 'square', 0.06, null, 0.06); },
 };
 

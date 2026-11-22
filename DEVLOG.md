@@ -20,3 +20,9 @@
 - Live check after keys: /api/chat 200 in 2.2 s; /api/contact sent a test message (Brevo accepted, HTTP 200). Improved chunks (stack in contribution chunks + one chunk per engine group, 52 chunks) and top-5 retrieval; 'Three.js games' now returns all three.
 - Exploration: 8 places tracked (localStorage), zone-arrival banners, 'Discovered' toasts + sound, minimap with player arrow, full map (M / tap) with fast travel, beacons over unexplored zones, highlight ring under the nearest interactable.
 - Phone: menu sheet replaces the chip row under 860 px, title moved to the bottom, joystick hint, RUN toggle, big tap-to-interact button, panels as bottom sheets; minimap hides while a panel is open.
+
+## 2026-11-22 (evening): hut + board worlds (owner's change list)
+- Flow: landing with avatar + car (avatar waves facing the camera) → walk or drive to the hut (minimap with distance + arrow) → walkable hut with the board table → click a board (or E next to it) → camera dives into it → you are inside that board world (exit portal back).
+- Board worlds: Project Street (12 houses; each house interior shows the project poster, info and contributions on the walls; arcade cabinet opens the link), Snakes & Ladders (milestone signs rise out of the squares; Victory on ladders, Disappointed on snakes, slide along snake bodies), Ludo garden (about-me plaques, E to read up close), Chess plaza (skill statues + plaques, play vs AI), Trophy hall (framed certificates with captions). Old telephone in the hut rings when you come near and opens the contact form.
+- Bugs fixed: car only spun (it collided with its own hit-box; now skipped while driving) → test drove 8 m in 2.5 s; phone movement (canvas lacked touch-action:none so the browser ate drags) → touch test moved 8 m. Chotu and the avatar now respect walls, boards, trees; indoors the camera pulls closer instead of clipping.
+- Measured (hut, Full): 31 draw calls, 32.6k triangles.

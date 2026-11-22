@@ -46,7 +46,7 @@ function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }
 
 document.addEventListener('click', (e) => {
   const gm = e.target.closest('[data-game]'); if (gm) { launchGame(gm.dataset.game === 'chess' ? 'chess' : 'snakes', { stage, go, toast }); return; }
-  const g = e.target.closest('[data-go]'); if (g) { if (isGameActive()) exitGame(); go(g.dataset.go); return; }
+  const g = e.target.closest('[data-go]'); if (g) { if (isGameActive()) exitGame(); const id = g.dataset.go; if (stage && body.dataset.mode === '3d' && ['about', 'skills', 'projects', 'journey', 'achievements'].includes(id)) { go('home'); stage.teleportTo(id); return; } go(id); return; }
   if (e.target.closest('[data-close]')) { go('home'); return; }
   const c = e.target.closest('[data-cert]'); if (c) openCert(c.dataset.cert);
 });
@@ -138,8 +138,7 @@ async function boot3D() {
     stage = await initWorld({
       canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar,
       onSection: (id, o) => { fromWorldNav = !!o?.fromWorld; go(id); }, onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
-      onProject: (id) => { go('projects'); hooks.focusProject?.(id); },
-      onAbout: (id) => { go('about'); hooks.focusAbout?.(id); },
+      onGame: (k) => launchGame(k, { stage, go, toast }),
       toast: (h, ms) => toast(h, ms),
       onPlayStart: () => { introDone = true; $('#home').hidden = true; body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {

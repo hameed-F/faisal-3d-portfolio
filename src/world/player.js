@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { blocked } from './scene.js';
+import { blocked } from './areas.js';
 
 // Third-person controller: the avatar walks/runs where you steer, the camera orbits behind.
 // Desktop: WASD/arrows, Shift = run, drag = look, wheel = zoom.  Phone: left thumb joystick, drag right side to look.
-export function createPlayer({ avatar, camera, colliders, dom }) {
+export function createPlayer({ avatar, camera, colliders: getCols, bounds: getBounds = () => null, dom }) {
+  const cols = () => (typeof getCols === 'function' ? getCols() : getCols);
   const body = avatar.group; const keys = new Set();
   const st = { runLock: false, yaw: Math.PI, pitch: 0.32, dist: 7.5, targetDist: 7.5, speed: 0, enabled: false, run: false, moving: false, lockCam: false };
   const joy = { x: 0, y: 0, id: null, ox: 0, oy: 0 };
@@ -49,9 +50,11 @@ export function createPlayer({ avatar, camera, colliders, dom }) {
     }
     if (st.speed > 0.05) {
       const nx = body.position.x + move.x * st.speed * dt; const nz = body.position.z + move.z * st.speed * dt;
-      if (!blocked(colliders, nx, nz, 0.35)) { body.position.x = nx; body.position.z = nz; }
-      else if (!blocked(colliders, nx, body.position.z, 0.35)) body.position.x = nx; // slide along walls
-      else if (!blocked(colliders, body.position.x, nz, 0.35)) body.position.z = nz;
+      const cc = cols();
+      if (!blocked(cc, nx, nz, 0.35)) { body.position.x = nx; body.position.z = nz; }
+      else if (!blocked(cc, nx, body.position.z, 0.35)) body.position.x = nx; // slide along walls
+      else if (!blocked(cc, body.position.x, nz, 0.35)) body.position.z = nz;
+      else if (blocked(cc, body.position.x, body.position.z, 0.35)) { body.position.x = nx; body.position.z = nz; } // already overlapping: let the player walk out
     }
     // animation: Walk clip in place, sped up for running
     const moving = st.speed > 0.4;
@@ -62,7 +65,11 @@ export function createPlayer({ avatar, camera, colliders, dom }) {
   function followCamera(dt, snap = false) {
     st.dist += (st.targetDist - st.dist) * Math.min(1, dt * 6);
     camTarget.set(body.position.x, body.position.y + 1.45, body.position.z);
-    camPos.set(camTarget.x + Math.sin(st.yaw) * Math.cos(st.pitch) * st.dist, camTarget.y + Math.sin(st.pitch) * st.dist, camTarget.z + Math.cos(st.yaw) * Math.cos(st.pitch) * st.dist);
+    // indoors the camera pulls in closer instead of being squashed against a wall
+    const b = getBounds(); let d = st.dist;
+    const place = () => camPos.set(camTarget.x + Math.sin(st.yaw) * Math.cos(st.pitch) * d, camTarget.y + Math.sin(st.pitch) * d, camTarget.z + Math.cos(st.yaw) * Math.cos(st.pitch) * d);
+    place();
+    if (b) { while (d > 1.3 && (camPos.x < b.minX + 0.3 || camPos.x > b.maxX - 0.3 || camPos.z < b.minZ + 0.3 || camPos.z > b.maxZ - 0.3 || camPos.y > b.maxY)) { d -= 0.2; place(); } camPos.x = THREE.MathUtils.clamp(camPos.x, b.minX + 0.3, b.maxX - 0.3); camPos.z = THREE.MathUtils.clamp(camPos.z, b.minZ + 0.3, b.maxZ - 0.3); camPos.y = Math.min(camPos.y, b.maxY); }
     camPos.y = Math.max(camPos.y, 0.6);
     if (snap) camera.position.copy(camPos); else camera.position.lerp(camPos, Math.min(1, dt * 10));
     camera.lookAt(camTarget);

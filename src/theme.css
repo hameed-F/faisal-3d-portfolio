@@ -183,3 +183,10 @@ form.contact input:focus,form.contact textarea:focus{border-color:var(--amber);o
   body[data-mode="3d"] .panel,body[data-mode="3d"] .panel.wide{left:0;right:0;bottom:0;width:auto;height:78vh;border-radius:16px 16px 0 0;padding:1rem 1rem calc(1rem + var(--safe-b))}
   .panel h2{font-size:1.35rem}
 }
+
+.ex-where{display:grid;gap:.1rem;background:var(--ui-bg);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.35rem .6rem;cursor:pointer;max-width:240px}
+.ex-where b{font:700 .85rem var(--display);color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.ex-where span{font-size:.72rem;color:var(--ui-dim)}
+.minimap[hidden]{display:none}
+.fader{position:fixed;inset:0;z-index:65;background:#06090c;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.fader.on{opacity:1}

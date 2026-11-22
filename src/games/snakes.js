@@ -36,7 +36,7 @@ export function createSnakes({ view, onEnd, onExit, toast }) {
     }
     // journey milestone squares (only revealed by the player's pawn)
     const mi = MILESTONES.indexOf(st.pos[who]);
-    if (who === 'you' && mi >= 0 && !seen.has(mi) && journey[mi]) { seen.add(mi); const j = journey[mi]; toast?.(`<b>${j.when}: ${j.title}</b><br>${j.where}`, 6000); }
+    if (who === 'you' && mi >= 0 && !seen.has(mi) && journey[mi]) { seen.add(mi); const j = journey[mi]; if (view.milestone) await view.milestone(st.pos[who], j, seen.size); else toast?.(`<b>${j.when}: ${j.title}</b><br>${j.where}`, 6000); }
     if (st.pos[who] === 100) {
       st.over = true; const won = who === 'you';
       setHud({ status: `${msg} ${won ? '<b>You win!</b> 🎉' : '<b>Chotu wins this time.</b>'}`, main: { label: 'Play again' } });
