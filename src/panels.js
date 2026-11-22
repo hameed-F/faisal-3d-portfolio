@@ -11,13 +11,14 @@ export function youtubeId(url) {
 }
 
 export function renderAll(hooks = {}) {
+  hooks.focusAbout = (id) => { const el = document.getElementById('zone-' + id); if (el) { setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); } };
   document.getElementById('tagline').textContent = profile.tagline;
 
   // ABOUT (Ludo home zones)
   document.getElementById('about').innerHTML = `${closeBtn}
     <h2>About me</h2><p class="sub">${esc(profile.title)} · ${esc(profile.location)}</p>
     <p>${esc(profile.summary)}</p>
-    <div class="zones">${aboutZones.map((z) => `<div class="zone" style="background:${z.color}"><h3>${esc(z.title)}</h3><p>${esc(z.text)}</p></div>`).join('')}</div>
+    <div class="zones">${aboutZones.map((z) => `<div class="zone" id="zone-${z.id}" style="background:${z.color}"><h3>${esc(z.title)}</h3><p>${esc(z.text)}</p></div>`).join('')}</div>
     <div class="row"><a class="btn" href="${profile.resume}" download>Download CV</a>
       <a class="btn alt" href="${profile.github}" target="_blank" rel="noopener">GitHub</a>
       <a class="btn alt" href="${profile.framer}" target="_blank" rel="noopener">Earlier portfolio</a></div>`;
@@ -44,7 +45,7 @@ export function renderAll(hooks = {}) {
       (!state.q || (p.name + ' ' + p.summary + ' ' + p.stack + ' ' + p.role).toLowerCase().includes(state.q)));
     list = [...list].sort((a, b) => state.sort === 'name' ? a.name.localeCompare(b.name)
       : state.sort === 'year' ? (b.year || 0) - (a.year || 0) : (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-    document.getElementById('pCards').innerHTML = list.map((p) => `<article class="card" style="--gc:${GROUP_COLORS[p.group] || '#22160d'}">
+    document.getElementById('pCards').innerHTML = list.map((p) => `<article class="card" id="card-${p.id}" style="--gc:${GROUP_COLORS[p.group] || '#22160d'}">
       ${p.image ? `<img loading="lazy" decoding="async" src="${p.image}" alt="${esc(p.name)} screenshot" />` : '<div class="ph">No image yet</div>'}
       <div class="body"><h3>${esc(p.name)}${p.featured ? '<span class="badge">FEATURED</span>' : ''}</h3>
         <div class="meta">${esc(p.stack)}${p.year ? ' · ' + p.year : ''}<br>${esc(p.role)}</div><p>${esc(p.summary)}</p>
@@ -60,6 +61,8 @@ export function renderAll(hooks = {}) {
     const b = e.target.closest('.gbtn'); if (!b) return; state.g = b.dataset.g;
     root.querySelectorAll('.gbtn').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); draw();
   });
+  hooks.focusProject = (id) => { state.q = ''; state.g = ''; root.querySelector('#pSearch').value = ''; root.querySelectorAll('.gbtn').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === ''))); draw();
+    const el = document.getElementById('card-' + id); if (el) { setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); el.classList.add('flash'); el.querySelector('details')?.setAttribute('open', ''); setTimeout(() => el.classList.remove('flash'), 1800); } };
   hooks.setProjectGroup = (g) => { state.g = g || ''; root.querySelectorAll('.gbtn').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === state.g))); draw(); };
 
   // JOURNEY (Snakes & Ladders)

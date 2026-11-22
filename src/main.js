@@ -1,4 +1,5 @@
 import './style.css';
+import './theme.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
@@ -57,7 +58,7 @@ document.addEventListener('keydown', (e) => {
 
 // ---------- theme ----------
 const applyTheme = (t) => { body.dataset.theme = t; store.set('theme', t); document.querySelector('meta[name=theme-color]').content = t === 'day' ? '#cfe0e6' : '#14202b'; nav.onTheme?.(t); };
-applyTheme(store.get('theme', matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'dusk'));
+applyTheme(store.get('theme', 'dusk'));
 $('#themeChip').addEventListener('click', () => applyTheme(body.dataset.theme === 'day' ? 'dusk' : 'day'));
 
 // ---------- "read as a page" / basic mode ----------
@@ -100,7 +101,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const det = detectTier();
 const qp = new URLSearchParams(location.search).get('q'); // ?q=lite|full|basic for testing
 let tier = TIERS[qp] ? qp : det.tier;
-let stage = null;
+let stage = null; let fromWorldNav = false;
 const tierLabel = () => { $('#tierLabel').textContent = TIERS[tier].name; };
 const loadBar = (f, m) => { $('#loadBar').style.width = Math.round(f * 100) + '%'; if (m) $('#loadMsg').textContent = m; };
 
@@ -133,30 +134,30 @@ async function boot3D() {
     if (tier === 'full' && !det.manual && !qp) { tier = 'lite'; switchedOnLoad = true; body.dataset.tier = 'lite'; tierLabel(); toast('Loading slowly, so I switched to <b>Lite mode</b>. <button data-tier="full">Back to Full</button>'); }
   }, 6000);
   try {
-    const { initStage } = await import('./stage/index.js');
-    stage = await initStage({
+    const { initWorld } = await import('./world/index.js');
+    stage = await initWorld({
       canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar,
-      onSection: (id) => go(id), onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
-      onTitle: () => { introDone = false; $('#home').hidden = false; body.classList.remove('in-world'); },
-      onIntroDone: () => { introDone = true; $('#home').hidden = true; body.classList.add('in-world'); },
+      onSection: (id, o) => { fromWorldNav = !!o?.fromWorld; go(id); }, onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
+      onProject: (id) => { go('projects'); hooks.focusProject?.(id); },
+      onAbout: (id) => { go('about'); hooks.focusAbout?.(id); },
+      onPlayStart: () => { introDone = true; $('#home').hidden = true; body.classList.add('in-world'); },
       onSlow: (fps, cur, why) => {
         if (new URLSearchParams(location.search).has('nogov') && why !== 'context') return;
         if (why === 'context') { startBasic('the graphics driver stopped responding'); return; }
-        if (tier === 'full') { setTier('lite'); toast(`<b>You're in Lite mode.</b> The full version was running slowly on this device (${fps | 0} fps), so I switched to a lighter one. <button data-tier="full">Switch back</button>`, 10000); }
+        if (tier === 'full') { setTier('lite'); toast(`<b>Lite mode is on.</b> The full version was running slowly on this device (${fps | 0} fps), so I lowered the detail. <button data-tier="full">Switch back</button>`, 10000); }
         else if (tier === 'lite' && fps < 14) { toast(`This device is struggling with 3D (${fps | 0} fps). <button data-tier="basic">Use the text version</button>`, 12000); }
       },
     });
     clearTimeout(slowLoad);
     if (switchedOnLoad) stage.setTier('lite');
     stage.setTheme(body.dataset.theme); nav.onTheme = (t) => stage.setTheme(t);
-    nav.onChange.push((id) => { if (id === 'home') stage.closePanel(); else stage.focusSection(id); });
+    nav.onChange.push((id) => { if (id === 'home') stage.closePanel(); else stage.focusSection(id, { fromWorld: fromWorldNav }); fromWorldNav = false; });
     hooks.stage = stage;
     stage.sfx = play; stage.onSpeed = (v) => (v === null ? setEngine(null) : setEngine(v));
-    stage.world.onInterior = (inside) => setScene(inside ? 'inside' : 'outside');
     loadBar(1, 'Ready'); setTimeout(() => $('#loader').classList.add('done'), 250);
     if (det.reasons.length && tier === 'lite' && !det.manual) toast(`<b>Lite mode</b> is on (${det.reasons[0]}). <button data-tier="full">Switch to Full</button>`, 8000);
     const start = location.hash.slice(1);
-    if (PANELS.includes(start)) { stage.skipIntro(); go(start); }
+    if (PANELS.includes(start)) go(start);
   } catch (err) {
     clearTimeout(slowLoad); console.error(err); startBasic('the 3D scene could not start');
   }
@@ -164,13 +165,8 @@ async function boot3D() {
 
 $('#chotu').hidden = false;
 initChat({ go, hooks });
-$('#startBtn').addEventListener('click', () => { $('#home').hidden = true; stage?.startDrive(); });
-$('#creditsBtn').addEventListener('click', () => { stage?.skipIntro(); go('credits'); });
-$('#driveBtn').addEventListener('click', () => {
-  if (!stage) { toast('Free Drive needs the 3D version. <button data-tier="full">Switch to Full</button>'); return; }
-  if (stage.startFreeDrive()) $('#home').hidden = true;
-  else toast('Free Drive is switched off in <b>Lite mode</b> to keep things smooth. <button data-tier="full">Switch to Full</button>');
-});
+$('#startBtn').addEventListener('click', () => { $('#home').hidden = true; stage?.startPlay(); });
+$('#creditsBtn').addEventListener('click', () => { go('credits'); });
 if (tier === 'basic') startBasic(det.reasons[0]); else boot3D();
 document.addEventListener('visibilitychange', () => stage?.pause(document.hidden));
 window.__app = { go, toast, hooks, store, nav, get stage() { return stage; } };

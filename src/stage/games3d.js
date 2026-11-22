@@ -30,7 +30,7 @@ function pieceGeos() {
   GEOS.n = [base, head, mane];
   return GEOS;
 }
-function makePiece(type, color, scale) {
+export function makePiece(type, color, scale) {
   const mat = color === 'w' ? psxMat({ color: '#f4ecd8' }) : psxMat({ color: '#2a1609' });
   const g = new THREE.Group(); const geos = pieceGeos();
   if (type === 'n') {
@@ -86,13 +86,13 @@ export function chess3DView(stage) {
 }
 
 // ---------------- Snakes & Ladders ----------------
-function diceMaterials() {
+export function diceMaterials() {
   const pips = { 1: [[1, 1]], 2: [[0, 0], [2, 2]], 3: [[0, 0], [1, 1], [2, 2]], 4: [[0, 0], [2, 0], [0, 2], [2, 2]], 5: [[0, 0], [2, 0], [1, 1], [0, 2], [2, 2]], 6: [[0, 0], [2, 0], [0, 1], [2, 1], [0, 2], [2, 2]] };
   const make = (n) => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d'); g.fillStyle = '#efe6d2'; g.fillRect(0, 0, 32, 32); g.fillStyle = n === 1 ? '#a8462a' : '#22160d'; for (const [x, y] of pips[n]) { g.beginPath(); g.arc(7 + x * 9, 7 + y * 9, 3.1, 0, 7); g.fill(); } const t = new THREE.CanvasTexture(c); t.magFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace; return psxMat({ map: t }); };
   // box face order: +x, -x, +y, -y, +z, -z
   return [make(3), make(4), make(1), make(6), make(2), make(5)];
 }
-const FACE_UP = { 1: [0, 0, 0], 6: [Math.PI, 0, 0], 2: [-Math.PI / 2, 0, 0], 5: [Math.PI / 2, 0, 0], 3: [0, 0, Math.PI / 2], 4: [0, 0, -Math.PI / 2] };
+export const FACE_UP = { 1: [0, 0, 0], 6: [Math.PI, 0, 0], 2: [-Math.PI / 2, 0, 0], 5: [Math.PI / 2, 0, 0], 3: [0, 0, Math.PI / 2], 4: [0, 0, -Math.PI / 2] };
 
 export function snakes3DView(stage) {
   const board = stage.world.boards.journey; const S = 0.56; const m = S * 0.05; const s = (S - 2 * m) / 10; const Y = 0.034;

@@ -4,8 +4,8 @@
 // basic : no WebGL at all, the HTML page (also the accessibility fallback)
 
 export const TIERS = {
-  full: { name: 'Full', renderH: 360, trees: 520, rocks: 90, grain: 0.07, snap: true, dither: true, maxFps: 60, drive: true, freeDrive: true, avatarHz: 60, texSize: 512 },
-  lite: { name: 'Lite', renderH: 240, trees: 160, rocks: 30, grain: 0.0, snap: false, dither: true, maxFps: 30, drive: false, freeDrive: false, avatarHz: 30, texSize: 256 },
+  full: { name: 'Full', renderH: 360, trees: 650, rocks: 90, grain: 0.07, snap: true, dither: true, maxFps: 60, drive: true, freeDrive: true, avatarHz: 60, texSize: 512 },
+  lite: { name: 'Lite', renderH: 240, trees: 220, rocks: 30, grain: 0.0, snap: false, dither: true, maxFps: 30, drive: false, freeDrive: false, avatarHz: 30, texSize: 256 },
   basic: { name: 'Text only' },
 };
 

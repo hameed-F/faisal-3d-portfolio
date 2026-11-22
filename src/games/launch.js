@@ -12,13 +12,13 @@ export async function launchGame(kind, { stage, go, toast }) {
   if (kind === 'snakes') {
     const { createSnakes, snakes2DView } = await import('./snakes.js');
     let view;
-    if (stage) { const { snakes3DView } = await import('../stage/games3d.js'); stage.focusGame('journey'); view = snakes3DView(stage); }
+    if (stage) { const { snakesGiantView } = await import('../world/games-giant.js'); stage.focusGame('journey'); view = snakesGiantView(stage); }
     else { const { snakesTex } = await import('../stage/textures.js'); view = snakes2DView(snakesTex(360, [1, 21, 28, 51, 72, 80, 100]).image); }
     active = createSnakes({ view, toast, onExit: done, onEnd: (won) => { play(won ? 'win' : 'lose'); stage?.avatar.play(won ? 'Victory' : 'Disappointed'); } });
   } else if (kind === 'chess') {
     const { createChess, chess2DView } = await import('./chess.js');
     let view;
-    if (stage) { const { chess3DView } = await import('../stage/games3d.js'); stage.focusGame('skills'); view = chess3DView(stage); }
+    if (stage) { const { chessGiantView } = await import('../world/games-giant.js'); stage.focusGame('skills'); view = chessGiantView(stage); }
     else view = chess2DView();
     active = createChess({
       view, onExit: done,
