@@ -55,3 +55,9 @@
 - Waiting on the owner's documentary-edit image (attachment did not reach this session).
 - Owner uploaded the Documentary Style Edit frame (paper collage, rotunda + king): added as public/img/projects/documentary-edit_frame.webp (29 kB) and used on its card/screen. Not copied into source/ (CLAUDE.md: ask before touching source).
 - Replaced bug enemies (owner: a friend's site uses bugs) with Deadlines: walking alarm clocks that shake harder when you are near; stomp = DEADLINE BEATEN.
+
+### 2026-11-22 (late night): MIDNIGHT REEL
+- Owner rejected the platformer ("no personality, bad to navigate, no day/night") and gave a taste list: PS-1, CS/GTA, Mario, Sonic, Where's My Water, Subway Surfers, Fruit Ninja, Keaton/Chaplin, dark and moody.
+- New concept: a silent-film night street (src/noir/). Restored the third-person controller (player.js) and added auto-walk. Added uSilent to the PS1 post shader. Skill Slice swipe game (slice.js). Projector-robot Chotu. Removed the snake greeting from chat.js.
+- Tested with Playwright (Edge headless, 1280x720 and 390x844 touch): all 7 places reached by auto-walk in 5.4 to 8.6 s (incl. intertitle), chess opens and exits, trailer and contact open, chat opens, day/night and silent toggles work, 0 console errors. FPS on this laptop (Intel UHD, headless): ~57.
+- Kept the retro STAGE 1-1 loader (now titled MIDNIGHT REEL). src/run/ (platformer) removed.

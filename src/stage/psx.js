@@ -50,7 +50,7 @@ const POST_VS = /* glsl */`varying vec2 vUv; void main(){ vUv = uv; gl_Position 
 const POST_FS = /* glsl */`
   precision highp float;
   uniform sampler2D tScene; uniform vec2 uLowRes; uniform float uTime; uniform float uGrain; uniform float uDither;
-  uniform float uVignette; uniform vec3 uShadowTint; uniform vec3 uHighTint; uniform float uFade;
+  uniform float uVignette; uniform vec3 uShadowTint; uniform vec3 uHighTint; uniform float uFade; uniform float uSilent;
   varying vec2 vUv;
   float bayer4(vec2 p){
     int x = int(mod(p.x, 4.0)); int y = int(mod(p.y, 4.0)); int i = x + y * 4;
@@ -71,6 +71,15 @@ const POST_FS = /* glsl */`
     c += (hash(px + fract(uTime) * 91.7) - 0.5) * uGrain;
     // vignette
     vec2 d = vUv - 0.5; c *= 1.0 - uVignette * dot(d, d) * 2.2;
+    if (uSilent > 0.0) { // silent-film look: monochrome, warm paper tint, flicker, scratches, dust
+      float l = dot(c, vec3(0.299, 0.587, 0.114)); l = pow(l, 0.92) * 1.08;
+      float fl = 0.93 + 0.07 * hash(vec2(floor(uTime * 18.0), 3.1));
+      vec3 m = vec3(l) * vec3(1.06, 1.0, 0.86) * fl;
+      float sx = hash(vec2(floor(uTime * 9.0), 1.7)); float scratch = step(abs(vUv.x - sx), 0.0012) * step(0.8, hash(vec2(floor(uTime * 9.0), 8.2)));
+      float dust = step(0.9985, hash(floor(vUv * vec2(320.0, 180.0)) + floor(uTime * 12.0)));
+      m = mix(m, vec3(0.92), scratch * 0.7); m = mix(m, vec3(0.05), dust);
+      c = mix(c, m, uSilent); c *= 1.0 - uSilent * 0.35 * dot(d, d) * 2.0;
+    }
     c *= uFade;
     gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0);
   }`;
@@ -86,7 +95,7 @@ export class PsxRenderer {
       uniforms: {
         tScene: { value: this.rt.texture }, uLowRes: { value: new THREE.Vector2(4, 4) }, uTime: { value: 0 },
         uGrain: { value: 0.07 }, uDither: { value: 1 }, uVignette: { value: 0.55 },
-        uShadowTint: { value: new THREE.Color(0.86, 0.98, 1.06) }, uHighTint: { value: new THREE.Color(1.06, 1.0, 0.9) }, uFade: { value: 1 },
+        uShadowTint: { value: new THREE.Color(0.86, 0.98, 1.06) }, uHighTint: { value: new THREE.Color(1.06, 1.0, 0.9) }, uFade: { value: 1 }, uSilent: { value: 0 },
       },
     });
     this.quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.post);

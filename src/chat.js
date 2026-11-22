@@ -27,7 +27,7 @@ export function initChat({ go, hooks }) {
   const open = () => {
     hooks.stage?.spawnChotu?.();
     chat.hidden = false; input.focus();
-    if (!log.children.length) bubble('bot', "Hiss-llo! I'm <b>Chotu</b>. Ask me anything about Faisal's projects, skills, studies or experience. I only answer from his portfolio.");
+    if (!log.children.length) bubble('bot', "Click-click, the reel is rolling! I'm <b>Chotu</b>, the little projector. Ask me anything about Faisal's projects, skills, studies or experience. I only answer from his portfolio.");
     hooks.stage?.chotu.setMode('listening'); play('chotu');
   };
   const close = () => { chat.hidden = true; stopSpeaking(); hooks.stage?.chotu.setMode('idle'); };

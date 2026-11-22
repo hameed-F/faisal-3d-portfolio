@@ -6,23 +6,26 @@ Facts about the owner come only from `../source/`. Anything missing is listed in
 
 ---
 
-## 1. Concept: "FAISAL'S PORTFOLIO RUN" (current, 2026-11-22 night)
+## 1. Concept: "MIDNIGHT REEL" (current, 2026-11-22 late night)
 
-> Owner asked for a classic side-scrolling platformer. It is an **original** retro platformer in that genre (no Nintendo characters, art, blocks, pipes or levels are copied). Every earlier concept is scrapped.
+> Built from the owner's taste list: retro PS-1 games, GTA/CS street mood, Mario/Sonic energy, casual swipe games (Fruit Ninja, Subway Surfers), Buster Keaton and Chaplin films, dark and moody. Original design; nothing copied from those games or films. Every earlier concept (incl. the platformer) is scrapped; only the retro "STAGE 1-1" loader is kept.
 
-One long level with 6 zones: **About me → Journey → Projects → Skills → Trophies → Contact**. The avatar is the player (run, jump, head-butt blocks).
-- **`</>` code blocks**: hit from below → a retro dialog card pops out (profile, about, CV, education, each journey step, 12 projects with image + links, 5 skill groups).
-- **Journey** is a staircase: each step is a milestone.
-- **Deadlines** ⏰ (walking alarm clocks, shaking harder as you get close) patrol: stomp = "DEADLINE BEATEN +100"; touching one = "RIIING! TOO LATE" knockback + Disappointed (no deaths). (Bugs were dropped at the owner's request.)
-- **Commits** (gems) to collect; **trophies** = the 6 certificates (collect → card with Verify).
-- **Side quest**: arcade cabinet → chess vs my AI (3 levels). **Mailbox** → contact form. **TV** → promo video. **SHIP IT rocket** at the end → launch, COURSE CLEAR screen (score, blocks, trophies, deadlines, time) with Send invite / Promo / CV / Play again.
-- **Chotu** reimagined as a hovering TV-head robot that follows the player (pixel face, "..." when thinking); tap it or the 🤖 button to chat.
-- **Retro loading screen** ("STAGE 1-1", lives ×∞, block progress bar) and **title screen** (logo, PRESS START, READ AS A PAGE).
-- HUD: SCORE · COMMITS · ZONE · TIME. Stage select in the menu (recruiter shortcut). Achievements toasts. Phone: D-pad + A button + USE.
-- Avatar clips: Idle, Walk (speed-scaled), Jump, Point (cards), Victory (skills, trophies, ship), Disappointed (deadline hit), Think (chess), Throw (mailbox), Talk (Chotu), Wave (start), Dance (idle 9 s), Sit (idle 18 s).
+A silent film starring Faisal, set on one city block at night. You walk him around a small rainy plaza; every building is one part of the portfolio.
+- **Opening**: the loader, then a black-and-white title card ("Midnight Reel, starring Muhammad Faisal Hameed"). On *Roll film* he waves, an intertitle plays, and colour floods in.
+- **Navigation that can't fail**: tap any building, its floating label, or a sign in the bottom dock, and he walks there by himself (gets round lamps/benches; if ever stuck, an iris wipe takes him there). WASD/arrows + Shift run + Space jump on laptop; left-thumb joystick + drag to look on phones. Near a door: "press E / tap to enter".
+- **Buildings** (each opens with a silent-film intertitle and a "reel" dialog):
+  - *Extra! Extra!* newspaper kiosk → About me (newspaper layout, CV, GitHub, email)
+  - *The Picture House* cinema → 12 projects as film posters → detail (image, role, points, links). Documentary edit uses the owner's frame.
+  - *The Academy* → Journey as a film strip
+  - *Trophies & Pawn* → certificates (thumbnails, full size, Verify)
+  - *The Penny Arcade* → **Skill Slice** (swipe film cans to cut out skills, avoid dynamite), chess vs my engine, Snakes & Ladders, plus a plain skills list
+  - *Telephone booth* → contact form (Brevo) · *Billboard* → promo video placeholder
+- **Chotu** is a tiny film-projector robot that hovers behind his shoulder (reels spin faster while thinking, lens beam while answering). Tap him or the projector button to chat.
+- **Day / night** toggle (iris wipe) and **Silent film** toggle (sepia, flicker, scratches, dust in the PS1 post shader).
+- Avatar clips: Wave (start, kiosk), Walk/run, Idle, Point (arriving at a door), Think (reading a project, chess), Talk (phone booth, Chotu), Throw (coin at the arcade), Sit (benches), Jump (Space), Victory/Dance/Disappointed (game results), random idle flourishes.
 
 ## 2. Art direction
-Bright retro: sky blue, pixel-art 16×16 textures (grass, dirt, stone, gold code blocks) with crisp nearest filtering, low-poly hills, trees, bushes and flowers in a 2.5D diorama, chunky "Press Start 2P" pixel font for UI headings with Inter for readable body text, navy dialog boxes with white pixel borders. All art is generated in code (no downloads).
+Dark and moody PS-1: low-poly brick buildings with lit windows, wet cobbles with puddles, rain, fog, warm sodium lamps, art-deco marquees. Rendered crisper than before (560 px tall on Full, 380 on Lite, light grain). UI is an art-deco silent-film style: black cards, thin gold rules, Limelight display font, Inter for reading. All 3D art generated in code (no downloads).
 
 ## 3. Avatar (Module 2)
 
