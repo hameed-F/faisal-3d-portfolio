@@ -6,27 +6,22 @@ Facts about the owner come only from `../source/`. Anything missing is listed in
 
 ---
 
-## 1. Concept: "MIDNIGHT REEL" (current, 2026-11-22 late night)
+## 1. Concept: "THE FAISAL SESSIONS" (current, 2026-11-23)
 
-> Built from the owner's taste list: retro PS-1 games, GTA/CS street mood, Mario/Sonic energy, casual swipe games (Fruit Ninja, Subway Surfers), Buster Keaton and Chaplin films, dark and moody. Original design; nothing copied from those games or films. Every earlier concept (incl. the platformer) is scrapped; only the retro "STAGE 1-1" loader is kept.
+> Owner asked for a Cowboy Bebop-style site. This is an **original** space-jazz design in that mood (60s/70s jazz-poster graphics, episode title cards, a worn cargo ship, bounty posters). No names, characters, logos, lines or art from the show are used. Midnight Reel and every earlier concept are scrapped. Chess and Snakes & Ladders are dropped (owner's request).
 
-A silent film starring Faisal, set on one city block at night. You walk him around a small rainy plaza; every building is one part of the portfolio.
-- **Opening**: the loader, then a black-and-white title card ("Midnight Reel, starring Muhammad Faisal Hameed"). On *Roll film* he waves, an intertitle plays, and colour floods in.
-- **Round 2 (owner feedback):** sharp native-resolution render with MSAA; fixed high camera over the plaza; click/tap anywhere to walk; 18 golden film reels to collect; pigeons that scatter.
-- **Navigation that can't fail**: tap any building, its floating label, or a sign in the bottom dock, and he walks there by himself (gets round lamps/benches; if ever stuck, an iris wipe takes him there). WASD/arrows + Shift run + Space jump on laptop; left-thumb joystick + drag to look on phones. Near a door: "press E / tap to enter".
-- **Buildings** (each opens with a silent-film intertitle and a "reel" dialog):
-  - *Extra! Extra!* newspaper kiosk → About me (newspaper layout, CV, GitHub, email)
-  - *The Picture House* cinema → 12 projects as film posters → detail (image, role, points, links). Documentary edit uses the owner's frame.
-  - *The Academy* → Journey as a film strip
-  - *Trophies & Pawn* → certificates (thumbnails, full size, Verify)
-  - *The Penny Arcade* → **Skill Slice** (swipe film cans to cut out skills, avoid dynamite), with a plain skills list inside. Chess and Snakes & Ladders were dropped at the owner's request.
-  - *Telephone booth* → contact form (Brevo) · *Billboard* → promo video placeholder
-- **Chotu** is a tiny film-projector robot that hovers behind his shoulder (reels spin faster while thinking, lens beam while answering). Tap him or the projector button to chat.
-- **Day / night** toggle (iris wipe) and **Silent film** toggle (sepia, flicker, scratches, dust in the PS1 post shader).
-- Avatar clips: Wave (start, kiosk), Walk/run, Idle, Point (arriving at a door), Think (reading a project, chess), Talk (phone booth, Chotu), Throw (coin at the arcade), Sit (benches), Jump (Space), Victory/Dance/Disappointed (game results), random idle flourishes.
+A small cargo ship seen from the side (cutaway, like a doll's house): seven rooms on one corridor, so navigation is 1-D and can't get stuck.
+- Tap a room (or its tag on the roof, or the bottom dock) and Faisal walks there; arrows/A-D walk, Space jumps, E enters. Phones: tap rooms or use the on-screen pad.
+- Rooms: #01 Cockpit = about me (CV, GitHub, email) · #02 Radio room = contact form · #03 Lounge = 12 projects as WANTED posters on the CRT/bounty board → project dossier · #04 Arcade = Skill Swipe (swipe data cores, avoid mines; skills list inside) · #05 Bunk room = certificates · #06 Screening room = trailer placeholder · #07 Hangar (red fighter) = journey "flight log".
+- First entry to a room plays a "SESSION #0X" title card (sliding colour blocks, big condensed type).
+- 21 gold credit chips along the corridor (every 4th needs a jump); Victory every 7, Dance + "Jackpot" card at 21.
+- Chotu is a small robot dog that trots after Faisal; tap him (or the dog button) to chat.
+- Optional procedural jazz loop (walking bass, ride, brushes, electric piano) when sound is on; Cabin lights / Starlight toggle.
+- Outside the portholes: stars, a ringed planet, a moon, drifting asteroids.
+- Avatar clips: Wave (start, cockpit), Walk (speed-scaled), Idle, Jump (real jump), Point (entering), Talk (radio), Sit (screening), Think (hangar, reading a project), Victory (medals, chips), Throw (arcade coin), Dance/Victory/Disappointed (game results), idle flourishes.
 
 ## 2. Art direction
-Dark and moody PS-1: low-poly brick buildings with lit windows, wet cobbles with puddles, rain, fog, warm sodium lamps, art-deco marquees. Rendered crisper than before (560 px tall on Full, 380 on Lite, light grain). UI is an art-deco silent-film style: black cards, thin gold rules, Limelight display font, Inter for reading. All 3D art generated in code (no downloads).
+Flat 60s/70s palette (mustard, burnt orange, teal, red, cream, navy), low-poly props, crisp native-resolution render with MSAA. UI: cream cards with thick black borders and offset colour shadows, Bebas Neue display type, Inter body. Retro "SESSION 1-1" pixel loader kept.
 
 ## 3. Avatar (Module 2)
 

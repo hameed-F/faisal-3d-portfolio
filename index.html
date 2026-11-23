@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Muhammad Faisal Hameed · Game Developer & Interactive 3D Programmer</title>
   <meta name="description" content="Interactive 3D portfolio of Muhammad Faisal Hameed: game developer (Unreal Engine 5, Unity, Three.js) from Karachi, Pakistan." />
-  <meta name="theme-color" content="#07080b" />
+  <meta name="theme-color" content="#0b0e1c" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2314202b'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='%23e8b25a' font-family='Georgia' font-weight='700'>F</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Limelight&family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body data-tier="full" data-theme="dusk">
   <a class="skip" href="#content">Skip to content</a>
@@ -32,9 +32,9 @@
       <div class="sheet-head"><b>Go to</b><button id="sheetClose" aria-label="Close menu">×</button></div>
       <div class="sheet-grid three">
         <button data-zone="0">About me</button><button data-zone="1">Journey</button><button data-zone="2">Projects</button>
-        <button data-zone="3">Skills & games</button><button data-zone="4">Certificates</button><button data-zone="5">Contact</button>
+        <button data-zone="3">Skills game</button><button data-zone="4">Certificates</button><button data-zone="5">Contact</button>
       </div>
-      <div class="sheet-grid three"><button data-chotu>🎞 Ask Chotu</button><button data-go="contact">✉ Contact</button><button data-go="credits">Credits</button></div>
+      <div class="sheet-grid three"><button data-chotu>🐕 Ask Chotu</button><button data-go="contact">✉ Contact</button><button data-go="credits">Credits</button></div>
       <div class="sheet-head"><b>View</b></div>
       <div class="sheet-grid two"><button id="readBtn">📄 Read as a page</button><button data-go="promo">▶ Promo video</button></div>
       <div class="sheet-head"><b>Quality</b></div>
@@ -44,16 +44,16 @@
 
   <!-- Landing -->
   <section class="title landing" id="home" aria-label="Start">
-    <div class="title-inner">
-      <div class="logo"><span>A silent picture in seven scenes</span><b>Midnight Reel</b><i>❦</i></div>
+    <div class="title-inner"><div class="lp-bars"><i></i><i></i><i></i></div><div class="lp-in">
+      <div class="logo"><span>A space-jazz portfolio in seven sessions</span><b>The Faisal<br /><em>Sessions</em></b></div>
       <p class="lead">starring <b>Muhammad Faisal Hameed</b>, game developer<br /><span id="tagline"></span></p>
       <div class="menu">
-        <button class="menu-btn primary" id="startBtn">▶ Roll film</button>
+        <button class="menu-btn primary" id="startBtn">▶ Board the ship</button>
         <button class="menu-btn" id="plainBtn">Read as a page</button>
       </div>
-      <p class="hint">Walk the street at night. Every building is a part of my portfolio.</p>
+      <p class="hint">Seven rooms, one corridor. Tap a room and walk in.</p>
       <p class="copy">© 2026 MUHAMMAD FAISAL HAMEED</p>
-    </div>
+    </div></div>
   </section>
 
   <!-- Content panels (real HTML, readable without 3D) -->
@@ -70,7 +70,7 @@
 
   <!-- Chotu -->
   <div id="chotu" class="chotu" hidden>
-    <button class="chotu-btn" id="chotuBtn" aria-label="Chat with Chotu, the portfolio assistant"><svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true"><circle cx="16" cy="12" r="7" fill="none" stroke="#c9a24a" stroke-width="3"/><circle cx="32" cy="12" r="7" fill="none" stroke="#c9a24a" stroke-width="3"/><rect x="9" y="20" width="26" height="15" rx="2" fill="#efe4c8"/><path d="M35 24l7-3v13l-7-3z" fill="#efe4c8"/><rect x="14" y="25" width="10" height="3" fill="#100d0b"/><path d="M15 35l-3 7M29 35l3 7" stroke="#c9a24a" stroke-width="3" stroke-linecap="round"/></svg></button>
+    <button class="chotu-btn" id="chotuBtn" aria-label="Chat with Chotu, the portfolio assistant"><svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true"><rect x="8" y="20" width="22" height="12" fill="#14110e"/><rect x="26" y="12" width="14" height="12" fill="#14110e"/><rect x="30" y="16" width="8" height="3" fill="#7fd6e8"/><path d="M27 12l2-6 3 6zM35 12l2-6 3 6z" fill="#c8562b"/><path d="M10 32v8M16 32v8M22 32v8M28 32v8" stroke="#14110e" stroke-width="3"/><path d="M8 22l-5-6" stroke="#14110e" stroke-width="2"/><circle cx="3" cy="15" r="2" fill="#b23a2e"/></svg></button>
     <div class="chat" id="chat" role="dialog" aria-label="Chat with Chotu" hidden>
       <div class="chat-head"><b>Chotu</b><span>answers only from my portfolio</span><button id="speakBtn" class="ic" aria-pressed="false" aria-label="Read answers aloud" title="Read answers aloud" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><button id="chatClose" aria-label="Close chat">×</button></div>
       <div class="chat-log" id="chatLog" aria-live="polite"></div>
@@ -80,7 +80,7 @@
   </div>
 
   <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true"><button id="lbClose" aria-label="Close">×</button><div id="lbBody"></div></div>
-  <div class="loader" id="loader" role="status"><div class="ld-in"><p class="ld-stage">STAGE 1-1</p><p class="ld-title">MIDNIGHT REEL</p><div class="ld-lives"><span class="ld-hero"></span>× ∞</div><div class="bar"><i id="loadBar"></i></div><p id="loadMsg">LOADING</p><p class="ld-tip" id="ldTip">TIP: TAP ANY BUILDING AND FAISAL WALKS THERE</p></div></div>
+  <div class="loader" id="loader" role="status"><div class="ld-in"><p class="ld-stage">SESSION 1-1</p><p class="ld-title">THE FAISAL SESSIONS</p><div class="ld-lives"><span class="ld-hero"></span>× ∞</div><div class="bar"><i id="loadBar"></i></div><p id="loadMsg">LOADING</p><p class="ld-tip" id="ldTip">TIP: TAP ANY ROOM AND FAISAL WALKS THERE</p></div></div>
 
   <script type="module" src="/src/main.js"></script>
   <noscript><p style="padding:2rem;color:#fff">This portfolio needs JavaScript. Email: hameedfaisal24@gmail.com · GitHub: github.com/hameed-F</p></noscript>

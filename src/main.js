@@ -1,6 +1,6 @@
 import './style.css';
 import './theme.css';
-import './noir/noir.css';
+import './ship/ship.css';
 import { renderAll, openCert } from './panels.js';
 import { detectTier, saveTier, clearSavedTier, TIERS } from './quality.js';
 import { initChat } from './chat.js';
@@ -34,7 +34,7 @@ export function go(id) {
   if (OVERLAY.includes(id)) { $('#' + id).scrollTop = 0; play('open'); }
 }
 function showAllForPage() { PANELS.forEach((p) => { $('#' + p).hidden = false; }); $('#home').hidden = true; }
-export function enterPageMode() { body.dataset.mode = 'page'; const f = $('#contactForm'); if (f && !$('#contact').contains(f)) $('#contact').appendChild(f); showAllForPage(); $('#chotu').hidden = false; document.querySelectorAll('.nhud,.nlabels,.reel').forEach((e) => { e.hidden = true; }); }
+export function enterPageMode() { body.dataset.mode = 'page'; const f = $('#contactForm'); if (f && !$('#contact').contains(f)) $('#contact').appendChild(f); showAllForPage(); $('#chotu').hidden = false; document.querySelectorAll('.shud,.stags,.spanel').forEach((e) => { e.hidden = true; }); }
 
 document.addEventListener('click', (e) => {
   const zn = e.target.closest('[data-zone]'); if (zn) { const i = +zn.dataset.zone; if (stage && body.dataset.mode === '3d') { $('#home').hidden = true; go('home'); stage.warp(i); } else go(['about', 'journey', 'projects', 'skills', 'achievements', 'contact'][i]); return; }
@@ -106,8 +106,8 @@ async function boot3D() {
   body.dataset.tier = tier; body.dataset.mode = '3d';
   $('#home').hidden = false;
   try {
-    const { initNoir } = await import('./noir/index.js');
-    stage = await initNoir({
+    const { initShip } = await import('./ship/index.js');
+    stage = await initShip({
       canvas: $('#stage'), tierName: tier, reducedMotion, onProgress: loadBar, toast: (h, ms) => toast(h, ms), playSfx: (n) => play(n),
       onCert: (id) => openCert(id), onChotu: () => hooks.openChat?.(),
       onContact: () => go('contact'), onPromo: () => go('promo'),

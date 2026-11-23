@@ -68,3 +68,8 @@
 - Navigation: fixed high camera that shows the whole plaza (no camera dragging needed). Click/tap anywhere to walk there (a ring marks the spot), tap a building or the bottom dock to go in. Auto-walk always runs; first visit plays a short title card, later visits open straight away. Measured arrivals 3.9 to 6.0 s from across the plaza.
 - Fun: 18 golden film reels to collect (counter top-left, Victory every 6, Dance + "That's a wrap!" at 18); pigeons peck and scatter when you run at them. The Penny Arcade now launches Skill Slice directly (skills list inside it).
 - Removed chess, Snakes & Ladders, src/games, stage/games3d.js, stage/textures.js, stage/chotu.js and the chess.js dependency; Read-mode panels no longer mention them.
+
+### 2026-11-23: THE FAISAL SESSIONS (space-jazz rebuild)
+- Owner: "still not liking it, can you make a website cowboy bebop style??" Built an original space-jazz ship cutaway (src/ship/: ship.js, index.js, cards.js, jazz.js, slice.js, ship.css). Removed src/noir.
+- Told owner no show names/characters/logo/lines are used (copyright); mood only.
+- Tested (Edge headless, 1280x720 and 390x844 touch): every room opens (arrivals 1.8 to 6.9 s across the whole ship), dossier, Skill Swipe, contact, trailer, lights toggle, jump; 0 console errors. FPS ~55 (laptop) / ~59 (phone size).
