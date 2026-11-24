@@ -47,7 +47,7 @@ export default async function handler(req, res) {
   try {
     if (mode === 'audio') {
       const hit = cache.get(key) || (await azure(text).then((b) => (b ? remember(key, { type: 'audio/mpeg', body: b }) : null)));
-      if (!hit) return res.status(501).json({ error: 'No server voice configured.' });
+      if (!hit) return res.status(200).json({ configured: false }); // no Azure key: the browser falls back to its own voices
       res.setHeader('Content-Type', hit.type); res.setHeader('Cache-Control', 'public, max-age=86400'); return res.status(200).send(hit.body);
     }
     const hit = cache.get(key) || (await toDevanagari(text).then((t) => (t ? remember(key, { type: 'text', body: t }) : null)));

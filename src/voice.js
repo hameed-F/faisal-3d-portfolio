@@ -22,7 +22,7 @@ export function listen({ lang = navigator.language || 'en-US', onResult, onEnd, 
 //    (Chrome's "Google हिन्दी"); spoken Urdu and Hindi sound alike. If none works, onNoVoice() is called (no male voice).
 const FEMALE = /گل|عظمی|uzma|\bgul\b|female|zira|jenny|aria|michelle|ava\b|emma|salma|swara|kalpana|heera|google (us|हिन्दी|اردو)|google uk english female|samantha|karen|lekha/i;
 const MALE = /اسد|سلمان|asad|salman|david|guy|mark|\bmale\b|ravi|hemant|madhur|daniel|alex|fred|rishi/i;
-let audioEl = null; let token = 0;
+let audioEl = null; let token = 0; let serverVoice = null;
 function voicesNow() { return canSpeak ? speechSynthesis.getVoices() : []; }
 function waitVoices() { return new Promise((res) => { if (voicesNow().length) return res(voicesNow()); const t = setTimeout(() => res(voicesNow()), 1500); speechSynthesis.addEventListener?.('voiceschanged', () => { clearTimeout(t); res(voicesNow()); }, { once: true }); }); }
 function femaleVoice(voices, base) {
@@ -43,10 +43,11 @@ export async function speak(text, { lang, onNoVoice } = {}) {
     if (v) say(clean, v, 1.02); else onNoVoice?.('en');
     return;
   }
-  // 1) server voice
-  try {
+  // 1) server voice (skipped once we know it is not configured)
+  if (serverVoice !== false) try {
     const r = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: clean }) });
     if (my !== token) return;
+    if (r.ok && !(r.headers.get('content-type') || '').includes('audio')) serverVoice = false;
     if (r.ok && (r.headers.get('content-type') || '').includes('audio')) { const url = URL.createObjectURL(await r.blob()); audioEl = new Audio(url); window.__ttsPlaying = true; audioEl.onended = audioEl.onpause = () => { window.__ttsPlaying = false; URL.revokeObjectURL(url); }; await audioEl.play(); return; }
   } catch { /* fall through */ }
   if (my !== token || !canSpeak) return;
