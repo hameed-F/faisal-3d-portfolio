@@ -1,6 +1,21 @@
 # Muhammad Faisal Hameed: Life-Size Snakes & Ladders Portfolio
 
-> **Semester project submission** (Roll No. CTGA-23008, Prof. Saadia Arshad). Live site: https://faisal-3d-portfolio.vercel.app/ · The report (PDF), After Effects project and video, Blender file, avatar model, Mixamo clips and screenshots are in [`deliverables/`](deliverables/README.md), which also maps every required deliverable to its location.
+> **Semester project submission** · Muhammad Faisal Hameed · Roll No. CTGA-23008 · Instructor: Prof. Saadia Arshad
+> **Live site:** https://faisal-3d-portfolio.vercel.app/
+
+## Deliverables: everything is inside the [`deliverables/`](deliverables/) folder
+
+| What | Where |
+|---|---|
+| Project report (PDF) | [`deliverables/report/`](deliverables/report/) |
+| After Effects project + rendered video | [`deliverables/after-effects/`](deliverables/after-effects/) |
+| Blender file (`.blend`) | [`deliverables/blender/`](deliverables/blender/) |
+| Avatar model (`avatar.glb`) + previews | [`deliverables/avatar/`](deliverables/avatar/) |
+| Mixamo animation clips | [`deliverables/mixamo/`](deliverables/mixamo/) |
+| Screenshots of the modules | [`deliverables/screenshots/`](deliverables/screenshots/) |
+| Website source code (frontend + backend) | This repository root: `src/`, `api/`, `data/`, `public/` |
+
+See [`deliverables/README.md`](deliverables/README.md) for the full map of the brief's required items and how to open each file.
 
 An interactive 3D portfolio built with Three.js and Vite. A folded game board unfolds as the site loads. Then Faisal (a custom Blender avatar with 18 Mixamo animations) stands on tile 1 of a life-size Snakes & Ladders board at night. Seven glowing tiles hold the sections: About me, Education & experience, Projects, Skills, Contact, the promo video and tile 100. Each trip uses a different movement (roll, ladder climb, slide, jumps, walk, run + snake, flying). The dice companion, **Pappu Pansa**, rolls the way, chats in English, Urdu or Roman Urdu (RAG over the portfolio, with citations) and plays a real game against you at the end.
 
