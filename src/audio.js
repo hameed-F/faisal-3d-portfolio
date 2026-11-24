@@ -18,7 +18,7 @@ function ensure() {
   sfxBus = ctx.createGain(); sfxBus.gain.value = .5; sfxBus.connect(comp);
   noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   // duck the music while speech synthesis is talking
-  duckTimer = setInterval(() => { if (!musicBus) return; const talking = 'speechSynthesis' in window && speechSynthesis.speaking; musicBus.gain.setTargetAtTime(talking ? .05 : .22, ctx.currentTime, .3); }, 400);
+  duckTimer = setInterval(() => { if (!musicBus) return; const talking = ('speechSynthesis' in window && speechSynthesis.speaking) || !!document.querySelector('audio.__tts') || window.__ttsPlaying; musicBus.gain.setTargetAtTime(talking ? .05 : .22, ctx.currentTime, .3); }, 400);
   return ctx;
 }
 
