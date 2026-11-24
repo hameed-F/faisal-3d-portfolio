@@ -126,3 +126,4 @@
 - Board refinements: tiles are glazed and bevelled with dark grout between them, quieter emblems, small two-digit numbers, a thin inset line; dark walnut frame with a brass rim; softer glow rings, beams and orbs.
 - The board now rests on a big wooden table (plank texture drawn in code, thick top, dark apron and four legs, floor far below), so it no longer floats. 7 extra draw calls, one 512 px texture.
 - Removed the "Or tap any glowing tile" hint popup (dice-roll hints during trips stay).
+- Study-table props around the board (pencils, sticky notes, notebook, ruler, eraser, paper clips, pen cup, desk lamp, cup of chai), all simple shapes drawn in code; fewer in Lite. Board, environment and interactions unchanged.

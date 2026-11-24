@@ -39,6 +39,52 @@ export function ladderEnds(a, b) {
   return { foot: new THREE.Vector3(ax + d.x * .9, .06, az + d.z * .9), top: new THREE.Vector3(bx - d.x * .85, 1.45, bz - d.z * .85) };
 }
 
+// Study-table props around the board (all simple shapes, drawn in code).
+function addStationery(scene, cfg) {
+  const Y = -.42; const g = new THREE.Group(); scene.add(g); const lite = cfg.lamps === 2;
+  const L = (c, e = 0) => new THREE.MeshLambertMaterial({ color: c, emissive: e });
+  const put = (m, x, z, ry = 0, y = 0) => { m.position.set(x, Y + y, z); m.rotation.y = ry; g.add(m); return m; };
+  // pencils: hexagonal body, wood cone, graphite tip, ferrule + eraser
+  const pencil = (col, x, z, ry) => {
+    const p = new THREE.Group(); const len = 3.4;
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, len, 6), L(col)); body.rotation.z = Math.PI / 2; p.add(body);
+    const wood = new THREE.Mesh(new THREE.ConeGeometry(.13, .42, 6), L(0xe8c39a)); wood.rotation.z = -Math.PI / 2; wood.position.x = len / 2 + .21; p.add(wood);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(.045, .14, 6), L(0x333333)); tip.rotation.z = -Math.PI / 2; tip.position.x = len / 2 + .37; p.add(tip);
+    const fer = new THREE.Mesh(new THREE.CylinderGeometry(.14, .14, .2, 10), L(0xc0c4cc)); fer.rotation.z = Math.PI / 2; fer.position.x = -len / 2 - .1; p.add(fer);
+    const er = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .22, 10), L(0xef8c8c)); er.rotation.z = Math.PI / 2; er.position.x = -len / 2 - .31; p.add(er);
+    return put(p, x, z, ry, .13);
+  };
+  pencil(0xffc72c, -11.2, 6.8, .5); pencil(0x2f8cf0, -12.4, 4.6, -.2); pencil(0xef4b3f, 11.6, -3.4, 2.4);
+  // sticky notes with a few scribbled lines
+  const noteTex = (c) => { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const x = cv.getContext('2d'); x.fillStyle = c; x.fillRect(0, 0, 128, 128); x.fillStyle = '#00000014'; x.fillRect(0, 0, 128, 22); x.strokeStyle = '#1d2540aa'; x.lineWidth = 4; x.lineCap = 'round'; for (let i = 0; i < 4; i++) { x.beginPath(); x.moveTo(16, 42 + i * 20); for (let k = 0; k < 6; k++) x.lineTo(16 + k * 16 + Math.random() * 6, 42 + i * 20 + (Math.random() - .5) * 6); x.stroke(); } const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; };
+  const notes = [['#ffe066', -11.6, -2.2, .25], ['#ff9fb2', -10.4, -4.0, -.35], ['#9ee6c9', 11.0, 5.6, .15], ['#9cc8ff', 12.2, 7.4, -.4], ['#ffe066', 4.5, 10.6, .3]];
+  notes.slice(0, lite ? 3 : 5).forEach(([c, x, z, ry], i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 2.3), new THREE.MeshLambertMaterial({ map: noteTex(c) })); m.rotation.x = -Math.PI / 2; m.rotation.z = ry; m.position.set(x, Y + .012 + i * .004, z); g.add(m); });
+  // notebook (cover + pages + elastic band)
+  const nb = new THREE.Group(); const cover = new THREE.Mesh(new THREE.BoxGeometry(4.2, .28, 5.6), L(0x2a3a6b)); nb.add(cover); const pages = new THREE.Mesh(new THREE.BoxGeometry(4.0, .2, 5.4), L(0xf4efe2)); pages.position.set(.08, .02, 0); nb.add(pages); const band = new THREE.Mesh(new THREE.BoxGeometry(.12, .3, 5.65), L(0xef4b3f)); band.position.x = 1.5; nb.add(band); put(nb, 11.6, 1.2, -.12, .14);
+  // ruler
+  const rcv = document.createElement('canvas'); rcv.width = 512; rcv.height = 32; const rx = rcv.getContext('2d'); rx.fillStyle = '#e9edf2'; rx.fillRect(0, 0, 512, 32); rx.fillStyle = '#1d2540'; for (let i = 0; i < 60; i++) rx.fillRect(8 + i * 8.2, 0, 2, i % 5 ? 8 : 15); const rt = new THREE.CanvasTexture(rcv); rt.colorSpace = THREE.SRGBColorSpace;
+  const ruler = new THREE.Mesh(new THREE.BoxGeometry(7, .08, .9), [L(0xd7dde6), L(0xd7dde6), new THREE.MeshLambertMaterial({ map: rt }), L(0xd7dde6), L(0xd7dde6), L(0xd7dde6)]); put(ruler, -4.5, 10.8, .08, .04);
+  // eraser + paper clips
+  put(new THREE.Mesh(new THREE.BoxGeometry(1.0, .35, .6), L(0xf3a0a0)), -9.8, 9.4, .6, .18);
+  if (!lite) for (let i = 0; i < 3; i++) { const clip = new THREE.Mesh(new THREE.TorusGeometry(.22, .03, 6, 16), L(0xb8bec8)); clip.scale.set(1, 2.2, 1); clip.rotation.x = Math.PI / 2; clip.position.set(9.6 + i * .5, Y + .04, 10.2 - i * .3); g.add(clip); }
+  // pen cup with pens
+  const cup = new THREE.Group(); const cyl = new THREE.Mesh(new THREE.CylinderGeometry(.85, .75, 2.2, 18, 1, true), new THREE.MeshLambertMaterial({ color: 0x2fb86e, side: THREE.DoubleSide })); cyl.position.y = 1.1; cup.add(cyl);
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(.75, 18), L(0x248f56)); bottom.rotation.x = -Math.PI / 2; bottom.position.y = .05; cup.add(bottom);
+  [[0x1d2540, .2, .1, .15], [0xef4b3f, -.25, .15, -.2], [0x2f8cf0, .05, -.3, .1], [0xffc72c, .3, -.1, -.25]].forEach(([c, x, z, t]) => { const pen = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 3.0, 8), L(c)); pen.position.set(x, 1.9, z); pen.rotation.z = t; pen.rotation.x = t * .6; cup.add(pen); });
+  put(cup, -12.0, -6.6, 0, 0);
+  // desk lamp: heavy base, two arms, a shade with a glowing bulb (no extra light, the lanterns still light the scene)
+  const lamp = new THREE.Group(); const metal = L(0x1d2540); const brass = L(0xc9a24a, 0x2a2008);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.5, .35, 24), metal); base.position.y = .18; lamp.add(base);
+  const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, 4.2, 8), brass); arm1.position.set(.6, 2.2, 0); arm1.rotation.z = -.3; lamp.add(arm1);
+  const joint = new THREE.Mesh(new THREE.SphereGeometry(.2, 12, 8), metal); joint.position.set(1.22, 4.2, 0); lamp.add(joint);
+  const arm2 = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 3.4, 8), brass); arm2.position.set(-.2, 4.75, 0); arm2.rotation.z = 1.25; lamp.add(arm2);
+  const shade = new THREE.Mesh(new THREE.ConeGeometry(1.0, 1.4, 20, 1, true), new THREE.MeshLambertMaterial({ color: 0xef4b3f, side: THREE.DoubleSide })); shade.position.set(-1.75, 4.6, 0); shade.rotation.z = .5; lamp.add(shade);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(.32, 12, 10), new THREE.MeshBasicMaterial({ color: 0xfff0c8 })); bulb.position.set(-1.95, 4.25, 0); lamp.add(bulb);
+  put(lamp, 12.8, -5.6, -2.5, 0);
+  // a cup of chai with a saucer
+  if (!lite) { const mug = new THREE.Group(); const sau = new THREE.Mesh(new THREE.CylinderGeometry(1.0, .85, .1, 24), L(0xf4efe2)); sau.position.y = .05; mug.add(sau); const body = new THREE.Mesh(new THREE.CylinderGeometry(.6, .5, 1.0, 20), L(0xf4efe2)); body.position.y = .6; mug.add(body); const tea = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), L(0x9a5a2a)); tea.rotation.x = -Math.PI / 2; tea.position.y = 1.0; mug.add(tea); const h = new THREE.Mesh(new THREE.TorusGeometry(.28, .07, 8, 14), L(0xf4efe2)); h.position.set(.68, .62, 0); mug.add(h); put(mug, 9.6, 8.8, .4, 0); }
+}
+
 export async function createWorld({ canvas, tier = 'full', theme = 'light', onProgress = () => {}, onSlow, FpsGovernor }) {
   let cfg = TIER_CFG[tier] || TIER_CFG.full;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: cfg.aa, powerPreference: 'high-performance', alpha: false });
@@ -77,6 +123,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const apron = new THREE.Mesh(new THREE.BoxGeometry(TW - 1.6, 1.1, TD - 1.6), apronMat); apron.position.set(0, -.42 - TT - .55, .4); scene.add(apron);
   const legGeo = new THREE.BoxGeometry(1.1, 8.2, 1.1);
   for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const leg = new THREE.Mesh(legGeo, apronMat); leg.position.set(lx * (TW / 2 - 1.3), -.42 - TT - 4.1, .4 + lz * (TD / 2 - 1.3)); scene.add(leg); }
+  addStationery(scene, cfg);
   const sp = new Float32Array(cfg.stars * 3); for (let i = 0; i < cfg.stars; i++) { const a = Math.random() * Math.PI * 2; const e = .15 + Math.random() * 1.2; const r = 90; sp[i * 3] = Math.cos(a) * Math.cos(e) * r; sp[i * 3 + 1] = Math.sin(e) * r * .9 + 4; sp[i * 3 + 2] = Math.sin(a) * Math.cos(e) * r; }
   const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xdfe6ff, size: 1.8, sizeAttenuation: false, transparent: true, opacity: .8, fog: false })); scene.add(stars);
