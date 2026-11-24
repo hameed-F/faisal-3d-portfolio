@@ -1,3 +1,3 @@
 {
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)submission' ':(exclude)vercel.json' ':(exclude).vercelignore' ':(exclude)README.md'"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)deliverables' ':(exclude)submission' ':(exclude)vercel.json' ':(exclude).vercelignore' ':(exclude)README.md'"
 }

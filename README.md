@@ -1,6 +1,6 @@
 # Muhammad Faisal Hameed: Life-Size Snakes & Ladders Portfolio
 
-> **Semester project submission** (Roll No. CTGA-23008, Prof. Saadia Arshad). Live site: https://faisal-3d-portfolio.vercel.app/ · The report (PDF), After Effects project and video, Blender file, avatar model, Mixamo clips and screenshots are in [`submission/`](submission/README.md), which also maps every required deliverable to its location.
+> **Semester project submission** (Roll No. CTGA-23008, Prof. Saadia Arshad). Live site: https://faisal-3d-portfolio.vercel.app/ · The report (PDF), After Effects project and video, Blender file, avatar model, Mixamo clips and screenshots are in [`deliverables/`](deliverables/README.md), which also maps every required deliverable to its location.
 
 An interactive 3D portfolio built with Three.js and Vite. A folded game board unfolds as the site loads. Then Faisal (a custom Blender avatar with 18 Mixamo animations) stands on tile 1 of a life-size Snakes & Ladders board at night. Seven glowing tiles hold the sections: About me, Education & experience, Projects, Skills, Contact, the promo video and tile 100. Each trip uses a different movement (roll, ladder climb, slide, jumps, walk, run + snake, flying). The dice companion, **Pappu Pansa**, rolls the way, chats in English, Urdu or Roman Urdu (RAG over the portfolio, with citations) and plays a real game against you at the end.
 

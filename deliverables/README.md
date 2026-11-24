@@ -27,7 +27,7 @@ This folder holds every deliverable that is not website code. The website source
 ## Folder layout
 
 ```
-submission/
+deliverables/
 ├── README.md                 this file
 ├── report/
 │   ├── Faisal_Hameed_CTGA-23008_Project_Report.pdf
