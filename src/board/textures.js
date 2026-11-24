@@ -66,6 +66,19 @@ export function makeBoardTexture(size) {
 /** Board frame: dark lacquered walnut. */
 export function makeEdgeTexture() { const [c, g] = mk(256, 32); g.fillStyle = '#3a2416'; g.fillRect(0, 0, 256, 32); for (let i = 0; i < 70; i++) { g.fillStyle = Math.random() < .5 ? '#2c1a10' : '#4a2f1d'; g.globalAlpha = .7; g.fillRect(0, Math.random() * 32, 256, 1 + Math.random()); } g.globalAlpha = 1; const t = tex(c); t.wrapS = THREE.RepeatWrapping; return t; }
 
+/** Tabletop: warm planks with grain. */
+export function makeTableTexture() {
+  const [c, g] = mk(512, 512); const planks = 6; const pw = 512 / planks;
+  for (let i = 0; i < planks; i++) {
+    const base = ['#8a5a36', '#7d5130', '#93613b', '#84552f', '#8e5d37', '#7a4f2e'][i];
+    g.fillStyle = base; g.fillRect(i * pw, 0, pw, 512);
+    for (let k = 0; k < 60; k++) { g.strokeStyle = Math.random() < .5 ? '#00000014' : '#ffffff10'; g.lineWidth = 1 + Math.random() * 2; const x = i * pw + Math.random() * pw; g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + (Math.random() - .5) * 14, 170, x + (Math.random() - .5) * 14, 340, x + (Math.random() - .5) * 10, 512); g.stroke(); }
+    if (i % 2) { g.fillStyle = '#00000022'; g.beginPath(); g.ellipse(i * pw + pw * .5, 120 + i * 50, 7, 14, 0, 0, 7); g.fill(); }
+    g.fillStyle = '#00000055'; g.fillRect(i * pw, 0, 2, 512); // seam between planks
+  }
+  return tex(c);
+}
+
 /** Snake skin: along the length (u). */
 export function makeSnakeTexture(a, b, kind) {
   const [c, g] = mk(256, 64); g.fillStyle = a; g.fillRect(0, 0, 256, 64);

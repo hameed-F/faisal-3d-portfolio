@@ -124,3 +124,5 @@
 - Loading screen shows both: the Ludo board unfolding in quarters (right half, then bottom half) and the tile loading bar under it, driven by the same progress.
 - Flags redesigned to look professional: slim navy banners with a coloured edge at the pole, the tile number and the title in spaced capitals (Nunito Sans), thin metal pole with a brass base and finial, gentle wave.
 - Board refinements: tiles are glazed and bevelled with dark grout between them, quieter emblems, small two-digit numbers, a thin inset line; dark walnut frame with a brass rim; softer glow rings, beams and orbs.
+- The board now rests on a big wooden table (plank texture drawn in code, thick top, dark apron and four legs, floor far below), so it no longer floats. 7 extra draw calls, one 512 px texture.
+- Removed the "Or tap any glowing tile" hint popup (dice-roll hints during trips stay).

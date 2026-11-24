@@ -133,8 +133,8 @@ export function createStory({ world, toast, onSection }) {
   }
   function showNext() {
     const n = nextTarget(); cta.hidden = false; skipBtn.hidden = true; nextBtn.hidden = false;
-    if (n) { nextBtn.textContent = `Next: ${n.next} →`; nextBtn.dataset.id = n.id; setHint('Or tap any glowing tile'); }
-    else { nextBtn.textContent = 'Play a round of Snakes & Ladders'; nextBtn.dataset.id = 'game'; setHint('You have seen every tile. Tap any glowing tile to revisit it.'); }
+    if (n) { nextBtn.textContent = `Next: ${n.next} →`; nextBtn.dataset.id = n.id; setHint(''); }
+    else { nextBtn.textContent = 'Play a round of Snakes & Ladders'; nextBtn.dataset.id = 'game'; setHint(''); }
   }
   function hideCta() { cta.hidden = true; }
 
@@ -223,7 +223,7 @@ export function createStory({ world, toast, onSection }) {
     setTimeout(() => { av.play('Wave', { fade: .3, loop: true }); }, 500);
     setTimeout(() => { if (!S.busy && S.cur === 1 && !S.screen) { av.play('Idle', { fade: .6 }); lookAtCam(false); } }, 500 + av.duration('Wave') * 2000 + 100);
     cta.hidden = false; skipBtn.hidden = true; nextBtn.hidden = false; nextBtn.textContent = 'Start the tour: About me →'; nextBtn.dataset.id = 'about';
-    setHint('Or tap any glowing tile on the board');
+    setHint('');
   }
 
   // ---------- game mode ----------

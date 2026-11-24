@@ -43,7 +43,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   let cfg = TIER_CFG[tier] || TIER_CFG.full;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: cfg.aa, powerPreference: 'high-performance', alpha: false });
   renderer.setClearColor(SKY); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, cfg.dpr));
-  const scene = new THREE.Scene(); scene.background = SKY.clone(); scene.fog = new THREE.Fog(SKY, 46, 110);
+  const scene = new THREE.Scene(); scene.background = SKY.clone(); scene.fog = new THREE.Fog(SKY, 40, 95);
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
   try { await Promise.race([Promise.all([document.fonts.load('700 40px Fredoka'), document.fonts.load("700 40px 'Nunito Sans'"), document.fonts.load("600 40px 'Nunito Sans'")]), new Promise((r) => setTimeout(r, 1500))]); } catch { /* font optional */ }
   onProgress(0.05, 'unfolding the board');
@@ -67,7 +67,16 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   });
 
   // ---------- ground + stars ----------
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(60, 48), new THREE.MeshBasicMaterial({ map: TX.makeGroundTexture(), fog: false })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.42; scene.add(ground);
+  // the board rests on a big wooden table (top, thick edge, four legs) standing on a dark floor
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(70, 40), new THREE.MeshBasicMaterial({ map: TX.makeGroundTexture(), fog: false })); ground.rotation.x = -Math.PI / 2; ground.position.y = -9.5; scene.add(ground);
+  const tableTex = TX.makeTableTexture(); tableTex.wrapS = tableTex.wrapT = THREE.RepeatWrapping; tableTex.repeat.set(2, 2);
+  const tableMat = new THREE.MeshLambertMaterial({ map: tableTex, emissive: 0xffffff, emissiveMap: tableTex, emissiveIntensity: .06 });
+  const TW = 30, TD = 27, TT = .9;
+  const tableTop = new THREE.Mesh(new THREE.BoxGeometry(TW, TT, TD), tableMat); tableTop.position.set(0, -.42 - TT / 2, .4); scene.add(tableTop);
+  const apronMat = new THREE.MeshLambertMaterial({ color: 0x2a1a10 });
+  const apron = new THREE.Mesh(new THREE.BoxGeometry(TW - 1.6, 1.1, TD - 1.6), apronMat); apron.position.set(0, -.42 - TT - .55, .4); scene.add(apron);
+  const legGeo = new THREE.BoxGeometry(1.1, 8.2, 1.1);
+  for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const leg = new THREE.Mesh(legGeo, apronMat); leg.position.set(lx * (TW / 2 - 1.3), -.42 - TT - 4.1, .4 + lz * (TD / 2 - 1.3)); scene.add(leg); }
   const sp = new Float32Array(cfg.stars * 3); for (let i = 0; i < cfg.stars; i++) { const a = Math.random() * Math.PI * 2; const e = .15 + Math.random() * 1.2; const r = 90; sp[i * 3] = Math.cos(a) * Math.cos(e) * r; sp[i * 3 + 1] = Math.sin(e) * r * .9 + 4; sp[i * 3 + 2] = Math.sin(a) * Math.cos(e) * r; }
   const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xdfe6ff, size: 1.8, sizeAttenuation: false, transparent: true, opacity: .8, fog: false })); scene.add(stars);
