@@ -3,9 +3,6 @@ import * as THREE from 'three';
 import { T, N, tileXZ, SECTIONS, LADDERS, SNAKES } from './layout.js';
 import * as TX from './textures.js';
 import { loadAvatar } from './avatar.js';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
-import fontJson from 'three/examples/fonts/helvetiker_bold.typeface.json';
 
 export const TIER_CFG = {
   full: { dpr: 2, boardTex: 2048, snakeSegs: 110, stars: 320, lamps: 4, aa: true, fps: 60, avatarHz: 60 },
@@ -127,16 +124,22 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   // ---------- glowing tiles ----------
   const ringTex = TX.makeRingTexture(); const beamTex = TX.makeBeamTexture(); const glowTex = TX.makeGlowTexture();
-  const markers = []; const hits = []; const font = new FontLoader().parse(fontJson);
+  const markers = []; const hits = []; const poleMat = new THREE.MeshLambertMaterial({ color: 0x17203d }); const knobMat = new THREE.MeshLambertMaterial({ color: 0xffc72c, emissive: 0xffc72c, emissiveIntensity: .4 });
   for (const s of SECTIONS) {
     const [x, z] = tileXZ(s.tile); const col = new THREE.Color(s.color); const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
     const ring = new THREE.Mesh(new THREE.PlaneGeometry(T * 1.55, T * 1.55), new THREE.MeshBasicMaterial({ map: ringTex, color: col, transparent: true, opacity: .9, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = .05; g.add(ring);
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(.62, .85, 3.2, 20, 1, true), new THREE.MeshBasicMaterial({ map: beamTex, color: col, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 1.6; g.add(beam);
     const orbs = []; for (let i = 0; i < 3; i++) { const o = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); o.scale.setScalar(.55); g.add(o); orbs.push(o); }
-    const tg = new TextGeometry(s.title, { font, size: .42, depth: .2, curveSegments: 3, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 2 }); tg.computeBoundingBox(); tg.center();
-    const label = new THREE.Group(); const txt = new THREE.Mesh(tg, [new THREE.MeshBasicMaterial({ color: col.clone().lerp(new THREE.Color('#ffffff'), .25) }), new THREE.MeshBasicMaterial({ color: 0x17203d })]); label.add(txt); g.add(label);
+    // a flag planted on the tile, like a pin on a map; the cloth waves
+    const fl = TX.makeFlag(s.title, s.color); const fh = .78; const fw = Math.min(3.4, fh * fl.aspect);
+    const label = new THREE.Group(); label.position.set(-.62, 0, -.45); g.add(label);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.045, .06, 3.3, 8), poleMat); pole.position.y = 1.65; label.add(pole);
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(.12, 12, 8), knobMat); knob.position.y = 3.34; label.add(knob);
+    const fgeo = new THREE.PlaneGeometry(fw, fh, 16, 2); fgeo.translate(fw / 2 + .04, 3.3 - fh / 2, 0);
+    const cloth = new THREE.Mesh(fgeo, new THREE.MeshBasicMaterial({ map: fl.texture, transparent: true, alphaTest: .4, side: THREE.DoubleSide })); label.add(cloth);
+    const base = Float32Array.from(fgeo.attributes.position.array); cloth.userData = { base, fw };
     const hit = new THREE.Mesh(new THREE.CylinderGeometry(.95, .95, 3.4, 12), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 1.5; hit.userData.section = s.id; g.add(hit); hits.push(hit);
-    markers.push({ s, g, ring, beam, orbs, label, ph: Math.random() * 6.28 });
+    markers.push({ s, g, ring, beam, orbs, label, cloth, ph: Math.random() * 6.28 });
   }
 
   // ---------- holo projector (Projects) ----------
@@ -271,7 +274,12 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     for (const m of markers) {
       const a = W.t * .9 + m.ph; m.ring.rotation.z = W.t * .5 + m.ph; m.ring.scale.setScalar(1 + .06 * Math.sin(W.t * 2 + m.ph));
       m.orbs.forEach((o, i) => { const aa = a * 1.4 + i * 2.094; o.position.set(Math.cos(aa) * .95, .55 + .55 * Math.sin(W.t * 1.3 + i * 2 + m.ph) + i * .35, Math.sin(aa) * .95); });
-      m.label.position.set(Math.cos(a) * .45, 3.0 + Math.sin(W.t * 1.6 + m.ph) * .12, Math.sin(a) * .45); m.label.quaternion.copy(camera.quaternion); m.label.rotateY(Math.sin(W.t * .9 + m.ph) * .28);
+      if (m.label.visible) {
+        m.label.rotation.y = Math.atan2(camera.position.x - m.g.position.x, camera.position.z - m.g.position.z) + Math.sin(W.t * .5 + m.ph) * .12;
+        const pa = m.cloth.geometry.attributes.position; const b0 = m.cloth.userData.base; const fw = m.cloth.userData.fw;
+        for (let i = 0; i < pa.count; i++) { const x = b0[i * 3] - .04; const f = Math.max(0, x / fw); pa.array[i * 3 + 2] = Math.sin(x * 2.4 - W.t * 3.2 + m.ph) * .16 * f; pa.array[i * 3 + 1] = b0[i * 3 + 1] - f * f * .08 + Math.sin(x * 1.7 - W.t * 2.4) * .03 * f; }
+        pa.needsUpdate = true;
+      }
       m.beam.material.opacity = .26 + .07 * Math.sin(W.t * 2.4 + m.ph);
     }
     for (const l of lamps) { l.g.position.y = l.y + Math.sin(W.t * .8 + l.ph) * .18; l.g.rotation.y = W.t * .2 + l.ph; }

@@ -22,6 +22,7 @@ export function createStory({ world, toast, onSection }) {
   const setHint = (t, ms = 0) => { hint.textContent = t || ''; hint.hidden = !t; clearTimeout(setHint._t); if (ms) setHint._t = setTimeout(() => { hint.hidden = true; }, ms); };
 
   // ---------- movement helpers ----------
+  function lookAtCam(on) { av.look.target = cam.position; av.look.w = on ? 1 : 0; }
   const setY = (y) => { P.y = y; };
   function faceCamera() { world.face(yawOf(cam.position.x - P.x, cam.position.z - P.z)); }
   function pathLen(pts) { let L = 0; for (let i = 1; i < pts.length; i++) L += pts[i].distanceTo(pts[i - 1]); return L; }
@@ -96,6 +97,7 @@ export function createStory({ world, toast, onSection }) {
   async function openSection(id) {
     const s = SEC[id]; S.visited.add(id); S.cur = s.tile; S.current = id; hideCta(); setHint('');
     onSection?.(id);
+    lookAtCam(id === 'about' || id === 'contact' || id === 'play');
     if (id === 'about') { closeCam(); av.play('Wave', { fade: .3, loop: true }); mount('side', id); }
     else if (id === 'contact') { closeCam(); av.play('Talk', { fade: .3 }); mount('side', id); }
     else if (id === 'edu') { const lad = ladderEnds(8, 29).top; closeCam({ dist: 2.9, h: 1.55, lookY: 1.4, fov: 32, dir: V(P.x - lad.x, 0, P.z - lad.z) }); av.play('Think', { fade: .3 }); mount('bubble', id); }
@@ -116,7 +118,7 @@ export function createStory({ world, toast, onSection }) {
   }
   async function closeSection() {
     const was = closeScreen(); if (!was) return;
-    av.play('Idle', { fade: .5 }); if (S.current === 'edu' || true) { /* keep position */ }
+    av.play('Idle', { fade: .5 }); lookAtCam(false);
     if (P.y > 0.01 && S.current !== 'play') world.tween(.5, (k) => setY(P.y * (1 - k)), 'io');
     if (S.current === 'play' || was === 'home') { enterHome(); return; }
     farCam(1.2);
@@ -142,7 +144,7 @@ export function createStory({ world, toast, onSection }) {
     setHint('');
   }
   async function runTo(id) { // tile click / menu: run straight there, no dice
-    if (S.busy) return; const s = SEC[id]; if (!s) return;
+    if (S.busy) return; lookAtCam(false); const s = SEC[id]; if (!s) return;
     if (S.cur === s.tile && S.current === id) { stopHome(); closeScreen(); openSection(id); return; }
     stopHome(); S.busy = true; hideCta(); closeScreen(); skipBtn.hidden = false; cta.hidden = false; nextBtn.hidden = true; world.W.skip = false; setHint('');
     S.camMode = 'follow'; world.setCam(followPose(), { tau: .7, sx: 0, sy: 0 });
@@ -153,7 +155,7 @@ export function createStory({ world, toast, onSection }) {
     await openSection(id);
   }
   async function travel(id) {
-    if (S.busy) return; const s = SEC[id]; if (!s) return; stopHome();
+    if (S.busy) return; const s = SEC[id]; if (!s) return; stopHome(); lookAtCam(false);
     if (S.cur === s.tile && S.current === id) { openSection(id); return; }
     S.busy = true; hideCta(); closeScreen(); skipBtn.hidden = false; cta.hidden = false; nextBtn.hidden = true; world.W.skip = false; world.holo.visible = false;
     S.camMode = 'follow'; world.setCam(followPose(), { tau: .9, sx: 0, sy: 0 });
@@ -217,9 +219,9 @@ export function createStory({ world, toast, onSection }) {
     P.copy(tileV(1)); world.faceSnap(0); av.play('Idle', { fade: 0 }); startCam(0.01);
     world.dice.position.copy(P).add(V(.6, 1.85, -1.3)); S.cur = 1;
     // after the loader is gone: the camera is already in place; Faisal turns to the camera and waves
-    const sp = world.camGoal(); world.face(yawOf(sp.x - P.x, sp.z - P.z));
-    setTimeout(() => { av.play('Wave', { fade: .3 }); }, 500);
-    setTimeout(() => { av.play('Idle', { fade: .6 }); }, 500 + av.duration('Wave') * 1000 + 100);
+    const sp = world.camGoal(); world.face(yawOf(sp.x - P.x, sp.z - P.z)); lookAtCam(true);
+    setTimeout(() => { av.play('Wave', { fade: .3, loop: true }); }, 500);
+    setTimeout(() => { if (!S.busy && S.cur === 1 && !S.screen) { av.play('Idle', { fade: .6 }); lookAtCam(false); } }, 500 + av.duration('Wave') * 2000 + 100);
     cta.hidden = false; skipBtn.hidden = true; nextBtn.hidden = false; nextBtn.textContent = 'Start the tour: About me →'; nextBtn.dataset.id = 'about';
     setHint('Or tap any glowing tile on the board');
   }
@@ -297,7 +299,7 @@ export function createStory({ world, toast, onSection }) {
   function cycleHome() { av.play(HOME_CLIPS[homeI++ % HOME_CLIPS.length], { fade: .45, loop: true }); homeTimer = setTimeout(cycleHome, 4200); }
   function stopHome() { clearTimeout(homeTimer); homeTimer = 0; world.D.side = false; document.body.classList.remove('home'); if (S.screen === 'home') closeScreen(); }
   function enterHome() {
-    stopHome(); closeScreen(); P.y = 0; S.free = true; homeCam(); cycleHome(); hideCta(); setHint('');
+    stopHome(); closeScreen(); P.y = 0; S.free = true; homeCam(); cycleHome(); lookAtCam(true); hideCta(); setHint('');
     scr.className = 'scr k-home'; scr.hidden = false; S.screen = 'home'; document.body.dataset.screen = 'home'; document.body.classList.add('home'); world.D.hide = 0; world.D.side = true;
     scr.innerHTML = `<div class="home-card" role="region" aria-label="Home"><p class="kick">Muhammad Faisal Hameed</p><h2>Thanks for playing!</h2><p>Tap any glowing tile on the board to jump back into a section, or play another round.</p>
       <div class="home-tiles">${SECTIONS.filter((x) => x.id !== 'play').map((x) => `<button type="button" class="tile-btn" data-run="${x.id}" style="--c:${x.color}">${x.title}</button>`).join('')}</div>

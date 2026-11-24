@@ -8,36 +8,42 @@ const TILE_WHITE = '#fff8ea';
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; };
 const tex = (c, srgb = true) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
 
-// ---- printed gaming icons (unit box, centred on 0,0, about 1 wide) ----
 const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+// Tile art: emblems of Faisal's own projects + little Karachi / Pakistan doodles. All drawn in code, centred on 0,0, about 1 unit wide.
 const ICONS = [
-  (g) => { rr(g, -.5, -.26, 1, .52, .24); g.fill(); g.fillStyle = '#fff8'; g.fillRect(-.3, -.04, .2, .06); g.fillRect(-.23, -.11, .06, .2); g.beginPath(); g.arc(.22, -.04, .05, 0, 7); g.arc(.34, .06, .05, 0, 7); g.fill(); }, // controller
-  (g) => { g.beginPath(); g.arc(0, -.2, .17, 0, 7); g.fill(); g.fillRect(-.04, -.2, .08, .45); g.beginPath(); g.ellipse(0, .3, .3, .11, 0, 0, 7); g.fill(); }, // joystick
-  (g) => { g.fillRect(-.12, -.42, .24, .84); g.fillRect(-.42, -.12, .84, .24); }, // d-pad
-  (g) => { rr(g, -.3, -.42, .6, .84, .06); g.fill(); g.fillStyle = '#fff9'; g.fillRect(-.2, -.32, .4, .3); }, // cartridge
-  (g) => { g.beginPath(); g.moveTo(0, .38); g.bezierCurveTo(-.7, -.1, -.3, -.55, 0, -.2); g.bezierCurveTo(.3, -.55, .7, -.1, 0, .38); g.fill(); }, // heart
-  (g) => { g.beginPath(); g.arc(0, 0, .4, 0, 7); g.fill(); g.strokeStyle = '#fffa'; g.lineWidth = .06; g.beginPath(); g.arc(0, 0, .26, 0, 7); g.stroke(); }, // coin
-  (g) => { g.save(); g.rotate(.7); g.fillRect(-.05, -.5, .1, .75); g.fillRect(-.22, .2, .44, .08); g.fillRect(-.05, .28, .1, .2); g.restore(); }, // sword
-  (g) => { g.beginPath(); g.moveTo(-.34, -.36); g.lineTo(.34, -.36); g.lineTo(.34, .05); g.quadraticCurveTo(.3, .35, 0, .46); g.quadraticCurveTo(-.3, .35, -.34, .05); g.fill(); }, // shield
-  (g) => { g.beginPath(); g.arc(0, .14, .3, 0, 7); g.fill(); g.fillRect(-.09, -.42, .18, .35); g.fillRect(-.14, -.46, .28, .07); }, // potion
-  (g) => { g.beginPath(); g.arc(-.22, 0, .2, 0, 7); g.fill(); g.fillRect(-.08, -.05, .6, .1); g.fillRect(.3, .05, .07, .16); g.fillRect(.42, .05, .07, .12); }, // key
-  (g) => { g.beginPath(); g.moveTo(-.28, -.4); g.lineTo(.28, -.4); g.lineTo(.2, .05); g.quadraticCurveTo(0, .25, -.2, .05); g.fill(); g.fillRect(-.04, .1, .08, .22); g.fillRect(-.2, .3, .4, .1); }, // trophy
+  // ---- his projects ----
+  (g) => { g.beginPath(); g.arc(0, -.1, .32, Math.PI, 0); g.lineTo(.32, .38); g.lineTo(.16, .26); g.lineTo(0, .38); g.lineTo(-.16, .26); g.lineTo(-.32, .38); g.closePath(); g.fill(); hole(g, -.12, -.1, .07); hole(g, .12, -.1, .07); }, // ghost (Ghost Lantern)
+  (g) => { g.fillRect(-.06, -.46, .12, .08); g.beginPath(); g.moveTo(-.22, -.36); g.lineTo(.22, -.36); g.lineTo(.3, .3); g.lineTo(-.3, .3); g.closePath(); g.fill(); g.fillRect(-.34, .3, .68, .1); hole(g, 0, -.02, .12); }, // lantern
+  (g) => { g.beginPath(); g.moveTo(-.38, -.42); g.lineTo(-.18, -.2); g.lineTo(.18, -.2); g.lineTo(.38, -.42); g.lineTo(.4, .1); g.quadraticCurveTo(.38, .42, 0, .42); g.quadraticCurveTo(-.38, .42, -.4, .1); g.closePath(); g.fill(); hole(g, -.15, .02, .06); hole(g, .15, .02, .06); }, // cat (Mochi)
+  (g) => { g.beginPath(); g.ellipse(-.06, 0, .32, .2, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(.2, 0); g.lineTo(.46, -.2); g.lineTo(.46, .2); g.closePath(); g.fill(); hole(g, -.24, -.04, .04); }, // fish (Royal Fish)
+  (g) => { g.beginPath(); g.arc(0, -.12, .28, Math.PI * .8, Math.PI * .2); g.lineTo(.12, .2); g.lineTo(-.12, .2); g.closePath(); g.fill(); g.fillRect(-.12, .24, .24, .07); g.fillRect(-.09, .34, .18, .06); }, // bulb (Light Up The House)
+  (g) => { g.beginPath(); g.arc(0, 0, .4, 0, 7); g.fill(); hole(g, 0, 0, .32); g.fillRect(-.03, -.25, .06, .27); g.save(); g.rotate(1.1); g.fillRect(-.03, -.2, .06, .22); g.restore(); }, // clock (Chrono Rebellion)
+  (g) => { g.beginPath(); g.moveTo(-.46, -.12); g.quadraticCurveTo(0, -.32, .46, -.12); g.quadraticCurveTo(.44, .22, .14, .2); g.quadraticCurveTo(0, .08, -.14, .2); g.quadraticCurveTo(-.44, .22, -.46, -.12); g.fill(); hole(g, -.2, -.02, .08); hole(g, .2, -.02, .08); }, // mask (Behind the Smile, jam theme "Mask")
+  (g) => { rr(g, -.44, -.2, .88, .4, .14); g.fill(); g.fillRect(-.5, -.06, .06, .12); g.fillRect(.44, -.06, .06, .12); hole(g, -.18, 0, .11); hole(g, .18, 0, .11); }, // VR headset (B99 VR)
+  (g) => { g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, .4, .6, Math.PI * 2 - .6); g.closePath(); g.fill(); for (const x of [.3, .44]) { g.beginPath(); g.arc(x + .06, 0, .05, 0, 7); g.fill(); } }, // chomper (Pac-Man clone)
+  (g) => { g.beginPath(); g.moveTo(.46, 0); g.lineTo(-.3, -.06); g.lineTo(-.42, -.24); g.lineTo(-.48, -.24); g.lineTo(-.42, .02); g.lineTo(-.44, .06); g.lineTo(-.3, .06); g.closePath(); g.fill(); g.beginPath(); g.moveTo(.06, -.03); g.lineTo(-.14, -.42); g.lineTo(-.24, -.42); g.lineTo(-.12, -.03); g.moveTo(.06, .03); g.lineTo(-.14, .42); g.lineTo(-.24, .42); g.lineTo(-.12, .03); g.fill(); }, // aircraft (low-poly aircraft)
+  (g) => { g.beginPath(); g.moveTo(0, -.42); g.lineTo(.4, -.2); g.lineTo(0, .02); g.lineTo(-.4, -.2); g.closePath(); g.fill(); g.globalAlpha *= .75; g.beginPath(); g.moveTo(-.4, -.2); g.lineTo(0, .02); g.lineTo(0, .46); g.lineTo(-.4, .24); g.closePath(); g.fill(); g.globalAlpha /= .75; g.beginPath(); g.moveTo(.4, -.2); g.lineTo(0, .02); g.lineTo(0, .46); g.lineTo(.4, .24); g.closePath(); g.fill(); }, // block (Mera Craft)
+  (g) => { g.save(); g.rotate(-.2); g.fillRect(-.42, -.34, .84, .16); g.restore(); rr(g, -.42, -.12, .84, .5, .04); g.fill(); hole(g, -.18, .13, .05); hole(g, 0, .13, .05); hole(g, .18, .13, .05); }, // clapperboard (motion & video work)
+  (g) => { rr(g, -.5, -.24, 1, .48, .22); g.fill(); hole(g, -.26, 0, .06); hole(g, .22, -.06, .05); hole(g, .34, .06, .05); }, // controller (game dev)
+  // ---- Karachi / Pakistan doodles ----
+  (g) => { rr(g, -.3, -.12, .5, .48, .08); g.fill(); g.lineWidth = .07; g.strokeStyle = g.fillStyle; g.beginPath(); g.arc(.24, .1, .12, -1.4, 1.4); g.stroke(); g.lineWidth = .05; for (const x of [-.16, 0]) { g.beginPath(); g.moveTo(x, -.22); g.quadraticCurveTo(x + .08, -.32, x, -.44); g.stroke(); } }, // cup of chai
+  (g) => { g.save(); g.rotate(.7); rr(g, -.09, -.48, .18, .62, .06); g.fill(); g.fillRect(-.04, .14, .08, .26); g.restore(); g.beginPath(); g.arc(.28, .28, .1, 0, 7); g.fill(); }, // cricket bat + ball
+  (g) => { g.beginPath(); g.moveTo(0, -.46); g.lineTo(.3, -.06); g.lineTo(0, .3); g.lineTo(-.3, -.06); g.closePath(); g.fill(); g.lineWidth = .04; g.strokeStyle = g.fillStyle; g.beginPath(); g.moveTo(0, .3); g.quadraticCurveTo(.15, .38, .05, .46); g.quadraticCurveTo(-.08, .5, .12, .52); g.stroke(); }, // kite (patang)
+  (g) => { g.beginPath(); g.moveTo(-.44, .2); g.lineTo(-.44, -.06); g.quadraticCurveTo(-.36, -.36, -.02, -.36); g.lineTo(.26, -.36); g.lineTo(.4, -.04); g.lineTo(.46, .2); g.closePath(); g.fill(); for (const x of [-.26, .28]) { g.beginPath(); g.arc(x, .26, .1, 0, 7); g.fill(); } hole(g, .12, -.18, .09); }, // rickshaw
+  (g) => { g.beginPath(); g.ellipse(0, .06, .3, .36, -.5, 0, 7); g.fill(); g.beginPath(); g.ellipse(.12, -.34, .14, .06, -.6, 0, 7); g.fill(); }, // mango
+  (g) => { g.beginPath(); g.moveTo(-.06, -.48); g.lineTo(.06, -.48); g.lineTo(.12, .2); g.lineTo(.3, .3); g.lineTo(.36, .46); g.lineTo(-.36, .46); g.lineTo(-.3, .3); g.lineTo(-.12, .2); g.closePath(); g.fill(); g.fillRect(-.1, -.2, .2, .05); g.fillRect(-.13, .02, .26, .05); }, // minaret
+  (g) => { for (let i = 0; i < 6; i++) { g.save(); g.rotate(i * Math.PI / 3); g.beginPath(); g.ellipse(0, -.24, .1, .2, 0, 0, 7); g.fill(); g.restore(); } hole(g, 0, 0, .09); }, // truck-art flower
+  (g) => { g.beginPath(); g.arc(0, .08, .28, Math.PI, 0); g.lineTo(.28, .34); g.lineTo(-.28, .34); g.closePath(); g.fill(); g.fillRect(-.03, -.36, .06, .18); g.fillRect(-.42, .34, .84, .1); g.fillRect(-.42, -.04, .08, .38); g.fillRect(.34, -.04, .08, .38); }, // dome (Karachi's white domes)
+  (g) => { g.beginPath(); g.moveTo(-.42, .36); g.lineTo(0, -.44); g.lineTo(.42, .36); g.closePath(); g.fill(); hole(g, 0, .08, .1); }, // samosa
   (g) => { g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5; const r = i % 2 ? .18 : .45; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill(); }, // star
-  (g) => { g.beginPath(); g.arc(0, -.1, .32, Math.PI, 0); g.lineTo(.32, .38); g.lineTo(.16, .26); g.lineTo(0, .38); g.lineTo(-.16, .26); g.lineTo(-.32, .38); g.closePath(); g.fill(); g.fillStyle = '#fffc'; g.beginPath(); g.arc(-.12, -.1, .07, 0, 7); g.arc(.12, -.1, .07, 0, 7); g.fill(); }, // ghost
-  (g) => { g.beginPath(); g.moveTo(0, -.46); g.quadraticCurveTo(.26, -.15, .16, .25); g.lineTo(-.16, .25); g.quadraticCurveTo(-.26, -.15, 0, -.46); g.fill(); g.beginPath(); g.moveTo(.16, .05); g.lineTo(.34, .32); g.lineTo(.16, .25); g.moveTo(-.16, .05); g.lineTo(-.34, .32); g.lineTo(-.16, .25); g.fill(); }, // rocket
-  (g) => { g.lineWidth = .08; g.strokeStyle = INK; g.beginPath(); g.arc(0, 0, .3, Math.PI, 0); g.stroke(); rr(g, -.4, -.02, .16, .3, .05); g.fill(); rr(g, .24, -.02, .16, .3, .05); g.fill(); }, // headset
-  (g) => { rr(g, -.4, -.34, .8, .68, .12); g.fill(); g.fillStyle = '#fff9'; rr(g, -.3, -.26, .6, .46, .08); g.fill(); }, // keycap
-  (g) => { g.beginPath(); g.arc(0, -.22, .15, 0, 7); g.fill(); g.beginPath(); g.moveTo(-.1, -.1); g.lineTo(.1, -.1); g.lineTo(.16, .22); g.lineTo(-.16, .22); g.fill(); g.fillRect(-.3, .22, .6, .12); }, // pawn
-  (g) => { rr(g, -.36, -.36, .72, .72, .12); g.fill(); g.fillStyle = '#fffd'; for (const [x, y] of [[-.18, -.18], [.18, -.18], [0, 0], [-.18, .18], [.18, .18]]) { g.beginPath(); g.arc(x, y, .06, 0, 7); g.fill(); } }, // dice
-  (g) => { g.beginPath(); g.moveTo(-.4, -.3); g.lineTo(-.13, -.4); g.lineTo(.13, -.3); g.lineTo(.4, -.4); g.lineTo(.4, .32); g.lineTo(.13, .42); g.lineTo(-.13, .32); g.lineTo(-.4, .42); g.closePath(); g.fill(); g.strokeStyle = '#fff9'; g.lineWidth = .04; g.beginPath(); g.moveTo(-.13, -.4); g.lineTo(-.13, .32); g.moveTo(.13, -.3); g.lineTo(.13, .42); g.stroke(); }, // map
-  (g) => { rr(g, -.4, -.05, .8, .42, .06); g.fill(); g.beginPath(); g.arc(0, -.05, .4, Math.PI, 0); g.fill(); g.fillStyle = '#fffb'; g.fillRect(-.05, .02, .1, .14); }, // chest
 ];
+function hole(g, x, y, r) { g.save(); g.globalAlpha = 1; g.fillStyle = g.canvas.__bg || '#fff'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.restore(); }
 
 export function makeBoardTexture(size) {
   const px = size / N; const [c, g] = mk(size, size);
   for (let n = 1; n <= 100; n++) {
     const { r, c: col } = rc(n); const x = col * px; const y = (N - 1 - r) * px; // texture y grows downward; row 0 is the near (bottom) edge
-    const coloured = (r + col) % 2 === 0; g.fillStyle = coloured ? TILE_COLORS[(Math.floor(col / 2) + r) % 4] : TILE_WHITE; g.fillRect(x, y, px, px);
+    const coloured = (r + col) % 2 === 0; const bg = coloured ? TILE_COLORS[(Math.floor(col / 2) + r) % 4] : TILE_WHITE; g.fillStyle = bg; g.fillRect(x, y, px, px); c.__bg = bg;
     if (coloured) { g.fillStyle = '#ffffff22'; g.fillRect(x + px * .06, y + px * .06, px * .88, px * .88); }
     // paper grain
     g.globalAlpha = 0.06; for (let i = 0; i < 26; i++) { g.fillStyle = Math.random() < .5 ? '#fff' : '#000'; g.fillRect(x + Math.random() * px, y + Math.random() * px, 1 + Math.random() * 2, 1 + Math.random() * 2); } g.globalAlpha = 1;
@@ -82,6 +88,20 @@ export function makeRingTexture() { const [c, g] = mk(256, 256); const gr = g.cr
 export function makeBeamTexture() { const [c, g] = mk(8, 128); const gr = g.createLinearGradient(0, 128, 0, 0); gr.addColorStop(0, '#ffffffcc'); gr.addColorStop(1, '#fff0'); g.fillStyle = gr; g.fillRect(0, 0, 8, 128); return tex(c); }
 /** Ground: dark, fading radial pool. */
 export function makeGroundTexture() { const [c, g] = mk(256, 256); const gr = g.createRadialGradient(128, 128, 20, 128, 128, 128); gr.addColorStop(0, '#26305a'); gr.addColorStop(.5, '#151b38'); gr.addColorStop(1, '#0a0e22'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); return tex(c); }
+
+/** Swallow-tail flag cloth with the section title. Returns { texture, aspect }. */
+export function makeFlag(text, color) {
+  const fs = 96; const [m, mg] = mk(1, 1); mg.font = `700 ${fs}px Fredoka, system-ui, sans-serif`;
+  const tw = mg.measureText(text).width; const w = Math.ceil(tw + fs * 1.6); const h = Math.ceil(fs * 1.75); const [c, g] = mk(w, h);
+  const notch = h * .32;
+  g.beginPath(); g.moveTo(0, 0); g.lineTo(w, 0); g.lineTo(w - notch, h / 2); g.lineTo(w, h); g.lineTo(0, h); g.closePath();
+  g.fillStyle = color; g.fill(); g.lineWidth = 10; g.strokeStyle = INK; g.stroke();
+  g.fillStyle = '#ffffff33'; g.fillRect(0, 0, w, h * .18); // a sheen band
+  g.fillStyle = INK; g.fillRect(0, 0, fs * .22, h); // hem at the pole
+  g.font = `700 ${fs}px Fredoka, system-ui, sans-serif`; g.textBaseline = 'middle'; g.textAlign = 'left';
+  g.lineWidth = 12; g.strokeStyle = INK; g.lineJoin = 'round'; g.strokeText(text, fs * .45, h / 2 + 4); g.fillStyle = '#ffffff'; g.fillText(text, fs * .45, h / 2 + 4);
+  return { texture: tex(c), aspect: w / h };
+}
 
 /** Floating title label (sprite texture). Returns { texture, aspect }. */
 export function makeLabel(text, color, dpr = 2) {

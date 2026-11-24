@@ -112,3 +112,10 @@
 - Menu bug: a document click handler matched `[data-tier]` on <body> and closed the menu on every click. Fixed (button[data-tier]).
 - UI skin: panels framed with a Ludo RGBY checker border, tile-style buttons, dark HUD tiles with coloured bases; the cream background is gone.
 - Tested headless (software GL, so camera moves were snapped for screenshots): every section screen, home screen, menu (real mouse clicks), dark mode, phone 390x844; 0 console errors. Build: world chunk 190 kB gz.
+
+### 2026-11-24 (night): polish round 2
+- Section titles are now flags planted on the tiles (swallow-tail cloth with the title, waving in code, turned toward the camera). The 3D text and its font were removed (world chunk 199 -> 173 kB gz).
+- Loader is a loading bar: ten Ludo-coloured board tiles flip face-up one by one as files arrive.
+- Faisal looks up at the camera while waving at the start (head, neck and upper spine tilt toward the camera on top of the clip; also on About, Contact, tile 100 and the home screen).
+- Tile art replaced: emblems of his own projects (ghost, lantern, cat, fish, bulb, clock, mask, VR headset, chomper, aircraft, block, clapperboard, controller) plus Karachi/Pakistan doodles (chai, cricket bat and ball, kite, rickshaw, mango, minaret, truck-art flower, dome, samosa).
+- "Read as a page" in the menu had no click handler; fixed. Removed the "No third-party 3D models" line from Credits.

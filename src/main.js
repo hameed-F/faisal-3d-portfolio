@@ -26,14 +26,14 @@ function applyTheme(t, save = true) {
 applyTheme(theme, false);
 $('#themeChip').addEventListener('click', () => applyTheme(theme === 'dark' ? 'light' : 'dark'));
 $('#mTheme').addEventListener('click', () => applyTheme(theme === 'dark' ? 'light' : 'dark'));
+$('#mRead').addEventListener('click', () => { $('#menu').hidden = true; world?.setActive(false); enterPageMode(); });
 
 // ---------- loader: a folded board that unfolds ----------
 const fold = $('#fold'); const t0 = performance.now(); let real = 0; let shown = 0; let doneCb = null;
+const ltiles = [...document.querySelectorAll('#fold .lt')];
 function setFold(p) {
-  // two folds = four quarters: first the right half swings open, then the bottom half
-  const e = (t) => t * t * (3 - 2 * t); const o1 = e(Math.min(1, Math.max(0, p / 0.5))); const o2 = e(Math.min(1, Math.max(0, (p - 0.5) / 0.5)));
-  fold.style.setProperty('--o1', o1.toFixed(3)); fold.style.setProperty('--o2', o2.toFixed(3));
-  fold.style.setProperty('--a', (-180 * (1 - o1)).toFixed(1) + 'deg'); fold.style.setProperty('--b', (180 * (1 - o2)).toFixed(1) + 'deg');
+  // a loading bar made of board tiles: each tile flips face-up as the files arrive
+  ltiles.forEach((t, i) => { const o = Math.min(1, Math.max(0, p * 10 - i)); t.style.setProperty('--o', o.toFixed(3)); });
   $('#ldPct').textContent = Math.round(p * 100);
 }
 function tickLoader() { const target = Math.min(real, (performance.now() - t0) / 2100); shown += (target - shown) * 0.18 + 0.002; shown = Math.min(shown, target); setFold(shown); if (shown >= 0.995 && real >= 1) { setFold(1); doneCb?.(); return; } requestAnimationFrame(tickLoader); }

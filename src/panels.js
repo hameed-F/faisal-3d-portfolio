@@ -55,7 +55,7 @@ export const html = {
   credits: () => `<h2>Credits</h2>
     <p>Avatar: a 3D character customised in Blender (skin tone, rig); animations from Mixamo. Everything else on the board (tiles, icons, ladders, snakes, dice, lamps) is built in code for this site.</p>
     <p>Built with Three.js and Vite, hosted on Vercel. Chat answers use Google Gemini. Fonts: Fredoka, Nunito Sans and Noto Naskh Arabic (SIL OFL).</p>
-    ${credits.length ? `<ul>${credits.map((c) => `<li>${esc(c.name)} by ${esc(c.author)} (${esc(c.license)}) <a href="${c.url}" target="_blank" rel="noopener">source</a></li>`).join('')}</ul>` : '<p>No third-party 3D models are used.</p>'}`,
+    ${credits.length ? `<ul>${credits.map((c) => `<li>${esc(c.name)} by ${esc(c.author)} (${esc(c.license)}) <a href="${c.url}" target="_blank" rel="noopener">source</a></li>`).join('')}</ul>` : ''}`,
 };
 
 /** Wire up interactions inside a freshly mounted section (collapsible project cards, group filter, video player, contact form). */
