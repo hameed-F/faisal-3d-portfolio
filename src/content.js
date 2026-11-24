@@ -2,6 +2,8 @@
 export const CONFIG = {
   // One-line change: paste the YouTube link of the promo video here (e.g. "https://youtu.be/XXXXXXXXXXX").
   PROMO_VIDEO_URL: '',
+  // Name of the dice companion (the chatbot). One-line change.
+  COMPANION: 'Pappu Pansa',
 };
 
 export const profile = {

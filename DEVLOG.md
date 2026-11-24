@@ -73,3 +73,27 @@
 - Owner: "still not liking it, can you make a website cowboy bebop style??" Built an original space-jazz ship cutaway (src/ship/: ship.js, index.js, cards.js, jazz.js, slice.js, ship.css). Removed src/noir.
 - Told owner no show names/characters/logo/lines are used (copyright); mood only.
 - Tested (Edge headless, 1280x720 and 390x844 touch): every room opens (arrivals 1.8 to 6.9 s across the whole ship), dossier, Skill Swipe, contact, trailer, lights toggle, jump; 0 console errors. FPS ~55 (laptop) / ~59 (phone size).
+
+### 2026-11-24: three new avatar clips
+- Added Roll, Climbing Ladder and Flying (from avatar/mixamo) in avatar_work.blend as `Roll`, `Climb`, `Fly`. Backup of the previous file: avatar/blend/avatar_work_before_roll_climb_fly.blend.
+- Climb was offset in the Mixamo file (hips ~1 m sideways, ~0.8 m up): re-centred on the spot, lowest foot now at 0.023 m (same as Idle). Roll and Fly were already in place.
+- New repeatable pack step: scripts/pack-avatar.mjs (drop rest-pose channels, resample, dedup, prune, meshopt high). avatar.glb 939,112 → 1,007,980 bytes (+67 KB; the three clips are ~39 KB of that). Raw Blender export 3.15 MB.
+- `Climb` and `Fly` added to the looping set in src/stage/avatar.js; `Roll` plays once. None of the three is wired into the ship yet.
+- Tested (Edge headless): all 15 clips load (0.45-0.56 s), Roll/Climb/Fly animate, 0 console errors; full site (?q=full) loads avatar.glb and renders with 0 errors; `vite build` passes.
+
+### 2026-11-24 (later): Run, Slide, Fall
+- Added Running → `Run` (loop, in place), Running Slide → `Slide` (made in place: original travels ~6 m), Falling Down → `Fall` (one-shot, ends lying ~1 m back). 18 clips; avatar.glb 1,077,340 bytes (+69 KB). Backup: avatar/blend/avatar_work_before_run_slide_fall.blend.
+- Headless Edge check: all 18 clips load, feet at floor (0.017 to 0.02 m), 0 console errors. `Run` added to the looping set in src/stage/avatar.js.
+- PLAN.md v2.1: always-night lighting (light mode = lamps over the board, dark mode = glowing snakes), dice name Pappu Pansa, build on main.
+
+## 2026-11-24: Life-Size Snakes & Ladders (v1, replaces the ship)
+- Plan v2.1 approved ("go"). Removed src/ship, stage/psx.js, audio.js, theme.css. New: src/board/{layout,textures,world,story,avatar}.js, new panels/chat/read/main/style, new index.html.
+- Route: 1 → 5 About (Roll) → ladder 8→29 Education (Walk + Climb) → 35 Projects (Run + Slide) → 41 Skills (6 Jump hops) → 52 Contact (Walk, rolls 6+5) → snake 58→18 Video (Run, Fall, Slide down the snake) → 100 (Fly, Yes/No → game). Dice rolls are programmed in exploration (a 6 rolls again), random in game mode.
+- Everything on the board is drawn in code: 20 printed gaming icons, dice faces, snake skins, labels. No downloaded models.
+- Always night. Light mode = 4 warm lamps (2 in Lite) light the board; dark mode = lamps off, snakes glow (emissive skin + additive halo, pulsing).
+- Dice companion "Pappu Pansa" (googly eyes, moustache, topi) follows Faisal, rolls before each trip, opens the chat.
+- Chat: api/chat.js now tells the model the reply language explicitly (Urdu script / Roman Urdu / English, detected in code) and lowers the retrieval threshold for Urdu-script questions (cross-language scores are lower). Tested live: English, Urdu script, Roman Urdu, and an unknown fact ("not provided") all answered correctly in the right language, 1.2 to 1.9 s.
+- Build: first screen JS 16 kB gz + CSS 5 kB gz; 3D chunk 170 kB gz (lazy); avatar.glb 1.05 MB. Loads to ready in about 3.6 s on the dev server (cold, headless).
+- Tested (headless Edge, software GL so ~6 fps): all 7 trips and screens open, game mode rolls/moves/turns, dark mode, phone layout (390x844), text version, production build (vite preview); 0 console errors. Real-GPU frame rate not measured yet.
+- Test hygiene: my headless test runs had left ~97 Edge processes running and slowing the PC; killed them and fixed the test script to close its browser.
+- Known/untested: real email send and chat on Vercel (need env vars there), read-aloud voices depend on the device, Urdu voice only if the OS has one.

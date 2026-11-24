@@ -1,31 +1,73 @@
-# PLAN — Muhammad Faisal Hameed · Interactive 3D Portfolio
+# PLAN: Muhammad Faisal Hameed · Interactive 3D Portfolio
 
-Status: **APPROVED by the owner (2026-11-22). Concept reset to "Player One: Faisal" on the owner's request (see §1).**
-**Timeline: everything today. Nothing is cut up front, including Free Drive and voice chat.** §13 is now only an emergency order, used if something genuinely can't be finished. The owner is told before anything is dropped.
-Facts about the owner come only from `../source/`. Anything missing is listed in §12, never invented.
+**Status: APPROVED v2.1 (owner said "go", 2026-11-24). v1 built the same day (see DEVLOG).** This replaces the space-jazz ship ("The Faisal Sessions"). No style is carried over: new art direction, new UI, new layout. What is kept: the avatar, the content in `src/content.js` (all facts from `source/`), the chatbot backend (`api/chat.js` + RAG index), the email backend (`api/contact.js`, Brevo), the voice helpers and the Full/Lite/Basic quality system.
 
----
+## 1. Concept: "Life-Size Snakes & Ladders"
 
-## 1. Concept: "THE FAISAL SESSIONS" (current, 2026-11-23)
+The site opens on a **folded game board**. As the files download, the board **unfolds like a loading bar**: each fold that opens means more has loaded. When it is fully open, the camera pulls back into the 3D world. The board is now **life-size**, seen from a high camera slightly behind it (a far shot). Faisal stands on tile 1, turns to the camera and **waves**.
 
-> Owner asked for a Cowboy Bebop-style site. This is an **original** space-jazz design in that mood (60s/70s jazz-poster graphics, episode title cards, a worn cargo ship, bounty posters). No names, characters, logos, lines or art from the show are used. Midnight Reel and every earlier concept are scrapped. Chess and Snakes & Ladders are dropped (owner's request).
+The board is a 10 x 10 grid (tiles 1 to 100, zig-zag like a real board). **Seven tiles glow**, each in a different row, each with a **floating title** above it. The glow ring and the title slowly **circle** over the tile, so visitors know what is there before they go.
 
-A small cargo ship seen from the side (cutaway, like a doll's house): seven rooms on one corridor, so navigation is 1-D and can't get stuck.
-- Tap a room (or its tag on the roof, or the bottom dock) and Faisal walks there; arrows/A-D walk, Space jumps, E enters. Phones: tap rooms or use the on-screen pad.
-- Rooms: #01 Cockpit = about me (CV, GitHub, email) · #02 Radio room = contact form · #03 Lounge = 12 projects as WANTED posters on the CRT/bounty board → project dossier · #04 Arcade = Skill Swipe (swipe data cores, avoid mines; skills list inside) · #05 Bunk room = certificates · #06 Screening room = trailer placeholder · #07 Hangar (red fighter) = journey "flight log".
-- First entry to a room plays a "SESSION #0X" title card (sliding colour blocks, big condensed type).
-- 21 gold credit chips along the corridor (every 4th needs a jump); Victory every 7, Dance + "Jackpot" card at 21.
-- Chotu is a small robot dog that trots after Faisal; tap him (or the dog button) to chat.
-- Optional procedural jazz loop (walking bass, ride, brushes, electric piano) when sound is on; Cabin lights / Starlight toggle.
-- Outside the portholes: stars, a ringed planet, a moon, drifting asteroids.
-- Avatar clips: Wave (start, cockpit), Walk (speed-scaled), Idle, Jump (real jump), Point (entering), Talk (radio), Sit (screening), Think (hangar, reading a project), Victory (medals, chips), Throw (arcade coin), Dance/Victory/Disappointed (game results), idle flourishes.
+A **dice companion** (the chatbot, see §6) rolls the number that takes Faisal to the next glowing tile. Every trip uses a **different movement**, so he is not just walking every time. Visitors can also **click or tap any glowing tile**. Faisal then travels there with that tile's movement and the section opens.
 
-## 2. Art direction
-Flat 60s/70s palette (mustard, burnt orange, teal, red, cream, navy), low-poly props, crisp native-resolution render with MSAA. UI: cream cards with thick black borders and offset colour shadows, Bebas Neue display type, Inter body. Retro "SESSION 1-1" pixel loader kept.
+### The route (exploration mode)
+I chose the tiles so that every trip is a real dice roll of 1 to 6 (a 6 gives another roll, the classic house rule). The ladders and snakes are part of the story.
 
-## 3. Avatar (Module 2)
+| # | Tile (row) | Section | Dice | How he gets there | Clip(s) |
+|---|---|---|---|---|---|
+| 0 | 1 (row 1) | Start | — | Stands, turns to the camera, waves | `Wave`, `Idle` |
+| 1 | **5** (row 1) | **About me** | 4 | **Rolls** forward across 4 tiles | `Roll` (chained, moved forward in code) |
+| 2 | **29** (row 3) | **Education & experience** | 3 | Walks 3 tiles to the foot of the ladder on tile 8, then **climbs** it up to 29 | `Walk` → `Climb` |
+| 3 | **35** (row 4) | **Projects** | 6 | Short **run**-up, then **slides** into the tile and bumps the hologram | `Run` → `Slide` |
+| 4 | **41** (row 5) | **Skills & tech** | 6 | **Jumps** tile to tile (6 hops) | `Jump` (one per hop, arc in code) |
+| 5 | **52** (row 6) | **Contact** | 6 + 5 | **Walks** 11 tiles | `Walk` |
+| 6 | **18** (row 2) | **Promo video** | 6 | **Runs** to tile 58, where a **snake** knocks him over and he slides down its body to 18. The video plays | `Run` → `Fall` → `Slide` (moved along the snake in code) |
+| 7 | **100** (row 10) | **Play with the companion** | — | **Flies** from 18 up to 100 | `Fly` |
 
-**Status: DONE (2026-11-22).** `avatar/export/avatar.glb` is **0.9 MB**, with all 12 clips (SittingIdle → `Sit`, Jump added later the same day), and it was tested in a real Three.js page with no loading errors.
+After each section closes, the camera returns to that tile on the board and a **"Next: …"** button starts the next trip. Trips never start by themselves while someone is reading.
+
+**Achievements (certificates)** sit in a "Trophies" strip inside the About panel, since the brief puts "projects and achievements" together and Projects already has its own hologram. *(Alternative: a second tab in the Projects hologram.)*
+
+### What each tile shows
+| Section | Camera and avatar | Panel |
+|---|---|---|
+| About me | "Character select" screen: the camera moves in, Faisal fills half the screen and **waves at you**, the board blurred behind him | Side panel on the other half: bio, what I build / what I'm doing now / what I'm looking for, Trophies strip, CV and GitHub buttons |
+| Education & experience | The camera zooms right in so only Faisal is visible, and he switches to **Think** | A big **thought bubble** rises from his head with the education and experience timeline inside |
+| Projects | Wide shot of the tile; when he slides in, a **hologram** pops up over it | Inside the hologram: a grid of project thumbnails. Each card has a **collapse arrow** that opens the details and links |
+| Skills & tech | **Front view**, Faisal **dances** | The skills rise out of his head like a thought bubble, as an overlay on top |
+| Contact | Same layout as About, but he **talks** | The contact form in the side panel; after a successful send he does `Victory` |
+| Promo video | Faisal sits dizzy on tile 18 | A video player styled like a game card (placeholder until the YouTube link is added) |
+| 100: Companion | Faisal **hovers** over tile 100 (the `Fly` loop) until the visitor chooses | A card: "Congratulations, you know me now! Want to play a round with my companion?" **Yes / No**. Yes starts game mode. No keeps him at 100 for free exploration (click any tile) |
+
+### Game mode (after "Yes")
+Faisal goes back to tile 1 and plays against the **dice companion's own pawn**. Now the dice is **random**, and the ladders and snakes work for both players. He throws on his turn (`Throw`), climbs ladders (`Climb`) and slides down snakes. Winning plays `Victory` then `Dance`; losing plays `Disappointed`. Then the visitor picks "Play again" or "Back to exploring".
+
+## 2. Art direction (a new identity)
+
+**"Toy-box tabletop, printed board."** The board looks like a real printed game board blown up to playground size: a thick cardboard edge, matte paper tiles, rounded toy-like wooden ladders and painted snakes. It should feel calm and touchable, not glossy, with no neon.
+- **Palette:** warm paper ivory, ink navy, and four muted tile colours (brick red, teal, mustard, sage). The snakes are patterned in colours from the same palette.
+- **Tiles:** each tile has a **printed gaming object**: controller, joystick, d-pad, cartridge, pixel heart, coin, sword, shield, potion, key, trophy, star, ghost, spaceship, headset, keyboard key, chess pawn, dice, map, treasure chest. I draw them in code into one texture, so there is nothing to download and they stay sharp at any size. They are printed in ink on a light paper texture. Tile numbers use a chunky board-game typeface.
+- **The world around the board:** it is **always night**; there is no daytime. A deep navy sky with a few soft stars and a ground that fades into darkness. No heavy scenery, which keeps it fast. A few oversized game props at the edges (a giant spare dice, a stack of cards) only if the performance budget allows.
+- **Light mode:** night, but **lamps illuminate the board**: a few big warm lamps hang over it and light the paper tiles, ladders and Faisal. The snakes are painted and unlit. Everything on the board is clearly visible.
+- **Dark mode:** the lamps go out and **the snakes glow** (their patterns light up softly, with a slow pulse). The board is dim, so the glowing snakes and the glowing section tiles are what you see.
+- **UI:** panels look like game cards on paper: a thick ink outline and a small drop shadow. A new font pairing (a chunky display face for titles and a clean, readable body face); I'll show 2 options in phase 1. Nothing comes from the ship version.
+
+## 3. Smoothness ("not jumpy")
+My refinements to the brief so it flows:
+- **One continuous camera:** every move is a smooth, eased camera glide, never a hard cut, and the camera never passes through objects. The loader and the board are one move: the 2D folded board hands over to the 3D board in the same spot.
+- **Blended animations:** every clip change cross-fades (0.2–0.4 s), and his movement speed matches his feet so he doesn't skate.
+- **The visitor sets the pace:** trips start only when the visitor presses Next or clicks a tile, never in the middle of reading.
+- **Skip and menu:** a "Skip" button on every trip, and a menu that lists all sections (also for keyboard users).
+- **Reduced motion:** if the device asks for reduced motion, trips become a quick fade and the camera moves less.
+
+## 4. Animation map and the three missing moves
+The brief asks for **slide**, **run** and **getting hit by a snake**. You downloaded the clips, so these are now in the avatar (**18 clips**): `Run` (loops, in place), `Slide` (from "Running Slide", made in place: the original travels about 6 m, so the code moves him instead) and `Fall` (from "Falling Down": a one-shot that ends lying down about 1 m behind where he started, which is how the snake knocks him over before he slides down it to tile 18).
+
+All 18 clips get used: Wave (start, About), Idle, Walk (Contact trip), Roll (About trip), Climb (ladders), Jump (Skills trip), Fly (trip to 100, hovering), Run (run-up to the snake), Slide (Projects trip), Fall (knocked over by the snake), Think (Education, chatbot thinking), Dance (Skills, game win), Talk (Contact, chatbot answer), Point (hovering over a tile), Throw (rolling the dice in game mode), Victory (contact sent, game win), Disappointed (game loss), Sit (watching the video on tile 18).
+
+### Avatar status (Module 2)
+
+**Status: DONE (2026-11-22, clips added 2026-11-24).** `avatar/export/avatar.glb` is **1.08 MB** (1,077,340 bytes), with 18 clips: `Idle`, `Wave`, `Walk`, `Talk`, `Think`, `Point`, `Victory`, `Disappointed`, `Dance`, `Throw`, `Sit` (SittingIdle), `Jump`, `Roll`, `Climb` (Climbing Ladder), `Fly` (Flying), `Run`, `Slide` (Running Slide, in place), `Fall` (Falling Down). Tested in a real Three.js page with no loading errors.
 
 What was done (source `avatar/blend/sunnywithmaterialandrigged.blend` is untouched; all work is in `avatar/blend/avatar_work.blend`):
 1. Rig checked: `mixamorig:` skeleton, 65 bones. All 10 Mixamo FBX clips matched every bone.
@@ -35,37 +77,24 @@ What was done (source `avatar/blend/sunnywithmaterialandrigged.blend` is untouch
 5. Scaled to 1.80 m with feet at the origin. The unused leftover action and the old skin image were removed.
 6. Exported with WebP textures (8 images), then compressed with meshopt (`gltf-transform optimize`): 2.42 MB → **0.85 MB**. 31.8k triangles, 9 draw calls. (Three.js loads it with `GLTFLoader` + `MeshoptDecoder`.)
 7. Known cosmetic issue: the shirt print reads mirrored. It comes from the original texture and was left as is.
-
-**Every clip is used on the site:**
-| Clip | Where |
-|---|---|
-| `Wave` | Greets you at the cabin door after the drive |
-| `Walk` | Walks from the door to the game table (the transition into the cabin) |
-| `Idle` | Default, beside the table |
-| `Point` | Points toward the board or object you hover or select |
-| `Think` | While Chotu is fetching an answer, and while the chess AI is "thinking" |
-| `Talk` | While Chotu's answer is shown, and when a section panel opens |
-| `Throw` | Throws the dice in Snakes & Ladders |
-| `Victory` | When you win a game (and on a successful contact-form send) |
-| `Disappointed` | When you lose a game |
-| `Dance` | Easter egg: tap the avatar 3 times, or checkmate the AI on hard |
-
-Head and eyes follow the mouse (extra credit). In Lite mode he updates at a lower rate, and Basic mode shows a still image.
+8. 2026-11-24: added `Roll` (one-shot), `Climb` and `Fly` (loops) the same way (FBX import, one NLA track each). Climb was re-centred on the spot with feet on the floor (the Mixamo file was offset sideways and about 0.8 m up); Roll and Fly were already in place. Re-packed with `node scripts/pack-avatar.mjs <raw.glb> <out.glb>` (drops channels that stay at rest, resamples keyframes, meshopt level high).
 
 **Blender access (confirmed):** I control your open Blender through the MCP add-on's local server (`127.0.0.1:9876`, `execute_code` runs Python in Blender). It has already been used to save the work copy, import the clips, edit the skin, and export the GLB, so editing and exporting both work this way. If that connection ever drops, I'll give you a ready-to-run `.py` script for Blender's Scripting tab instead. For new models that aren't part of your scene (like the chess-piece designs), I run a separate background Blender, so your open file is never touched.
 
-## 4. Games (scope)
+## 5. The board, ladders and snakes (built in code)
+- **Board:** one mesh for the 100 tiles with the printed tile texture (one atlas drawn at start-up) and a thick bevelled edge. 1 to 3 draw calls.
+- **Ladders:** wooden side rails with instanced rungs. About 4 ladders, including the 8 → 29 route ladder.
+- **Snakes:** a smooth tube along a curve with a patterned texture and a head with eyes, gently swaying (done in the shader, so it's cheap). About 4 snakes, including the 58 → 18 route snake. The dark-mode glow is an emissive pattern, with no expensive post-processing.
+- **Glowing tiles:** a ring on the tile, a soft column of light and a floating title, slowly circling.
+- **Folded-board loader:** pure HTML/CSS, so it shows instantly before any 3D code downloads. The 3D board starts exactly where the CSS board ends.
 
-| Game | Playable? | Opponent | Notes |
-|---|---|---|---|
-| **Snakes & Ladders** | Yes | CPU (dice) | 3D dice roll, camera follows the pawn; landing on a milestone square shows that part of the journey. Works fully on touch. |
-| **Chess** | Yes | **AI with 3 levels** (easy, medium, hard) | Rules and legal moves via `chess.js` (small, BSD license). Our own minimax AI with alpha-beta pruning, run in a **Web Worker** so the page never freezes. Tap-to-move on phones. Pieces built in code, so there's nothing to download: pawn, rook, bishop, queen and king are **lathe** shapes (a profile spun around an axis). The **knight can't be lathed**, so it's a lathe base plus a horse-head **side silhouette extruded with a bevel**, a separate mane strip and two eyes (about 900 triangles). The design was rendered for approval before building the set. |
-| Ludo | No (navigation board) | — | Could become a 3rd game later only if everything else is done. |
-| Property board | No (navigation board) | — | Original design inspired by property-trading games. No Monopoly name, art or layout. |
+## 6. The dice companion = the chatbot "Pappu Pansa"
+The companion is a **friendly 3D dice** with a small face on one side. It **follows Faisal** around the board, hops when it rolls and leans in when you hover over it. Click it to **chat** at any time; a chat button is also always on screen. In exploration mode its rolls are programmed (the route above); in game mode they are random.
+- **Name:** you asked me to invent a funky Pakistani name, so the dice is **"Pappu Pansa"** (pansa = the Urdu word for a dice). It is a placeholder you can veto; the backend, prompts and UI use one config value, so renaming is one line.
+- **Languages:** visitors can type or speak in **English, Urdu (Urdu script or Roman Urdu)** or other languages. Pappu Pansa answers in the same language, only from the portfolio, with source chips. Voice input has a language picker (Auto / English / اردو), and spoken replies use an Urdu voice when the device has one.
+- **States:** idle bob, thinking (spins slowly), answering (hops), listening (glows).
 
-## 5. Chotu the chatbot (Module 4)
-
-**Look:** a stylized low-poly snake built in code (a bendy tube along an animated curve, with a simple head and eyes) in the site palette. Nothing to download, near-zero cost to animate. He lives on the Snakes & Ladders board, then slithers to the corner of the screen and stays with you everywhere. Tapping him opens a speech-bubble chat panel. He bobs his head while "thinking" and gives a tongue flick when he answers. In Lite mode he's a small, still 3D or 2D icon with the same chat.
+## 7. Chatbot backend (Module 4, kept)
 
 **RAG pipeline** (per `build-requirements.md`):
 1. **Chunk:** a build script turns `profile.md`, `projects.md`, `certificates.md`, `resume.md` and `links.md` into small semantic chunks, each tagged with its source and section → `data/portfolio-chunks.json`.
@@ -73,143 +102,64 @@ Head and eyes follow the mouse (extra credit). In Lite mode he updates at a lowe
 3. **Retrieve:** `/api/chat` embeds the question, runs cosine similarity, and keeps the top 3–4 chunks.
 4. **Generate:** the Gemini Flash model answers **only** from those chunks. If the answer isn't there, it says the portfolio doesn't provide it. It never invents personal details.
 5. **Cite:** each answer shows source chips ("from Projects → Ghost Lantern") — extra credit.
-6. **Explain:** a collapsible "How Chotu works" panel shows the pipeline with a diagram (the brief asks for an explanation).
+6. **Explain:** a collapsible "How Pappu Pansa works" panel shows the pipeline with a diagram (the brief asks for an explanation).
 
 SDK: official `@google/genai`, server-side only. Model names are checked against Google's docs at build time (some in the brief may be outdated). Basic protections: input length cap, rate limit, no keys in the browser.
 
-## 6. Contact (Module 5)
+## 8. Contact (Module 5, kept)
 
-- **Mailbox / phone object** opens a form: Name, Email, Subject, Message.
+- The Contact tile opens the form in a side panel: Name, Email, Subject, Message.
 - **Validation** in the browser *and* on the server (required fields, email format, length limits), plus safe handling (trimmed, escaped, no HTML injection into the email).
 - **Spam protection:** hidden honeypot field + rate limiting (in-memory per instance as a baseline; Upstash/Vercel KV if you want it stronger — optional, free tier).
 - **Sending:** `/api/contact` calls Brevo's REST API (`https://api.brevo.com/v3/smtp/email`) with `await`. Sender = verified address, to = `CONTACT_RECEIVER_EMAIL`, replyTo = visitor.
 - **UI states:** sending, success, clear error message.
 - **Evidence:** you send a test message from the live site and keep a screenshot of the received email.
 
-## 7. Promo video (Module 3)
+## 9. Promo video (Module 3)
+Tile 18 opens a video card. The link stays a one-line change (`PROMO_VIDEO_URL` in `src/content.js`); until then the card says "Coming soon". The YouTube player only loads when the card is opened.
 
-The CRT TV plays a YouTube embed. The link lives in one config line (`src/config.js` → `PROMO_VIDEO_URL`). Until you add it, the TV shows a "Coming soon" static screen. The video is lazy-loaded only when the TV is tapped (YouTube embeds are heavy). The MP4 and `.aep` are yours to make in After Effects; they're submitted separately.
+## 10. Accessibility
+- **Read aloud:** every panel has a speaker button that reads it aloud with the browser's built-in speech (no extra service, no cost). The paragraph being read is highlighted, with stop and pause buttons.
+- Full keyboard use (Tab through tiles and sections, Enter to go, Esc to close), visible focus, alt text on every image, good contrast in both themes, reduced-motion support.
+- The **Basic** tier (no 3D) is a clean, readable page with the same sections, for screen readers and very weak devices.
 
-## 8. Tech stack
+## 11. Devices and layouts
+| Device | Layout |
+|---|---|
+| Laptop/desktop (landscape) | Half avatar / half panel screens as described; hologram and bubbles centred |
+| Tablet | Same idea with a narrower panel |
+| Phone (portrait) | Avatar in the top part of the screen and panels as **bottom sheets** you drag up; thought bubbles become a full-width card under his head; the camera is framed taller so the board fits; big tap targets |
 
-| Part | Choice | Why |
-|---|---|---|
-| Build tool | **Vite** | Fast, tiny output, what Three.js projects usually use. |
-| 3D | **Three.js** (plain, no React) | What the course taught; smallest bundle; full control for optimization. |
-| UI | Plain HTML/CSS + small JS modules | Content is real HTML: readable, accessible, works without 3D. |
-| Chess rules | `chess.js` | Small, well tested. |
-| Backend | **Vercel serverless functions** in `/api` (Node) | Same repo, keys stay server-side, free tier. |
-| LLM / embeddings | `@google/genai` | Required by the spec. |
-| Email | Brevo REST via `fetch` | Required by the spec; no extra library. |
-| Asset pipeline | `@gltf-transform/cli` (dev only) | Compresses models (meshopt), resizes and converts textures. |
-| Hosting | **Vercel**, from GitHub `hameed-F/faisal-3d-portfolio`; `main` = production, branches = previews | Continuous deployment. |
+## 12. Optimization and the automatic lighter mode
+This reuses the tier system: Full / Lite / Basic, the saved choice, the automatic switch on slow loading or low FPS, and the manual switch in the menu.
+- **Targets:** first screen (the folded board) in under 1 s on 4G; initial JS under 30 KB gzipped; the 3D code lazy-loaded (~180 KB gzipped); total download under 2.5 MB; under 60 draw calls and about 60k triangles; 60 fps on a laptop and 30+ fps on a phone.
+- **Lite:** lower render scale, no real shadows (a soft blob under him instead), fewer props, a simpler snake shader, avatar updated at 30 Hz, shorter trips.
+- Rendering pauses when the tab is hidden and when a full-screen panel covers the scene.
+- Measurements go in `DEVLOG.md` after each phase.
 
-Anything larger than these (physics engines, post-processing libraries, Stockfish) needs your approval first.
+## 13. Tech stack
+Same as before: Vite, plain Three.js, plain HTML/CSS/JS, Vercel functions for `/api/chat` and `/api/contact`, `@google/genai`, Brevo REST. **No new dependencies.**
 
-## 9. Optimization and automatic Lite mode
+## 14. Build order (after each phase I run and test it, then you check the preview link)
+You asked me to build directly on **`main`** and push, so each phase goes live on the Vercel URL once you ask me to commit and push (I won't push without being asked).
+1. **Clean-out and skeleton:** remove the ship code; new HTML shell, light/dark theme, fonts, the Basic page with all sections, read-aloud.
+2. **Folded-board loader and 3D board:** tiles, printed icons, ladders, snakes, glowing tiles with circling titles, far-shot camera, avatar waving on tile 1.
+3. **Trips:** all 7 movements, the dice following and rolling, click-a-tile, skip.
+4. **Section screens:** character screen (About, Contact), thought bubbles (Education, Skills), hologram (Projects), video card, tile 100 card.
+5. **Pappu Pansa chat and email**, wired to the existing backends; multilingual voice.
+6. **Game mode** against the dice (random rolls, ladders and snakes, win/lose).
+7. **Phones, Lite mode, accessibility pass,** measurements, README/DEVLOG, credits.
 
-### Quality tiers
-| Tier | When | What changes |
-|---|---|---|
-| **Full** | Capable laptop or phone | Full scene, real-time shadows only on the table, grain, Free Drive, render scale 0.85–1.0 |
-| **Lite** | Weak device, slow network, low FPS, or chosen by the user | Render scale 0.5–0.6, no shadows (baked only), fewer trees and props, smaller textures, no grain, no Free Drive, drive cut-scene shortened, avatar at lower update rate |
-| **Basic (no 3D)** | No WebGL, a software renderer, or the user picks "Text only" | A clean, fully styled HTML portfolio (same content, images, chatbot, contact). It also serves as the accessibility fallback. |
-
-### Automatic switching
-1. **Before loading:** check the GPU name (software renderers → Basic), CPU cores, device memory, the `Save-Data` setting and connection type, screen size, and `prefers-reduced-motion`. Pick a starting tier.
-2. **While loading:** if the core assets take longer than ~6 s, switch to Lite and load the small assets instead.
-3. **While running:** an FPS monitor watches the frame rate. If it stays under ~40 fps for 3 s, step down a tier. If it's very high for a long time on Lite, offer to step up (never automatically up, to avoid flicker).
-4. **Tell the user**, like the Odama reference: a small toast says "You're in Lite mode, because the full version was running slowly. Switch back any time" with a toggle. The **Options menu and a HUD chip** always allow a manual switch. The choice is remembered for next time.
-
-### Budgets (measured and logged in `DEVLOG.md`)
-- First screen interactive in under ~3 s on a mid phone over 4G. JS for the first screen: ≤ ~250 KB gzipped (Three.js included).
-- Download before the title screen: ≤ ~1.5 MB. Cabin and boards stream in during the drive. Games, chess AI, YouTube and the chatbot load only when used.
-- On screen: under ~150k triangles and ~100 draw calls in Full; under ~60k triangles in Lite.
-- Target 60 fps on a mid laptop, ≥ 30 fps on a mid phone.
-- Every model compressed, every texture ≤ 1024 px (most 256–512), one shared texture atlas for props where possible. Pixel ratio capped at 2 (Full) and 1 (Lite).
-- Tab hidden → rendering pauses. Nothing renders when nothing moves in panel views.
-
-## 10. Assets: build vs download
-
-**Built in code or Blender by me** (original, matches the style exactly, tiny file size):
-the 4 boards (art drawn by us as textures), dice, pawns, chess pieces, Chotu the snake, the table, playing cards, the road and terrain, the sky and fog, signposts, the CRT TV (simple shapes), and the UI.
-
-**Downloaded** (CC0 preferred, then CC-BY with credit):
-| Need | Where | License |
-|---|---|---|
-| Forest trees, rocks, grass | Kenney *Nature Kit* or Quaternius *Ultimate Nature* | CC0 |
-| Car | Kenney *Car Kit* or Quaternius cars | CC0 |
-| Cabin exterior | Kenney / Poly Pizza | CC0 or CC-BY |
-| Cabin furniture, lamp, mailbox or rotary phone | Kenney *Furniture Kit*, Poly Pizza | CC0 or CC-BY |
-| Ambient sound (forest, engine, dice) — optional | Freesound (CC0 filter), Kenney audio | CC0 |
-
-**How we get them:**
-1. **Kenney or Quaternius packs:** you download the zip from kenney.nl/assets or quaternius.com (free, no account), unzip it into `asset_inspo/downloads/<pack-name>/`, and tell me. I pick the pieces, recolor them to our palette in Blender, compress them, and log them.
-2. **Poly Pizza or Sketchfab:** I can search and import through the Blender add-on (both work). Per the project rules, **I'll show you the shortlist (name, author, license, preview) and wait for your OK before downloading.**
-3. Every asset goes in `asset_inspo/ASSET_LOG.md` (name, author, URL, license) and on the site's **Credits** screen.
-
-The Ludo and Monopoly models in `asset_inspo/` have no recorded source or license. They stay **mood reference only** unless you can tell me where they came from and their license allows use.
-
-## 11. Extra credit
-
-| Feature | Cost | Plan |
-|---|---|---|
-| Chatbot source citations | **Cheap** (chunks already carry sources) | Yes |
-| Project filtering, search and ordering | **Cheap** | Yes: color groups = engine filter, search box, sort by year/featured |
-| Animated avatar gestures and expressions | **Cheap** (clips already exist) | Yes |
-| 3D objects reacting to the mouse | **Cheap** | Yes: avatar head follows the cursor, boards tilt slightly, Chotu watches the pointer |
-| Accessibility | **Cheap** (the Basic tier does most of it) | Yes: keyboard navigation, focus states, alt text, reduced motion, contrast check |
-| Dark/light theme | **Cheap** | Yes: "Dusk" (default) and "Day" palettes for UI and sky |
-| Analytics | **Cheap** | Yes: Vercel Web Analytics (privacy-friendly, one line) |
-| Multilingual chatbot | **Cheap** | Yes: Chotu replies in the language he's asked in (e.g., English or Urdu), still grounded in the sources |
-| Voice chat | Medium | Optional: microphone input + spoken replies via the browser's speech features (best in Chrome). Late phase, cut if needed. |
-
-## 12. Build order: one day, all phases (each phase: build, test, commit, push, then you check the Vercel URL)
-
-*(The "Day 1 / Day 2" split below is now just the order of work within today. Free Drive (11) and voice chat are in scope, not stretch.)*
-
-The order is chosen so that **every graded module works by the end of day 1 in a simple form**, and day 2 makes it rich. If day 2 runs out, you still have a complete, gradeable site.
-
-**Already done:** avatar GLB (§3), repo + `.gitignore`.
-
-**Day 1: everything works**
-1. **Skeleton and deploy:** Vite + Three.js project, all sections as real HTML (this is also the Basic no-3D tier), README stub, first push. *You:* connect `hameed-F/faisal-3d-portfolio` to Vercel (I'll give exact clicks).
-2. **Performance core:** quality tiers, device check, FPS monitor, Lite toast and toggle, loading screen, asset compression script.
-3. **Contact form** (`/api/contact` + Brevo). *You:* verify the sender in Brevo, add the 3 env vars in Vercel, send a test and screenshot the email.
-4. **Chotu + RAG** (`/api/chat`, chunk + embed script, citations, "How Chotu works" panel). Chotu starts as a simple snake; he's polished on day 2.
-5. **Cabin + game table hub:** table, boards (flat versions first), trophy shelf, TV with placeholder, mailbox, avatar with Idle, Wave and Point; camera navigation, section panels, Quick Menu, mobile layout.
-
-**Day 2: make it a game**
-6. **Title screen + forest drive + cabin arrival** (Wave, then Walk to the table).
-7. **Snakes & Ladders**, playable (avatar Throw, Victory, Disappointed).
-8. **Chess vs AI** (3 levels, Web Worker, lathe pieces + approved knight).
-9. **Extras:** project filter, search and sort, Dusk/Day theme, analytics, multilingual Chotu, mouse reactions, Dance easter egg, credits screen.
-10. **Polish and proof:** measurements in `DEVLOG.md`, mobile and Lite tests, accessibility pass, README setup steps, module screenshots, report notes.
-11. **Stretch only if time remains:** Free Drive mode.
-
-## 13. Emergency cut order (only if something truly can't be finished; the owner decides)
-Nothing is cut in advance. If today runs out, drop from the top of this list:
-1. Free Drive mode
-2. Voice chat
-3. Ambient audio, film grain, extra props
-4. Forest drive shortened to a few seconds (title screen → cabin)
-5. Chess "hard" level and fancy piece animations
-6. Ludo as a 3D board (becomes a flat panel)
-7. Snakes & Ladders playable (stays as a navigation board)
-
-**Never cut:** the six modules, Lite mode, mobile support, the Basic (no 3D) fallback, credits, and no secrets in git.
-
-## 14. Teacher's brief → how we meet it
-
-| Module / item | How the concept delivers it | Still open |
-|---|---|---|
-| 1. 3D web portfolio (Home, About, Skills, Projects, Education & Experience, Contact; smooth transitions; responsive) | Level-select island: title = Home; 1 Player (About); 2 Quest Log (Education & experience); 3 Game Library (Projects); 4 Inventory (Skills); 5 Trophy Room (Achievements); 6 Multiplayer (Contact). Run/jump + camera transitions; Read page; Lite/Basic tiers; phone + laptop layouts | Content gaps below |
-| 2. Custom 3D avatar (Blender → GLB, animated) | **Done:** your avatar + all 12 Mixamo clips (incl. SittingIdle, Jump) in one 0.9 MB GLB; every clip used in the tower | — |
-| 3. Promo video (After Effects, 30–60 s, embedded) | Trailer slot in the Multiplayer level (plays the YouTube embed); one-line config (`PROMO_VIDEO_URL` in `src/content.js`) | **You** make the video and give the YouTube link |
-| 4. RAG chatbot + explanation | Chotu the snake on the fountain at the start of the path (and the floating button); chunk → embed → retrieve → grounded Gemini answer with citations; "How Chotu works" panel | Confirm current Gemini model names at build time |
-| 5. Email/contact (validation, spam protection, env vars, delivery evidence) | Multiplayer level "Send an invite" form → `/api/contact` → Brevo; honeypot + rate limit | **You** verify the Brevo sender, set Vercel env vars, take the screenshot |
-| 6. Deployment + documentation | Vercel from GitHub with preview branches; README, DEVLOG, credits | **You** connect the repo to Vercel |
-| Extra credit | Citations, filtering/search/sort, gestures, mouse-reactive 3D, accessibility, theme, analytics, multilingual (voice optional) | — |
+## 15. Teacher's brief → how we meet it
+| Module | How |
+|---|---|
+| 1. 3D portfolio (Home, About, Skills, Projects, Education & Experience, Contact; smooth transitions; responsive) | The board (Home) and 6 section tiles, smooth camera trips, layouts for each device |
+| 2. Avatar | Done (18 clips, 1.08 MB) |
+| 3. Promo video | Tile 18 video card, one-line link |
+| 4. RAG chatbot + explanation | Pappu Pansa the dice, the existing RAG backend, a "How Pappu Pansa works" panel, multilingual |
+| 5. Email/contact | Contact tile form → Brevo (existing: validated, honeypot, rate limit) |
+| 6. Deployment + docs | Vercel preview per branch, README, DEVLOG, credits |
+| Extra credit | Citations, multilingual + voice, light/dark, read aloud, accessibility, mouse-reactive tiles, game against the AI |
 
 ### Required submission materials
 | # | Item | Who / how |
@@ -225,10 +175,14 @@ Nothing is cut in advance. If today runs out, drop from the top of this list:
 | 9 | Live URL | Vercel |
 | 10 | GitHub link | `github.com/hameed-F/faisal-3d-portfolio` |
 
-## 15. Open questions and placeholders
-- **Promo video** YouTube link (placeholder until given).
-- **Fonts:** pick from 2–3 free options in phase 1.
-- **Chess knight:** design render waiting for your OK (the rest of the set follows the same style).
-- **Licenses** of the Ludo and Monopoly models in `asset_inspo/` (mood only until known).
+## 16. Decisions so far
+1. Missing moves: **done**, clips added (Run, Slide, Fall; 18 clips, avatar.glb 1.08 MB).
+2. Dice name: **Pappu Pansa** (placeholder, change anytime).
+3. Branch: build on `main`, push when you ask.
+4. Deadline: none.
+5. Plan approved ("go") on 2026-11-24.
+
+## 17. Placeholders and content gaps
+- **Promo video** YouTube link.
 - **Content gaps** from `source/missing-or-unclear.md`: CEGA Pre-Production certificate missing; CEGA Unreal certificate (two name spellings, no date); KDA dates blurred; Aerox ERP and Brave Believers dates; no Documentary Style Edit image; Pac-Man image says "C++", and its repo link; no builds for Light Up The House, B99 VR, Chrono Rebellion, Behind the Smile; YouTube IDs to test.
 - **Your setup steps (when we reach them):** connect GitHub to Vercel; add `GEMINI_API_KEY`, `BREVO_API_KEY` and `CONTACT_RECEIVER_EMAIL` in Vercel's dashboard; verify the Brevo sender address.

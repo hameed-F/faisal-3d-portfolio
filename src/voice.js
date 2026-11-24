@@ -1,4 +1,4 @@
-// Voice chat for Chotu using the browser's own speech features (no extra service or key).
+// Voice chat for the dice companion using the browser's own speech features (no extra service or key).
 // Speech-to-text: SpeechRecognition (Chrome, Edge, Safari). Text-to-speech: speechSynthesis (all modern browsers).
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 export const canListen = !!SR;
@@ -23,7 +23,7 @@ export function speak(text, { lang } = {}) {
   const u = new SpeechSynthesisUtterance(clean);
   const isUrdu = /[؀-ۿ]/.test(clean); u.lang = lang || (isUrdu ? 'ur-PK' : 'en-US');
   const voices = speechSynthesis.getVoices(); voice = voices.find((v) => v.lang.toLowerCase().startsWith(u.lang.slice(0, 2).toLowerCase())) || null;
-  if (voice) u.voice = voice; u.rate = 1.03; u.pitch = 1.25; // a slightly higher, friendlier Chotu
+  if (voice) u.voice = voice; u.rate = 1.03; u.pitch = 1.25; // a slightly higher, friendlier voice
   speechSynthesis.speak(u);
 }
 export function stopSpeaking() { if (canSpeak) speechSynthesis.cancel(); }

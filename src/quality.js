@@ -1,11 +1,11 @@
 // Quality tiers + automatic Lite mode.
-// full  : everything (PS1 post FX at 360p, dense forest, wobble, grain)
-// lite  : 240p, fewer props, no wobble/grain, 30 fps cap, short intro, no Free Drive
-// basic : no WebGL at all, the HTML page (also the accessibility fallback)
+// full  : everything (sharp pixels up to 2x, 4 lamps, dense board texture, 60 fps)
+// lite  : pixel ratio 1.25, 2 lamps, smaller textures and snakes, 30 fps cap
+// basic : no WebGL at all, the plain HTML text version (also the accessibility fallback)
 
 export const TIERS = {
-  full: { name: 'Full', renderH: 360, trees: 650, rocks: 90, grain: 0.07, snap: true, dither: true, maxFps: 60, drive: true, freeDrive: true, avatarHz: 60, texSize: 512 },
-  lite: { name: 'Lite', renderH: 240, trees: 220, rocks: 30, grain: 0.0, snap: false, dither: true, maxFps: 30, drive: false, freeDrive: false, avatarHz: 30, texSize: 256 },
+  full: { name: 'Full' },
+  lite: { name: 'Lite' },
   basic: { name: 'Text only' },
 };
 
