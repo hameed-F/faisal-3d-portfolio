@@ -6,7 +6,8 @@ import { GoogleGenAI } from '@google/genai';
 const INDEX = JSON.parse(readFileSync(new URL('../data/portfolio-index.json', import.meta.url), 'utf8'));
 // Checked against Google's model list on 2026-11-22. Override with env vars if a model is retired.
 // gemini-3.8-flash timed out (>40 s) in testing; 3.5 Flash-Lite answered in about 1 s.
-const GEN_MODELS = [process.env.CHAT_MODEL, 'gemini-3.5-flash-lite', 'gemini-3.6-flash'].filter(Boolean);
+// 3.5 Flash-Lite is the only model that answers reliably (others return 503 "high demand"); it sometimes stalls or 503s, so we retry it.
+const GEN_MODELS = [process.env.CHAT_MODEL, 'gemini-3.5-flash-lite'].filter(Boolean);
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
 const TOP_K = 5; const MIN_SCORE = 0.45;
 
@@ -25,7 +26,7 @@ const ROMAN_URDU = /\b(hai|hain|kya|kia|ka|ki|ke|ko|kahan|kaun|kon|batao|bataen|
 export function replyLanguage(q) {
   if (/[؀-ۿ]/.test(q)) return 'Urdu, written in Urdu script (not Roman Urdu)';
   const n = (q.match(ROMAN_URDU) || []).length; const words = q.trim().split(/\s+/).length;
-  if (n >= 2 || (n >= 1 && words <= 4)) return 'Roman Urdu (Urdu written in English letters)';
+  if (n >= 2 || (n >= 1 && words <= 4)) return 'Urdu, written in Urdu script (the visitor typed Roman Urdu; answer in proper Urdu script so it can be read aloud in Urdu)';
   return 'English, unless the question is clearly in another language, then that language';
 }
 
@@ -69,14 +70,25 @@ export default async function handler(req, res) {
       ...history.map((h) => ({ role: h.role, parts: [{ text: h.text }] })),
       { role: 'user', parts: [{ text: `Context passages:\n${context}\n\nReply language: ${replyLanguage(question)}\nVisitor's question: ${question}` }] },
     ];
-    let text = ''; let lastErr = null;
-    for (const model of GEN_MODELS) {
-      try {
-        const r = await withTimeout(ai.models.generateContent({ model, contents, config: { systemInstruction: SYSTEM, temperature: 0.3, maxOutputTokens: 400 } }), 12000);
-        text = (r.text || '').trim(); if (text) break;
-      } catch (err) { lastErr = err; if (!/404|not found|unsupported|deprecated|timeout|503|unavailable/i.test(String(err?.message))) break; }
+    let text = ''; let lastErr = null; let done = false; const t0 = Date.now(); const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    // up to three overlapping attempts (start at 0 s, 4.5 s, 9 s); each retries overload errors; the first answer wins (22 s cap)
+    const lane = async (model, wait) => {
+      await sleep(wait);
+      for (let k = 0; ; k++) {
+        if (done) throw new Error('not needed');
+        try { const r = await ai.models.generateContent({ model, contents, config: { systemInstruction: SYSTEM, temperature: 0.3, maxOutputTokens: 400 } }); const t = (r.text || '').trim(); if (t) return t; throw new Error('empty answer'); }
+        catch (err) { lastErr = err; if (!/503|429|unavailable|high demand|empty answer|fetch failed/i.test(String(err?.message)) || Date.now() - t0 > 19500) throw err; await sleep(700 + k * 600); }
+      }
+    };
+    try { text = await withTimeout(Promise.any([0, 4500, 9000].map((w) => lane(GEN_MODELS[0], w))), 22000); } catch (err) { lastErr = lastErr || err; }
+    done = true;
+    if (!text) { // Google is overloaded: answer from the retrieved passages instead of failing (still grounded, still cited)
+      console.error('chat: generation failed, extractive answer:', lastErr?.message);
+      const urdu = replyLanguage(question).startsWith('Urdu');
+      const intro = urdu ? 'میرا دماغ ابھی مصروف ہے، تو یہ فیصل کے پورٹ فولیو سے متعلقہ حصے ہیں:' : "My dice brain is busy right now, so here are the most relevant bits from Faisal's portfolio:";
+      const clip = (t) => (t.length > 230 ? t.slice(0, t.lastIndexOf(' ', 230)) + '…' : t);
+      text = intro + String.fromCharCode(10) + top.slice(0, 2).map((r, i) => `• ${r.c.title}: ${clip(r.c.text)} [${i + 1}]`).join(String.fromCharCode(10));
     }
-    if (!text) { console.error('chat: generation failed', lastErr?.message); return res.status(502).json({ error: 'The dice got stuck. Please try again.' }); }
     const used = new Set([...text.matchAll(/\[(\d+)\]/g)].map((m) => +m[1]));
     const sources = top.map((r, i) => ({ n: i + 1, id: r.c.id, title: r.c.title, section: r.c.section, score: +r.score.toFixed(3), used: used.has(i + 1) }));
     return res.status(200).json({ answer: text, sources });

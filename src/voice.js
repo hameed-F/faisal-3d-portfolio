@@ -22,7 +22,9 @@ export function speak(text, { lang } = {}) {
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(clean);
   const isUrdu = /[؀-ۿ]/.test(clean); u.lang = lang || (isUrdu ? 'ur-PK' : 'en-US');
-  const voices = speechSynthesis.getVoices(); voice = voices.find((v) => v.lang.toLowerCase().startsWith(u.lang.slice(0, 2).toLowerCase())) || null;
+  // a woman's voice: Edge/Windows names Urdu voices in Urdu script (گل Gul and عظمیٰ Uzma are female; اسد Asad and سلمان Salman male)
+  const voices = speechSynthesis.getVoices(); const same = voices.filter((v) => v.lang.toLowerCase().startsWith(u.lang.slice(0, 2).toLowerCase()));
+  voice = same.find((v) => /گل|عظمی|uzma|gul|female|zira|jenny|aria|michelle|ava|emma|salma|google/i.test(v.name) && !/اسد|سلمان|asad|salman|david|guy|mark/i.test(v.name)) || same[0] || null;
   if (voice) u.voice = voice; u.rate = 1.03; u.pitch = 1.25; // a slightly higher, friendlier voice
   speechSynthesis.speak(u);
 }
