@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project Report · Muhammad Faisal Hameed · Interactive 3D Web Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --navy: #0a0f26; --navy2: #17203d; --ink: #17203d; --paper: #fffdf8; --cream: #fbf3e2;
+    --amber: #ffc72c; --lamp: #f5b942; --R: #ef4b3f; --G: #2fb86e; --B: #2f8cf0; --Y: #ffc72c; --muted: #55608a;
+    --fd: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif; --fb: 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--fb); color: var(--ink); font-size: 10.6pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #ccc; }
+  .page { width: 210mm; height: 297mm; padding: 16mm 15mm 18mm; position: relative; overflow: hidden; background: var(--paper); page-break-after: always; break-after: page; margin: 0 auto; }
+  @media screen { .page { margin: 10px auto; box-shadow: 0 4px 20px #0005; } }
+  .page.dark { background: var(--navy); color: #eef0ff; }
+  /* halftone corner */
+  .page::before { content: ""; position: absolute; right: -30mm; top: -30mm; width: 90mm; height: 90mm; background-image: radial-gradient(circle, #17203d22 1.2px, transparent 1.6px); background-size: 6px 6px; border-radius: 50%; pointer-events: none; }
+  .page.dark::before { background-image: radial-gradient(circle, #ffc72c33 1.2px, transparent 1.6px); }
+  /* checker strip at the bottom of every page */
+  .page::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5mm; background: repeating-linear-gradient(90deg, var(--R) 0 10mm, var(--G) 10mm 20mm, var(--B) 20mm 30mm, var(--Y) 30mm 40mm); }
+  .folio { position: absolute; bottom: 8mm; right: 15mm; font: 600 8.5pt var(--fd); color: var(--muted); letter-spacing: .06em; }
+  .folio.l { left: 15mm; right: auto; }
+  .dark .folio { color: #a9b2dc; }
+
+  h1, h2, h3, h4 { font-family: var(--fd); line-height: 1.15; margin: 0 0 .4em; }
+  h2.sec { font-size: 22pt; display: flex; align-items: center; gap: 10px; margin-bottom: 4mm; }
+  h2.sec .num { display: inline-grid; place-items: center; min-width: 13mm; height: 13mm; padding: 0 3mm; background: var(--navy2); color: #fff; border-radius: 3mm; box-shadow: 0 4px 0 var(--c, var(--Y)); font-size: 15pt; }
+  h3 { font-size: 13pt; margin-top: 4mm; }
+  p { margin: 0 0 2.6mm; }
+  .lead { font-size: 11.5pt; }
+  a { color: var(--B); text-decoration: none; }
+  .dark a { color: var(--amber); }
+  code, .mono { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 9pt; background: #17203d10; padding: 0 3px; border-radius: 3px; }
+
+  /* comic panels */
+  .panel { border: 2.6px solid var(--ink); border-radius: 3mm; background: #fff; box-shadow: 4px 4px 0 var(--ink); overflow: hidden; position: relative; }
+  .panel img { display: block; width: 100%; height: auto; }
+  .panel.fit img { height: 100%; object-fit: cover; }
+  .cap { position: absolute; left: 0; top: 0; background: var(--amber); color: var(--ink); font: 600 8.3pt var(--fd); padding: 1.2mm 2.6mm; border-right: 2.6px solid var(--ink); border-bottom: 2.6px solid var(--ink); border-bottom-right-radius: 2mm; letter-spacing: .02em; }
+  .cap.r { background: var(--R); color: #fff; } .cap.g { background: var(--G); color: #fff; } .cap.b { background: var(--B); color: #fff; }
+  .under { font-size: 8.8pt; color: var(--muted); margin: 1.6mm 0 0; }
+  .grid { display: grid; gap: 5mm; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: 1fr 1fr 1fr; } .g4 { grid-template-columns: repeat(4, 1fr); } .g6 { grid-template-columns: repeat(6, 1fr); gap: 3mm; }
+  .span2 { grid-column: span 2; }
+
+  /* speech bubble */
+  .bubble { position: relative; color: var(--ink); background: #fff; border: 2.6px solid var(--ink); border-radius: 6mm; padding: 3mm 4.5mm; font-family: var(--fd); font-weight: 500; font-size: 10.5pt; box-shadow: 3px 3px 0 var(--ink); }
+  .bubble::after { content: ""; position: absolute; left: 10mm; bottom: -4.2mm; width: 6mm; height: 6mm; background: #fff; border-right: 2.6px solid var(--ink); border-bottom: 2.6px solid var(--ink); transform: skewX(30deg) rotate(45deg); }
+  .bubble.y { background: #fff6d6; } .bubble.y::after { background: #fff6d6; }
+  .boxnote { border: 2.6px solid var(--ink); border-left: 9px solid var(--c, var(--B)); border-radius: 2.5mm; padding: 2.6mm 4mm; background: #fff; margin: 3mm 0; }
+  .boxnote b.t { font-family: var(--fd); }
+  .todo { border: 2.6px dashed var(--R); background: #fff1ef; border-radius: 3mm; padding: 4mm; font-size: 9.8pt; }
+
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 9.2pt; border: 2.4px solid var(--ink); border-radius: 2.5mm; overflow: hidden; margin: 2mm 0 3mm; }
+  th { background: var(--navy2); color: #fff; font-family: var(--fd); font-weight: 600; text-align: left; padding: 1.8mm 2.4mm; }
+  td { padding: 1.6mm 2.4mm; border-top: 1px solid #17203d22; vertical-align: top; }
+  tr:nth-child(even) td { background: #f3f5fc; }
+  .ok { color: var(--G); font-weight: 700; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 2mm; }
+  .chip { font: 600 8.6pt var(--fd); background: var(--navy2); color: #fff; padding: 1mm 2.8mm; border-radius: 2mm; box-shadow: 0 2.5px 0 var(--c, var(--Y)); }
+  ul { margin: 0 0 3mm; padding-left: 5mm; } li { margin: .6mm 0; }
+
+  /* cover */
+  .cover { padding: 0; background: var(--navy); color: #fbf3e2; }
+  .cover .bg { position: absolute; inset: 0; background: url(img/d_dark_board.jpg) center/cover; opacity: .55; }
+  .cover .shade { position: absolute; inset: 0; background: linear-gradient(180deg, #0a0f26ee 0%, #0a0f2699 38%, #0a0f26cc 70%, #0a0f26 100%); }
+  .cover .in { position: relative; padding: 20mm 16mm; height: 100%; display: flex; flex-direction: column; }
+  .kick { font: 600 9pt var(--fd); letter-spacing: .22em; color: var(--amber); text-transform: uppercase; }
+  .cover h1 { font-size: 36pt; margin: 3mm 0 2mm; color: #fff; text-shadow: 0 3px 0 #0a0f26; }
+  .cover .sub { font: 500 15pt var(--fd); color: #ffd36b; }
+  .flag { display: inline-flex; align-items: center; gap: 3mm; background: #17203d; border: 2.6px solid #0a0f26; padding: 2mm 5mm 2mm 3mm; border-radius: 1.5mm; font: 600 10pt var(--fd); letter-spacing: .18em; color: #fff; box-shadow: 0 4px 0 var(--Y); }
+  .flag i { font-style: normal; background: var(--R); padding: .4mm 2mm; border-radius: 1mm; letter-spacing: 0; }
+  .idcard { margin-top: auto; background: var(--paper); color: var(--ink); border: 3px solid #0a0f26; border-radius: 4mm; box-shadow: 6px 6px 0 var(--Y); padding: 6mm 7mm; display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 8mm; }
+  .idcard div b { display: block; font: 600 8pt var(--fd); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .idcard div span { font: 600 12.5pt var(--fd); }
+  .idcard .wide { grid-column: span 2; }
+  .tiles { display: flex; gap: 2mm; margin: 6mm 0; }
+  .tiles span { width: 9mm; height: 9mm; border: 2.6px solid #0a0f26; border-radius: 1.5mm; display: grid; place-items: center; font: 700 10pt var(--fd); color: #fff; box-shadow: 0 3px 0 #0a0f26; }
+
+  .toc { columns: 2; column-gap: 10mm; font-size: 10.5pt; }
+  .toc div { display: flex; gap: 3mm; padding: 1.4mm 0; border-bottom: 1px dotted #17203d55; break-inside: avoid; }
+  .toc b { font-family: var(--fd); min-width: 8mm; }
+  .toc span.p { margin-left: auto; font-family: var(--fd); color: var(--muted); }
+
+  .pipe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; align-items: stretch; margin: 3mm 0; }
+  .pipe div { border: 2.6px solid var(--ink); border-radius: 3mm; padding: 2.6mm; background: #fff; box-shadow: 3px 3px 0 var(--c); font-size: 8.6pt; position: relative; }
+  .pipe div b { display: block; font-family: var(--fd); font-size: 10pt; margin-bottom: 1mm; }
+  .pipe div:not(:last-child)::after { content: "▶"; position: absolute; right: -4.4mm; top: 42%; font-size: 9pt; color: var(--ink); }
+  .stat { border: 2.6px solid var(--ink); border-radius: 3mm; padding: 3mm; background: #fff; box-shadow: 3px 3px 0 var(--c, var(--Y)); }
+  .stat b { display: block; font: 700 17pt var(--fd); line-height: 1.1; }
+  .stat span { font-size: 8.6pt; color: var(--muted); }
+  .phones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+  .phones .panel { border-radius: 5mm; }
+  .small { font-size: 9pt; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <div class="bg"></div><div class="shade"></div>
+  <div class="in">
+    <div class="kick">Semester Project Report · Interactive 3D Web Portfolio</div>
+    <h1>Muhammad Faisal Hameed</h1>
+    <div class="sub">A life-size Snakes &amp; Ladders portfolio, built with Three.js</div>
+    <div class="tiles"><span style="background:var(--R)">1</span><span style="background:var(--G)">2</span><span style="background:var(--B)">3</span><span style="background:var(--Y);color:#17203d">4</span><span style="background:var(--R)">5</span><span style="background:var(--G)">6</span></div>
+    <div style="max-width:118mm" class="bubble y">Roll the dice. Every tile on the board is a part of my portfolio, and the dice is a chatbot you can talk to.</div>
+    <div class="idcard">
+      <div><b>Student</b><span>Muhammad Faisal Hameed</span></div>
+      <div><b>Roll No.</b><span>CTGA-23008</span></div>
+      <div><b>Instructor</b><span>Prof. Saadia Arshad</span></div>
+      <div><b>Programme</b><span>BS Computer Science (Gaming &amp; Animation)</span></div>
+      <div><b>Live portfolio</b><span><a href="https://faisal-3d-portfolio.vercel.app/" style="color:var(--B)">faisal-3d-portfolio.vercel.app</a></span></div>
+      <div><b>Source code</b><span><a href="https://github.com/hameed-F/faisal-3d-portfolio" style="color:var(--B)">github.com/hameed-F/faisal-3d-portfolio</a></span></div>
+      <div class="wide"><b>Submitted</b><span>24 November 2026 · NED University of Engineering and Technology, Karachi</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTENTS + SUMMARY ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--R)">00</span>Contents</h2>
+  <div class="toc">
+    <div><b>01</b>Project summary and module checklist<span class="p">3</span></div>
+    <div><b>02</b>Concept and design decisions<span class="p">4</span></div>
+    <div><b>03</b>Module 1: the 3D portfolio (walkthrough)<span class="p">5</span></div>
+    <div><b>04</b>Themes, sound, quality modes, text version<span class="p">8</span></div>
+    <div><b>05</b>Phones and device layouts<span class="p">9</span></div>
+    <div><b>06</b>Module 2: the avatar and its 18 animations<span class="p">10</span></div>
+    <div><b>07</b>Blender work<span class="p">11</span></div>
+    <div><b>08</b>Module 3: the After Effects showreel<span class="p">12</span></div>
+    <div><b>09</b>Module 4: Pappu Pansa, the RAG chatbot<span class="p">13</span></div>
+    <div><b>10</b>Module 5: email and contact system<span class="p">15</span></div>
+    <div><b>11</b>Module 6: deployment and tech stack<span class="p">16</span></div>
+    <div><b>12</b>Optimization and performance<span class="p">17</span></div>
+    <div><b>13</b>Challenges and fixes<span class="p">18</span></div>
+    <div><b>14</b>Credits, assets and submission contents<span class="p">19</span></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:8mm; align-items:start">
+    <div class="panel"><span class="cap">The loader: the board unfolds as files arrive</span><img src="img/d_loader2.jpg" alt="Loading screen with the folding Ludo board"></div>
+    <div class="panel"><span class="cap b">Night board, light mode</span><img src="img/d_home.jpg" alt="The 3D board"></div>
+  </div>
+  <div class="boxnote" style="--c:var(--Y); margin-top:7mm">
+    <b class="t">How to read this report.</b> Every screenshot was taken fresh from the live site on 24 November 2026 (desktop at 1440×900, phone at 390×844). Numbers come from the project's own development log, git history and measurements I took on the live site the same day. Where something is not finished or not proven, the report says so.
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">02</span>
+</section>
+
+<!-- ============ 01 SUMMARY ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--G)">01</span>Project summary</h2>
+  <p class="lead">The brief asked for an interactive 3D portfolio with a custom Blender avatar, an After Effects promo video, a RAG chatbot, a working contact form and a live deployment. I built all six modules into one idea: <b>my portfolio is a life-size Snakes &amp; Ladders board at night</b>. My avatar stands on tile 1. A talking dice called <b>Pappu Pansa</b> rolls the way, and each roll takes me to a glowing tile that holds one section of the portfolio. Every trip uses a different animation: rolling, climbing a ladder, sliding, jumping, walking, getting knocked down a snake, and finally flying to tile 100.</p>
+
+  <table>
+    <tr><th style="width:26%">Module (from the brief)</th><th style="width:12%">Status</th><th>Where it is and how it is met</th></tr>
+    <tr><td><b>1. 3D web portfolio</b></td><td class="ok">Done</td><td>Home (the board), About, Education &amp; experience, Projects (12, with filters), Skills, Contact, plus the Video tile and tile 100. Smooth camera trips between tiles. Desktop, tablet and phone layouts. Sections 3–5.</td></tr>
+    <tr><td><b>2. Custom 3D avatar (Blender → GLB)</b></td><td class="ok">Done</td><td><code>avatar.glb</code>, 1.08 MB, 18 Mixamo animations, skin tone adjusted, used live on the site with every clip. <code>.blend</code> in the repo. Sections 6–7.</td></tr>
+    <tr><td><b>3. Promo video (After Effects)</b></td><td class="ok">Done</td><td>40 s, 1920×1080, 30 fps, H.264 + AAC. <code>Faisal_AE.aep</code> and <code>Faisal_AE.mp4</code> in the repo; a compressed copy plays on the Video tile. Section 8.</td></tr>
+    <tr><td><b>4. RAG chatbot</b></td><td class="ok">Done</td><td>Pappu Pansa: 52 chunks, Google embeddings, cosine retrieval, Gemini answers with source chips, English / Urdu / Roman Urdu, voice in and out, a "How it works" panel. Section 9.</td></tr>
+    <tr><td><b>5. Email and contact</b></td><td class="ok">Done</td><td>Form with front-end and server validation, honeypot, rate limit, Brevo REST API, keys in environment variables. Section 10.</td></tr>
+    <tr><td><b>6. Deployment and documentation</b></td><td class="ok">Done</td><td>Vercel with continuous deployment from GitHub <code>main</code>. README, PLAN.md, DEVLOG.md and this report. Section 11.</td></tr>
+  </table>
+
+  <h3>Extra credit that is in the build</h3>
+  <div class="chips">
+    <span class="chip" style="--c:var(--R)">Light / dark themes</span><span class="chip" style="--c:var(--G)">Chatbot source citations</span><span class="chip" style="--c:var(--B)">Multilingual chatbot (EN, اردو, Roman Urdu)</span><span class="chip" style="--c:var(--Y)">Voice input and read-aloud</span><span class="chip" style="--c:var(--R)">Animated avatar gestures (18 clips)</span><span class="chip" style="--c:var(--G)">Project filtering</span><span class="chip" style="--c:var(--B)">Accessibility: text version, keyboard, read aloud, reduced motion</span><span class="chip" style="--c:var(--Y)">Mouse-reactive 3D (hover and tap tiles, dice)</span><span class="chip" style="--c:var(--R)">A real game against the dice at tile 100</span><span class="chip" style="--c:var(--G)">Generated music and sound effects with a toggle</span>
+  </div>
+
+  <h3 style="margin-top:6mm">Deliverables at a glance</h3>
+  <div class="grid g4">
+    <div class="stat" style="--c:var(--R)"><b>6 / 6</b><span>modules live and tested</span></div>
+    <div class="stat" style="--c:var(--G)"><b>18</b><span>avatar animations in one 1.08 MB GLB</span></div>
+    <div class="stat" style="--c:var(--B)"><b>40 s</b><span>After Effects showreel, 1080p30</span></div>
+    <div class="stat" style="--c:var(--Y)"><b>~0.85 MB</b><span>transferred to reach the 3D board (measured)</span></div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">03</span>
+</section>
+
+<!-- ============ 02 CONCEPT ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--B)">02</span>Concept and design decisions</h2>
+  <p>I study Gaming &amp; Animation, so I wanted the portfolio itself to feel like a game, but it still has to work as a portfolio: a recruiter must find any section in one or two clicks. A board game solved both. Everyone already knows how Snakes &amp; Ladders works, so nobody needs a tutorial, and the board gives every section a fixed, visible place.</p>
+  <p>I did not get there first time. The git history shows <b>nine earlier concepts</b> I built and dropped (a PS1-style game table, an open world with a drivable car, a cutaway tower, a floating island, a retro platformer, a silent-film street and a space-jazz ship among them). Each taught me something I kept: never blurry, easy to navigate, every animation used, and a real day/night style toggle.</p>
+
+  <h3>The route around the board</h3>
+  <table>
+    <tr><th>Tile</th><th>Section</th><th>Dice</th><th>How the avatar gets there</th><th>Clips</th></tr>
+    <tr><td>1</td><td>Start</td><td>–</td><td>Turns to the camera and waves</td><td>Wave, Idle</td></tr>
+    <tr><td>5</td><td>About me</td><td>4</td><td>Rolls forward across four tiles</td><td>Roll</td></tr>
+    <tr><td>29</td><td>Education &amp; experience</td><td>3</td><td>Walks to the ladder on tile 8 and climbs it</td><td>Walk → Climb</td></tr>
+    <tr><td>35</td><td>Projects</td><td>6</td><td>Run-up, then slides in and bumps the hologram</td><td>Run → Slide</td></tr>
+    <tr><td>41</td><td>Skills &amp; tech</td><td>6</td><td>Six jumps, tile to tile</td><td>Jump</td></tr>
+    <tr><td>52</td><td>Contact</td><td>6 + 5</td><td>Walks eleven tiles (a 6 rolls again)</td><td>Walk</td></tr>
+    <tr><td>18</td><td>Promo video</td><td>6</td><td>Runs to 58, a snake knocks him down, slides to 18</td><td>Run → Fall → Slide</td></tr>
+    <tr><td>100</td><td>Play with the dice</td><td>–</td><td>Flies to the last tile; a real game can start</td><td>Fly</td></tr>
+  </table>
+
+  <div class="grid g2" style="align-items:start">
+    <div>
+      <h3>Art direction: "night toy-box"</h3>
+      <ul>
+        <li><b>Always night.</b> Light mode means a warm desk lamp lights the board; dark mode turns the lamp off and the snakes glow.</li>
+        <li><b>Board colours</b> borrowed from Ludo: red, green, blue and yellow, printed on warm white with dark grout.</li>
+        <li><b>Everything on the board is drawn in code</b>: tile emblems of my own projects plus Karachi doodles (chai, cricket bat, kite, rickshaw, truck-art flower), the dice faces, the snake skins and the flags.</li>
+        <li><b>Type:</b> Fredoka for headings, Nunito Sans for reading, Noto Naskh Arabic for Urdu.</li>
+        <li><b>UI:</b> dark tiles with a coloured base, panels with a red/green/blue/yellow checker frame. No neon, no glassy gradients.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Rules I set for the experience</h3>
+      <ul>
+        <li><b>The visitor sets the pace:</b> trips start only on "Next" or a tile click, never while someone is reading.</li>
+        <li><b>Nothing unreachable:</b> a menu lists every tile, and clicking any glowing tile runs straight there without dice.</li>
+        <li><b>One continuous camera:</b> eased glides, no hard cuts; clip changes cross-fade.</li>
+        <li><b>Fast first:</b> the loader is plain HTML/CSS and shows instantly; the 3D code loads after it.</li>
+        <li><b>Always usable:</b> weak devices get Lite mode or a full text version automatically.</li>
+      </ul>
+      <div class="bubble" style="margin-top:5mm">"It's a portfolio, not a game." So the loader shows my name, not a game title.</div>
+    </div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">04</span>
+</section>
+
+<!-- ============ 03 WALKTHROUGH 1 ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--Y)">03</span>Module 1: the 3D portfolio</h2>
+  <p>The site opens on a folded Ludo board that unfolds while the files download, with a row of ten tiles that flip over as a loading bar. When it is ready, the camera hands over to the 3D board on a wooden study table. Seven tiles glow, each marked by a flag with its title.</p>
+  <div class="panel" style="margin-bottom:5mm"><span class="cap">Home: the board, the avatar on tile 1, Pappu Pansa the dice, and the flags</span><img src="img/d_home.jpg" alt="Home board"></div>
+  <div class="grid g2">
+    <div><div class="panel"><span class="cap r">Tile 5 · About me</span><img src="img/d_about.jpg" alt="About me"></div><p class="under">He rolls in, turns and waves. Bio, "who I am / what I build / what I'm doing now / what I'm looking for", trophies, CV and GitHub.</p></div>
+    <div><div class="panel"><span class="cap g">Tile 29 · Education &amp; experience</span><img src="img/d_edu.jpg" alt="Education"></div><p class="under">After the ladder climb the camera moves close; a timeline covers NED, internships (Aerox ERP, Brave Believers, KDA), the game jam and certificates.</p></div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">05</span>
+</section>
+
+<section class="page">
+  <div class="grid g2">
+    <div><div class="panel"><span class="cap b">Tile 35 · Projects</span><img src="img/d_projects.jpg" alt="Projects"></div><p class="under">A hologram rises over the tile with floating 3D project cards. The panel lists 12 projects with filters (Unreal, Three.js, Unity, Systems, Motion); each card opens details and links.</p></div>
+    <div><div class="panel"><span class="cap">Tile 41 · Skills &amp; technologies</span><img src="img/d_skills.jpg" alt="Skills"></div><p class="under">Six hops in, then a dance. Skills are grouped (engines, programming, 3D and motion, workflow, VR) and each skill names the projects that prove it.</p></div>
+    <div><div class="panel"><span class="cap r">Tile 52 · Contact me</span><img src="img/d_contact.jpg" alt="Contact"></div><p class="under">He talks while the form sits beside him: name, email, subject, message. A successful send plays Victory.</p></div>
+    <div><div class="panel"><span class="cap g">Tile 18 · Promo video</span><img src="img/d_video.jpg" alt="Promo video"></div><p class="under">Knocked down the snake, he sits dizzy while the showreel plays. The video downloads only when Play is pressed.</p></div>
+  </div>
+  <div class="grid g2" style="margin-top:2mm">
+    <div><div class="panel"><span class="cap b">Tile 100 · the finish</span><img src="img/d_play.jpg" alt="Tile 100"></div><p class="under">"Congratulations, you know me now!" Yes starts a real Snakes &amp; Ladders game against the dice (random rolls, Throw / Victory / Disappointed clips).</p></div>
+    <div><div class="panel"><span class="cap">Home screen after the tour</span><img src="img/d_sound_on.jpg" alt="Home screen"></div><p class="under">Faisal big on screen, cycling his animations, with buttons to every section, Play again and Restart the tour.</p></div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">06</span>
+</section>
+
+<section class="page">
+  <h3 style="margin-top:0">Navigation: three ways to reach anything</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel"><span class="cap">Menu: every tile, theme, quality, text version, credits</span><img src="img/d_menu.jpg" alt="Menu"></div>
+    <div>
+      <ol style="padding-left:5mm">
+        <li><b>The story:</b> a big "Next: …" button rolls the dice and plays the next trip; "Skip" jumps to the end of a trip.</li>
+        <li><b>Direct:</b> click or tap any glowing tile and he runs straight there (no dice), then the section opens.</li>
+        <li><b>The menu:</b> lists all seven tiles plus settings (dark/light, Full / Lite / Auto quality, read as a page, credits). The MFH chip returns to the board.</li>
+      </ol>
+      <p>Keyboard users can Tab through buttons and close panels with Esc. Closing a section zooms back out to the whole board, so the visitor always sees where they are.</p>
+      <div class="bubble y" style="margin-top:6mm">Every clip I put on the avatar is used somewhere: trips, sections, the chat (Think while answering, Talk when replying) and the game.</div>
+    </div>
+  </div>
+  <h3>Section content comes from one source</h3>
+  <p>All text lives in <code>src/content.js</code>, taken only from my own documents (CV, project write-ups, certificates). The same HTML is used for the 3D section screens, the plain text version and the chatbot's knowledge base, so the three never disagree.</p>
+  <table>
+    <tr><th>Brief requirement</th><th>Where on the site</th></tr>
+    <tr><td>Home: name, intro, profile</td><td>Loader (name and title), board, About tile, home screen</td></tr>
+    <tr><td>About me</td><td>Tile 5</td></tr>
+    <tr><td>Skills &amp; technologies</td><td>Tile 41</td></tr>
+    <tr><td>Projects &amp; achievements gallery</td><td>Tile 35 hologram (12 projects, filters) + trophies strip on tile 5 (6 certificates, open full size)</td></tr>
+    <tr><td>Education &amp; experience</td><td>Tile 29</td></tr>
+    <tr><td>Contact</td><td>Tile 52</td></tr>
+    <tr><td>Smooth animations and transitions</td><td>Eased camera trips, cross-faded clips, unfolding loader, panel slide-ins</td></tr>
+    <tr><td>Responsive (desktop, tablet, phone)</td><td>Section 5</td></tr>
+  </table>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">07</span>
+</section>
+
+<!-- ============ 04 THEMES ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--R)">04</span>Themes, sound, quality modes, text version</h2>
+  <div class="grid g2" style="align-items:start">
+    <div><div class="panel"><span class="cap">Light mode: the desk lamp lights the board</span><img src="img/d_home.jpg" alt="Light mode"></div></div>
+    <div><div class="panel"><span class="cap b">Dark mode: the lamp goes out, the snakes glow</span><img src="img/d_dark_board.jpg" alt="Dark mode"></div></div>
+  </div>
+  <p style="margin-top:3mm">Dark mode is not just a colour swap. The ambient and fill lights drop almost to nothing, each snake gets an emissive pulsing skin and casts its own coloured light on the board, and a soft light follows Faisal so he stays visible. The UI switches to its dark palette at the same time.</p>
+  <div class="grid g2" style="align-items:start">
+    <div>
+      <h3>Sound toggle</h3>
+      <div class="panel" style="margin-bottom:2mm"><img src="img/sound_chip_off.png" alt="Sound off"></div>
+      <div class="panel"><img src="img/sound_chip_on.png" alt="Sound on"></div>
+      <p class="under">All audio is generated live with the Web Audio API (no audio files): a quiet night tune plus effects tied to the clips (footsteps, ladder, roll, landing, slide, whoosh, fall, dice rattle, a chime when a section opens). Off by default, remembered between visits, and the music ducks while text is read aloud.</p>
+    </div>
+    <div>
+      <h3>Lite mode (automatic or manual)</h3>
+      <div class="panel"><span class="cap g">Lite tier</span><img src="img/d_lite.jpg" alt="Lite mode"></div>
+      <p class="under">Lite renders at a lower pixel ratio, drops real shadows, uses fewer props and smaller textures and caps at 30 fps. It turns on automatically on weak or slow devices (section 12) and can be chosen in the menu.</p>
+    </div>
+  </div>
+  <div class="grid g2" style="align-items:start; margin-top:2mm">
+    <div class="panel"><span class="cap r">Text version (no 3D)</span><img src="img/p_text.jpg" alt="Text version"></div>
+    <p class="small">The <b>text version</b> is the same content as a clean, readable page with read-aloud on every section. It is used when WebGL is missing or only a software renderer is available, when the graphics driver crashes, when a device struggles even in Lite, or whenever the visitor chooses "Read it as a page". It is also the screen-reader friendly path.</p>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">08</span>
+</section>
+
+<!-- ============ 05 PHONES ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--G)">05</span>Phones and device layouts</h2>
+  <p>Phones get their own layout rather than a shrunk desktop. Icons replace the chip labels, the avatar stays in the top part of the screen and panels become bottom sheets. The camera is framed taller so the board fits portrait screens, and every button is a large tap target. Screens below were captured on the live site with phone emulation (390×844, touch).</p>
+  <div class="phones">
+    <div><div class="panel"><span class="cap">Board</span><img src="img/m_home.jpg" alt="Phone board"></div></div>
+    <div><div class="panel"><span class="cap r">About</span><img src="img/m_about.jpg" alt="Phone about"></div></div>
+    <div><div class="panel"><span class="cap b">Projects</span><img src="img/m_projects.jpg" alt="Phone projects"></div></div>
+  </div>
+  <table style="margin-top:5mm">
+    <tr><th>Device</th><th>Layout</th></tr>
+    <tr><td>Laptop / desktop</td><td>Half avatar, half panel; hologram and bubbles centred; chip labels shown.</td></tr>
+    <tr><td>Tablet</td><td>Same idea with a narrower panel.</td></tr>
+    <tr><td>Phone (portrait)</td><td>Avatar at the top, bottom-sheet panels, taller camera framing, icon-only HUD chips, full-width chat.</td></tr>
+  </table>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">09</span>
+</section>
+
+<!-- ============ 06 AVATAR ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--B)">06</span>Module 2: the avatar and its 18 animations</h2>
+  <p>The avatar is a rigged character with a Mixamo skeleton (65 <code>mixamorig:</code> bones). I worked only on a copy (<code>avatar_work.blend</code>), never the original file. In Blender I imported the Mixamo clips, cleaned them up so they play in place, adjusted the skin tone and exported one GLB with every animation.</p>
+  <div class="panel" style="width:78%;margin:0 auto"><span class="cap">All 18 clips, rendered from the final avatar.glb in Three.js</span><img src="img/avatar_18clips.jpg" alt="18 animation clips"></div>
+  <div class="grid g2" style="margin-top:4mm; align-items:start">
+    <div>
+      <h3 style="margin-top:0">Pipeline</h3>
+      <ol style="padding-left:5mm" class="small">
+        <li>Checked the rig: <code>mixamorig:</code> skeleton; every Mixamo FBX matched every bone.</li>
+        <li>Imported each FBX, renamed the action (Idle, Wave, Walk, Talk, Think, Point, Victory, Disappointed, Dance, Throw, Sit, Jump, Roll, Climb, Fly, Run, Slide, Fall), one NLA track each.</li>
+        <li>Made moving clips play in place so code can move him: Throw had its hips locked; Slide (travels ~6 m) was made in place; Climb was offset ~1 m sideways and ~0.8 m up and was re-centred with feet on the floor.</li>
+        <li>Skin: only the skin texture made a little browner, keeping freckles and shading; approved from front and side preview renders.</li>
+        <li>Scaled to 1.80 m, feet at the origin; unused actions and images removed.</li>
+        <li>Exported GLB with WebP textures, then packed with my script <code>scripts/pack-avatar.mjs</code> (drops channels that stay at rest, resamples keys, meshopt compression).</li>
+        <li>Tested in a real Three.js page: all 18 clips load, feet on the floor, no console errors.</li>
+      </ol>
+    </div>
+    <div>
+      <table>
+        <tr><th>Fact</th><th>Value</th></tr>
+        <tr><td>Final file</td><td><b>avatar.glb, 1,077,340 bytes (1.08 MB)</b></td></tr>
+        <tr><td>Before packing</td><td>3.38 MB (avatar_uncompressed.glb)</td></tr>
+        <tr><td>Sent over the network</td><td>~647 KB (server compression, measured)</td></tr>
+        <tr><td>Geometry</td><td>9 skinned meshes, ~31.8k triangles</td></tr>
+        <tr><td>Textures</td><td>8, WebP, ≤ 1024 px</td></tr>
+        <tr><td>Clips</td><td>18 (Idle, Walk, Run, Climb, Fly loop)</td></tr>
+        <tr><td>Brief limit</td><td>≤ 5 MB <span class="ok">✓</span></td></tr>
+      </table>
+      <div class="boxnote" style="--c:var(--R)"><b class="t">Known issue:</b> the shirt print reads mirrored. It comes from the original texture and was left as it is.</div>
+    </div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">10</span>
+</section>
+
+<!-- ============ 07 BLENDER ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--Y)">07</span>Blender work</h2>
+  <div class="grid g2" style="align-items:start">
+    <div><div class="panel"><span class="cap">Skin tone: before / after preview</span><img src="img/skin_preview.jpg" alt="Skin preview"></div></div>
+    <div><div class="panel"><span class="cap b">First test of the GLB in a Three.js page</span><img src="img/threejs_test.jpg" alt="Three.js test"></div></div>
+  </div>
+  <h3>Board, dice and showreel renders</h3>
+  <p>For the promo video I rebuilt the site's board in Blender using the site's own textures and layout (extracted from the live board), so the reel matches the website exactly. The dice, snakes, ladders and the avatar were rendered with Eevee at 1920×1080: 1,114 transparent PNG frames across nine shots, named by reel frame so they drop straight into the edit.</p>
+  <div class="panel"><span class="cap r">Contact sheet of the Blender renders (one frame per shot)</span><img src="img/blender_renders.jpg" alt="Blender renders"></div>
+  <div class="grid g3" style="margin-top:4mm">
+    <div class="stat" style="--c:var(--R)"><b>1,114</b><span>rendered PNG frames (RGBA)</span></div>
+    <div class="stat" style="--c:var(--G)"><b>≈ 4 s</b><span>per 1080p Eevee frame with the board</span></div>
+    <div class="stat" style="--c:var(--B)"><b>9</b><span>shots, timed to a 120 BPM beat grid</span></div>
+  </div>
+  <p class="small" style="margin-top:4mm">Blender was driven through the Blender MCP add-on's local socket, which let me script imports, NLA set-up, exports and renders while keeping the original file untouched. The working file is <code>submission/blender/avatar_work.blend</code>.</p>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">11</span>
+</section>
+
+<!-- ============ 08 AE ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--R)">08</span>Module 3: the After Effects showreel</h2>
+  <p>"Roll the dice" is a 40-second showreel that plays one turn of Snakes &amp; Ladders and introduces me through my projects. Cuts land on a 120 BPM beat grid (one beat = 15 frames), a small tile counter sits bottom-left, and the dice lands on the very last beat so the reel loops cleanly.</p>
+  <div class="panel"><span class="cap">Frames from Faisal_AE.mp4 (one every 4 seconds)</span><img src="img/ae_contact.jpg" alt="Showreel frames"></div>
+  <div class="grid g2" style="margin-top:4mm; align-items:start">
+    <div>
+      <table>
+        <tr><th>Shot</th><th>What happens</th></tr>
+        <tr><td>1</td><td>The dice drops: "Roll."</td></tr>
+        <tr><td>2</td><td>The board unfolds, Faisal waves, name and title type on</td></tr>
+        <tr><td>3–4</td><td>Unreal Engine 5, Three.js projects in "monitor" frames; the avatar slide wipes between them</td></tr>
+        <tr><td>5</td><td>Unity: Chrono Rebellion, then the 48-hour game jam (Behind the Smile)</td></tr>
+        <tr><td>6</td><td>Motion and 3D work, the avatar points at each screen</td></tr>
+        <tr><td>7</td><td>The snake fall, then the ladder climb with the internships</td></tr>
+        <tr><td>8</td><td>Victory on tile 100: "12 projects. UE5 · Unity · Three.js."</td></tr>
+        <tr><td>9</td><td>End card: name, role, what I'm open to, the site URL</td></tr>
+      </table>
+    </div>
+    <div>
+      <table>
+        <tr><th>Spec</th><th>Value</th></tr>
+        <tr><td>Project</td><td><code>Faisal_AE.aep</code> (114 KB)</td></tr>
+        <tr><td>Master</td><td><code>Faisal_AE.mp4</code>, 73.5 MB</td></tr>
+        <tr><td>Format</td><td>1920×1080, 30 fps, exactly 40.0 s</td></tr>
+        <tr><td>Codecs</td><td>H.264 (~14.7 Mbps) + AAC stereo</td></tr>
+        <tr><td>On the site</td><td>720p web copy, 4.3 MB, 6 kB poster, loads only on Play</td></tr>
+        <tr><td>Typography</td><td>Bold sans titles with an RGBY underline, matching the site</td></tr>
+      </table>
+      <div class="grid g2" style="gap:3mm">
+        <div class="panel"><img src="img/ae_6.jpg" alt=""></div><div class="panel"><img src="img/ae_37.5.jpg" alt=""></div>
+      </div>
+    </div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">12</span>
+</section>
+
+<!-- ============ 09 CHATBOT ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--G)">09</span>Module 4: Pappu Pansa, the RAG chatbot</h2>
+  <p>The chatbot is not a pop-up box: it is the dice that walks with my avatar. Its name, <b>Pappu Pansa</b>, is a playful Pakistani name (<i>pansa</i> is a dice in Urdu). Click the dice or the "Ask me" button to chat. While it thinks, it spins; when it answers, it hops. It answers only from my portfolio and shows which passages it used.</p>
+  <h3>The RAG pipeline</h3>
+  <div class="pipe">
+    <div style="--c:var(--R)"><b>1 · Chunk</b>My profile, projects, certificates, CV and links are split into <b>52</b> small passages, each tagged with its source section.</div>
+    <div style="--c:var(--G)"><b>2 · Embed</b>Each passage is embedded once with Google <code>gemini-embedding-001</code> (768-d). The index ships with the function, so there is no work at cold start.</div>
+    <div style="--c:var(--B)"><b>3 · Retrieve</b>The question is embedded (<i>RETRIEVAL_QUERY</i>), compared by cosine similarity, and the best passages are kept.</div>
+    <div style="--c:var(--Y)"><b>4 · Generate</b>Gemini Flash-Lite answers <b>only</b> from those passages; if the fact is not there it says it is not in the portfolio.</div>
+    <div style="--c:var(--R)"><b>5 · Cite</b>Numbered chips under the answer show the source passages; tapping one opens that section.</div>
+  </div>
+  <div class="grid g2" style="align-items:start">
+    <div><div class="panel"><span class="cap">A cited answer (dark mode, desktop)</span><img src="img/d_chat_dark.jpg" alt="Chat answer"></div></div>
+    <div><div class="panel"><span class="cap b">The built-in "How it works" panel</span><img src="img/d_chat_rag.jpg" alt="How it works panel"></div></div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">13</span>
+</section>
+
+<section class="page">
+  <div class="grid" style="grid-template-columns: 62mm 1fr; gap:7mm; align-items:start">
+    <div><div class="panel" style="border-radius:5mm"><span class="cap g">Roman Urdu question, Urdu answer (phone)</span><img src="img/m_chat.jpg" alt="Urdu answer on phone"></div></div>
+    <div>
+      <h3 style="margin-top:0">Languages and voice</h3>
+      <ul>
+        <li>Visitors can ask in <b>English, Urdu script or Roman Urdu</b>. The server detects the language in code and tells the model which language to answer in, which proved more reliable than letting it guess. Roman Urdu questions are answered in Urdu script so they can be read aloud by an Urdu voice.</li>
+        <li>For Urdu-script questions the retrieval threshold is lowered, because cross-language similarity scores are lower.</li>
+        <li><b>Voice input</b> with a language picker (Auto / English / اردو) and <b>read-aloud</b> answers. Urdu is spoken by a female Urdu voice where the browser has one; Chrome on Windows has no Urdu voice, so the server can transliterate to Devanagari for a Hindi voice instead of falling back to a male English voice.</li>
+      </ul>
+      <h3>Grounding and safety</h3>
+      <ul>
+        <li>The system instruction allows answers only from the retrieved passages about me; unknown facts get "not provided in the portfolio".</li>
+        <li>Tested: Three.js games (all three named), CGPA (correct), favourite food (correctly "not provided"), an Urdu question (answered in Urdu), and a prompt-injection asking for a home address (refused).</li>
+        <li>Input length cap, short history, keys only on the server (<code>process.env</code>), never sent to the browser.</li>
+      </ul>
+      <h3>Reliability</h3>
+      <p>On the day of testing, Google's API sometimes returned 503 "high demand" or stalled past the timeout. The fix: hedged requests with back-off retries, and if every attempt fails, an answer built directly from the retrieved passages (still cited) instead of an error. A local stress test then answered 12 of 12 questions in English, Urdu and Roman Urdu.</p>
+      <div class="bubble y">Salaam! I'm Pappu Pansa, Faisal's lucky dice. I only answer from his portfolio.</div>
+    </div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">14</span>
+</section>
+
+<!-- ============ 10 CONTACT ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--B)">10</span>Module 5: email and contact system</h2>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel"><span class="cap r">The contact form on tile 52</span><img src="img/d_contact.jpg" alt="Contact form"></div>
+    <div>
+      <table>
+        <tr><th>Requirement</th><th>How it is met</th></tr>
+        <tr><td>Name, email, subject, message</td><td>All four fields, labelled</td></tr>
+        <tr><td>Front-end validation</td><td>Required fields, email format, length limits, clear messages</td></tr>
+        <tr><td>Back-end validation</td><td>Same rules again in <code>/api/contact</code>; bad input gets HTTP 400</td></tr>
+        <tr><td>Sends to my email</td><td>Brevo REST API (<code>api.brevo.com/v3/smtp/email</code>), awaited before replying; reply-to is the visitor</td></tr>
+        <tr><td>Success and error messages</td><td>Sending / sent / error states; Victory animation on success</td></tr>
+        <tr><td>Credentials in env vars</td><td><code>BREVO_API_KEY</code>, <code>CONTACT_RECEIVER_EMAIL</code> in <code>.env.local</code> and Vercel; never committed</td></tr>
+        <tr><td>Spam protection</td><td>Hidden honeypot field + rate limit (5 messages / 10 min per server instance)</td></tr>
+        <tr><td>Safe input handling</td><td>Trimmed, length-capped, HTML-escaped before it goes into the email</td></tr>
+      </table>
+    </div>
+  </div>
+  <h3>Testing</h3>
+  <p>The API was unit-tested with a mocked Brevo for every path (405 wrong method, 400 invalid, honeypot, 200 sent, 429 rate limited, 502 Brevo error, 500 server error). After the keys were added on Vercel, a test message from the live site was accepted by Brevo with HTTP 200.</p>
+  <h3>Evidence of delivery</h3>
+  <div class="boxnote" style="--c:var(--G)"><b class="t">Verified:</b> a test message sent from the contact form on the live site arrived in my inbox as a "New portfolio message" email from Brevo. The screenshot of the received email is submitted with this report.</div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">15</span>
+</section>
+
+<!-- ============ 11 DEPLOY + STACK ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--Y)">11</span>Module 6: deployment and tech stack</h2>
+  <div class="pipe" style="grid-template-columns: repeat(4, 1fr)">
+    <div style="--c:var(--R)"><b>Code</b>Plain JavaScript, HTML and CSS with Vite; Three.js for 3D.</div>
+    <div style="--c:var(--G)"><b>GitHub</b>Public repo <code>hameed-F/faisal-3d-portfolio</code>, branch <code>main</code> = production.</div>
+    <div style="--c:var(--B)"><b>Vercel</b>Every push to <code>main</code> builds (<code>vite build</code>) and deploys; other branches get preview URLs.</div>
+    <div style="--c:var(--Y)"><b>Serverless</b><code>/api/chat</code>, <code>/api/contact</code>, <code>/api/tts</code> run as Vercel functions with keys from the dashboard.</div>
+  </div>
+  <h3>Tech stack</h3>
+  <table>
+    <tr><th>Layer</th><th>Tools</th><th>Why</th></tr>
+    <tr><td>3D engine</td><td>Three.js 0.170 (GLTFLoader + Meshopt decoder)</td><td>What the course taught; full control, small bundle</td></tr>
+    <tr><td>Build</td><td>Vite 6</td><td>Fast dev server, code splitting so the 3D loads after the first screen</td></tr>
+    <tr><td>UI</td><td>Plain HTML / CSS / JS, Google Fonts</td><td>No framework needed; tiny first download</td></tr>
+    <tr><td>Chatbot</td><td><code>@google/genai</code> (Gemini embeddings + Flash-Lite)</td><td>Official SDK, server-side only</td></tr>
+    <tr><td>Email</td><td>Brevo REST API via <code>fetch</code></td><td>Works on serverless (no SMTP)</td></tr>
+    <tr><td>Speech</td><td>Web Speech API; optional Azure voice via <code>/api/tts</code></td><td>Free read-aloud and voice input in the browser</td></tr>
+    <tr><td>Audio</td><td>Web Audio API</td><td>Music and effects generated in code: zero audio files</td></tr>
+    <tr><td>3D content</td><td>Blender 5.1, Mixamo</td><td>Avatar, animations, showreel renders</td></tr>
+    <tr><td>Asset tools</td><td>glTF-Transform, meshoptimizer, ffmpeg</td><td>Compressing the avatar, images and video</td></tr>
+    <tr><td>Video</td><td>Adobe After Effects</td><td>Showreel assembly and export</td></tr>
+    <tr><td>Hosting</td><td>Vercel + GitHub</td><td>Continuous deployment, HTTPS, CDN</td></tr>
+  </table>
+  <h3>Code map</h3>
+  <table class="small">
+    <tr><td><code>src/main.js</code></td><td>Boot, loader, quality tiers, theme, menu, text version</td></tr>
+    <tr><td><code>src/board/layout.js · world.js · story.js · textures.js · avatar.js</code></td><td>Board maths, the 3D scene, trips and screens, code-drawn textures, avatar clips</td></tr>
+    <tr><td><code>src/panels.js · content.js</code></td><td>All section content (one source for 3D, text version and chatbot)</td></tr>
+    <tr><td><code>src/chat.js · voice.js · read.js · audio.js · quality.js</code></td><td>Chat UI, voice, read-aloud, generated sound, tier detection and FPS governor</td></tr>
+    <tr><td><code>api/chat.js · contact.js · tts.js</code></td><td>Serverless RAG chat, email, server voice</td></tr>
+  </table>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">16</span>
+</section>
+
+<!-- ============ 12 OPTIMIZATION ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--R)">12</span>Optimization and performance</h2>
+  <p>Optimization was my top priority: a portfolio that stutters or takes ages to load loses the visitor. These numbers were measured on the live site on 24 November 2026 in a fresh (cold-cache) Microsoft Edge on my laptop.</p>
+  <div class="grid g4">
+    <div class="stat" style="--c:var(--R)"><b>~20 KB</b><span>first-screen JS (transferred); the loader shows before any 3D code</span></div>
+    <div class="stat" style="--c:var(--G)"><b>~182 KB</b><span>3D chunk (Three.js + scene), lazy-loaded after the loader</span></div>
+    <div class="stat" style="--c:var(--B)"><b>~848 KB</b><span>everything transferred to reach the interactive board</span></div>
+    <div class="stat" style="--c:var(--Y)"><b>~49k</b><span>triangles per frame on the board (Full)</span></div>
+  </div>
+  <h3>What I did</h3>
+  <div class="grid g2" style="align-items:start">
+    <ul class="small">
+      <li><b>No downloaded models or texture files for the world.</b> Board tiles, emblems, dice faces, snake skins, flags, wood and props are drawn in code at start-up into a few canvas textures.</li>
+      <li><b>Avatar:</b> 3.38 MB raw → 1.08 MB with WebP textures and meshopt; ~647 KB over the wire.</li>
+      <li><b>Video:</b> 73.5 MB master → 4.3 MB 720p web copy with a 6 kB poster and <code>preload="none"</code>, so it costs nothing until Play.</li>
+      <li><b>Images</b> are WebP; certificates open full size only on click.</li>
+      <li><b>Code splitting:</b> first screen is HTML/CSS + ~20 KB JS; Three.js and the scene come after.</li>
+      <li><b>Instancing and merging</b> for repeated parts (ladder rungs, tiles); snake sway done in the shader.</li>
+      <li><b>Rendering pauses</b> when the tab is hidden or a full-screen panel covers the scene.</li>
+      <li><b>Sound</b> is generated (no audio downloads).</li>
+    </ul>
+    <div>
+      <h3 style="margin-top:0">The automatic lighter mode</h3>
+      <table class="small">
+        <tr><th>Tier</th><th>What changes</th></tr>
+        <tr><td><b>Full</b></td><td>Pixel ratio up to 2, soft shadows from the desk lamp, all props, 60 fps</td></tr>
+        <tr><td><b>Lite</b></td><td>Pixel ratio 1.25, no real shadows, fewer props, smaller textures and snakes, 30 fps cap</td></tr>
+        <tr><td><b>Text</b></td><td>No WebGL at all: the readable page</td></tr>
+      </table>
+      <p class="small"><b>Before loading:</b> checks WebGL and the GPU name (software renderer → text version; older GPUs → Lite), device memory ≤ 3 GB, a 4-core touch device, Data Saver, a 2G/3G connection and the reduced-motion setting.<br><b>While running:</b> an FPS governor waits out a warm-up, then switches Full → Lite if the frame rate stays low, with a toast to switch back; if Lite still struggles it offers the text version. A lost WebGL context falls back to the text version. The visitor's own choice in the menu is saved.</p>
+    </div>
+  </div>
+  <div class="boxnote" style="--c:var(--B)"><b class="t">Honest notes.</b> Frame rate on a real phone GPU was not measured with tools; headless tests on my laptop run on a throttled renderer, so they prove behaviour, not speed. The renderer reported ~166 draw calls per frame in Full with shadows on, above my original plan's target of 60; Lite removes the shadow pass. Real email delivery and read-aloud voices depend on the service and the device.</div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">17</span>
+</section>
+
+<!-- ============ 13 CHALLENGES ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--G)">13</span>Challenges and fixes</h2>
+  <table>
+    <tr><th style="width:30%">Problem</th><th>Cause and fix</th></tr>
+    <tr><td>Finding a concept that was fun <i>and</i> easy to navigate</td><td>Nine versions were built and dropped (too grainy, too hard to navigate, no personality). The board game kept the fun and made every section one click away.</td></tr>
+    <tr><td>Snakes looked black in light mode</td><td>The snake tube's faces were wound the wrong way, so it rendered inside-out. Fixed the winding.</td></tr>
+    <tr><td>Mixamo clips that travel or are offset</td><td>Slide travelled ~6 m, Climb sat 1 m sideways and 0.8 m up, Climb and Fly faced the wrong way. Made them in place in Blender and corrected facing in code, so the code moves the avatar and his feet never skate.</td></tr>
+    <tr><td>The menu closed on every click</td><td>A document click handler matched <code>[data-tier]</code> on <code>&lt;body&gt;</code>. Narrowed it to <code>button[data-tier]</code>.</td></tr>
+    <tr><td>"The dice got stuck" in chat</td><td>Gemini sometimes returned 503 or stalled. Added hedged requests, back-off retries and a cited fallback answer from the retrieved passages.</td></tr>
+    <tr><td>Urdu read by a male English voice</td><td>Chrome on Windows has no Urdu voice and Edge names its voices in Urdu script. Now: wait for voices, prefer a female Urdu voice, speak sentence by sentence, then fall back to a server voice or Devanagari + a female Hindi voice.</td></tr>
+    <tr><td>Phone drags did nothing</td><td>The canvas lacked <code>touch-action: none</code>, so the browser used the gestures to scroll.</td></tr>
+    <tr><td>Test runs slowed my PC</td><td>Headless Edge test runs left ~97 browser processes running; the test script now closes its own browser.</td></tr>
+    <tr><td>Chess engine too weak in an early version</td><td>A library search managed ~400 nodes/s; I wrote a compact 0x88 engine in a worker (~250–330k nodes/s). The chess game was later removed with that concept.</td></tr>
+    <tr><td>Keeping the avatar under 5 MB with 18 clips</td><td>Dropped channels that stay at rest, resampled keys, meshopt + WebP: 1.08 MB.</td></tr>
+  </table>
+  <h3>What I would do next</h3>
+  <ul>
+    <li>Measure frame rate on real phones with remote debugging and reduce Full-mode draw calls (merge the props, bake shadows).</li>
+    <li>Store the contact rate limit in a shared store (Vercel KV / Upstash), since per-instance memory is only a baseline on serverless.</li>
+    <li>An Urdu version of the showreel.</li>
+  </ul>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">18</span>
+</section>
+
+<!-- ============ 14 CREDITS ============ -->
+<section class="page">
+  <h2 class="sec"><span class="num" style="--c:var(--B)">14</span>Credits, assets and submission contents</h2>
+  <table class="small">
+    <tr><th>Asset</th><th>Source</th><th>Licence / note</th></tr>
+    <tr><td>Board, tiles, emblems, dice, snakes, ladders, flags, table, props</td><td>Made by me, drawn in code (<code>src/board/textures.js</code>, <code>world.js</code>)</td><td>Original</td></tr>
+    <tr><td>Avatar model</td><td>Rigged character (Mixamo skeleton) customised in Blender: skin, scale, clips</td><td><code>avatar_work.blend</code> in the repo</td></tr>
+    <tr><td>18 animations</td><td>Adobe Mixamo (FBX "without skin")</td><td>Free to use under Adobe's Mixamo terms</td></tr>
+    <tr><td>Fonts</td><td>Fredoka, Nunito Sans, Noto Naskh Arabic (Google Fonts)</td><td>SIL Open Font License</td></tr>
+    <tr><td>Three.js, Vite, glTF-Transform, meshoptimizer</td><td>npm</td><td>MIT</td></tr>
+    <tr><td>Site music and sound effects</td><td>Generated live with Web Audio (<code>src/audio.js</code>)</td><td>Original, no audio files</td></tr>
+    <tr><td>Project screenshots and footage</td><td>My own projects</td><td>Mine</td></tr>
+    <tr><td>Downloaded 3D models</td><td>None in the current site</td><td>CC0 Poly Pizza models used in an earlier version are listed in the repo's asset log</td></tr>
+  </table>
+  <h3>What is in the GitHub repository</h3>
+  <table class="small">
+    <tr><th>Path</th><th>Contents</th></tr>
+    <tr><td><code>/</code> (root)</td><td>Complete website source: <code>src/</code>, <code>api/</code>, <code>public/</code>, <code>data/</code>, <code>scripts/</code>, README, PLAN.md, DEVLOG.md</td></tr>
+    <tr><td><code>submission/report/</code></td><td>This report as PDF and its HTML source with images</td></tr>
+    <tr><td><code>submission/after-effects/</code></td><td><code>Faisal_AE.aep</code> and the rendered <code>Faisal_AE.mp4</code></td></tr>
+    <tr><td><code>submission/blender/</code></td><td><code>avatar_work.blend</code> (avatar with all 18 actions)</td></tr>
+    <tr><td><code>submission/avatar/</code></td><td><code>avatar.glb</code> (final), <code>avatar_uncompressed.glb</code>, preview renders</td></tr>
+    <tr><td><code>submission/mixamo/</code></td><td>The 18 Mixamo FBX animation files</td></tr>
+    <tr><td><code>submission/screenshots/</code></td><td>Full-resolution screenshots of every module</td></tr>
+  </table>
+  <div class="grid g2" style="margin-top:4mm">
+    <div class="stat" style="--c:var(--R)"><b style="font-size:12.5pt">faisal-3d-portfolio.vercel.app</b><span>live portfolio</span></div>
+    <div class="stat" style="--c:var(--G)"><b style="font-size:12.5pt">github.com/hameed-F/faisal-3d-portfolio</b><span>public repository</span></div>
+  </div>
+  <span class="folio">MUHAMMAD FAISAL HAMEED · CTGA-23008</span><span class="folio l">19</span>
+</section>
+
+</body>
+</html>

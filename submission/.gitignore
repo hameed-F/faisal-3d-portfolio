@@ -1,0 +1,4 @@
+# Deliverables (.blend, .fbx, .aep, video) live only in this folder; the root .gitignore blocks .blend/.fbx elsewhere.
+!*.blend
+!*.fbx
+*.blend1
