@@ -3,12 +3,15 @@ import * as THREE from 'three';
 import { T, tileXZ, tilesBetween, rollsFor, SECTIONS, JUMPS, LADDERS } from './layout.js';
 import { ladderEnds, snakeCurve } from './world.js';
 import { html, bind, SECTION_TITLES } from '../panels.js';
+import { projects as PROJECTS } from '../content.js';
 import { SNAKES } from './layout.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const tileV = (n, y = 0) => { const [x, z] = tileXZ(n); return V(x, y, z); };
 const yawOf = (dx, dz) => Math.atan2(dx, dz);
+const FLY_YAW = -Math.PI / 2; // the Fly clip heads along the model's +x
+const CLIMB_YAW = Math.PI;    // the Climb clip faces the model's -z
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function createStory({ world, toast, onSection }) {
@@ -51,14 +54,15 @@ export function createStory({ world, toast, onSection }) {
     if (S.screen === 'bubble') placeDots();
   });
   function followPose() { if (portrait()) return world.fit(V(P.x * .85, 0, P.z + .6), halfW(), 60); const c = V(P.x * .8, 0, Math.min(P.z, 4.2) * .85); return world.fit(c, halfW(), 54); }
-  function farCam(tau = 1.4) { S.camMode = 'far'; world.setCam(world.boardFit(), { tau }); }
+  function farCam(tau = 1.4) { S.camMode = 'far'; world.setCam(portrait() ? world.fit(V(0, 0, 0.6), 8.9, 62, 38, 7) : world.boardFit(), { tau }); }
   function startCam(tau = 1.6) { // first shot: whole board on laptop; the lower rows (with Faisal) on phones
     S.camMode = 'far';
-    world.setCam(portrait() ? world.fit(V(-3.4, 0, 5.0), 4.9, 60) : world.fit(V(-1.0, 0, 2.6), 8.6, 50, 38, 7.0), { tau });
+    world.setCam(portrait() ? world.fit(V(-4.6, 0, 6.0), 3.6, 56) : world.fit(V(-1.0, 0, 2.6), 8.6, 50, 38, 7.0), { tau });
   }
-  function closeCam({ dist = 4.2, h = 1.5, lookY = 1.0, fov = 34, side = true, tau = 1.1 } = {}) {
-    S.camMode = 'close'; faceCamera();
-    const pos = V(P.x, P.y + h, P.z + dist); const look = V(P.x, P.y + lookY, P.z);
+  function closeCam({ dist = 4.2, h = 1.5, lookY = 1.0, fov = 34, side = true, tau = 1.1, dir = V(0, 0, 1) } = {}) {
+    S.camMode = 'close'; dir = dir.clone().setY(0).normalize();
+    const pos = V(P.x + dir.x * dist, P.y + h, P.z + dir.z * dist); const look = V(P.x, P.y + lookY, P.z);
+    world.face(yawOf(dir.x, dir.z)); // face the new camera, not the old one
     const por = portrait();
     world.setCam({ pos, look, fov: por ? fov + 10 : fov }, { tau, sx: side && !por ? 0.2 : 0, sy: por && side ? 0.22 : 0 });
   }
@@ -84,7 +88,7 @@ export function createStory({ world, toast, onSection }) {
     [[.18, 11], [.42, 17], [.7, 26]].forEach(([f, s], i) => { const d = $('.d' + (i + 1), scr); if (!d) return; d.style.width = d.style.height = s + 'px'; d.style.left = (hx + (tx - hx) * f - s / 2) + 'px'; d.style.top = (hy + (ty - hy) * f - s / 2) + 'px'; });
   }
   function closeScreen() {
-    scr.classList.remove('in'); const was = S.screen; S.screen = null; delete document.body.dataset.screen; world.D.hide = 0; scr.hidden = true; scr.innerHTML = ''; world.holo.visible = false;
+    scr.classList.remove('in'); const was = S.screen; S.screen = null; delete document.body.dataset.screen; world.D.hide = 0; scr.hidden = true; scr.innerHTML = ''; world.holo.visible = false; world.showCards(null);
     return was;
   }
 
@@ -94,16 +98,17 @@ export function createStory({ world, toast, onSection }) {
     onSection?.(id);
     if (id === 'about') { closeCam(); av.play('Wave', { fade: .3, loop: true }); mount('side', id); }
     else if (id === 'contact') { closeCam(); av.play('Talk', { fade: .3 }); mount('side', id); }
-    else if (id === 'edu') { closeCam({ dist: 2.7, h: 1.55, lookY: 1.4, fov: 32 }); av.play('Think', { fade: .3 }); mount('bubble', id); }
+    else if (id === 'edu') { const lad = ladderEnds(8, 29).top; closeCam({ dist: 2.9, h: 1.55, lookY: 1.4, fov: 32, dir: V(P.x - lad.x, 0, P.z - lad.z) }); av.play('Think', { fade: .3 }); mount('bubble', id); }
     else if (id === 'skills') { closeCam({ dist: 5.6, h: 1.9, lookY: 1.0, fov: 34 }); av.play('Dance', { fade: .3 }); mount('bubble', id); }
     else if (id === 'projects') {
-      closeCam({ dist: 5.6, h: 2.4, lookY: .9, fov: 36 }); world.holo.position.copy(P).setY(0); world.holo.position.x += 0; world.holo.visible = true; world.holo.scale.setScalar(.01);
-      av.play('Point', { fade: .2 }); setTimeout(() => av.play('Idle', { fade: .5 }), 1500); world.tween(.7, (k) => world.holo.scale.setScalar(.01 + k * .99), 'out'); mount('holo', id);
+      closeCam({ dist: 7.6, h: 3.4, lookY: 1.6, fov: 40 }); world.holo.position.copy(P).setY(0); world.holo.visible = true; world.holo.scale.setScalar(.01);
+      av.play('Point', { fade: .2 }); setTimeout(() => av.play('Idle', { fade: .5 }), 1500); world.tween(.7, (k) => world.holo.scale.setScalar(.01 + k * .99), 'out');
+      world.showCards(PROJECTS, world.holo.position.clone()); mount('holo', id);
     } else if (id === 'video') { closeCam({ dist: 4.6, h: 1.7, lookY: .9, fov: 34 }); av.play('Sit', { fade: .4 }); mount('card', id); }
     else if (id === 'play') { openFinish(); }
   }
   function openFinish() {
-    P.y = 2.2; closeCam({ dist: 6.2, h: 3.2, lookY: .2, fov: 38 }); av.play('Fly', { fade: .3 });
+    homeCam(); world.D.side = true; av.play('Victory', { fade: .3 });
     scr.className = 'scr k-card finish'; scr.hidden = false; S.screen = 'card'; document.body.dataset.screen = 'card';
     scr.innerHTML = `<div class="scrim"></div><div class="panel" role="dialog" aria-label="Congratulations" tabindex="-1"><div class="panel-body"><h2>Congratulations!</h2><p class="lead">You know me now. You made it to tile 100.</p><p>Want to play a round of Snakes &amp; Ladders against my dice companion, <b id="pn"></b>? It rolls for real this time.</p><div class="row"><button class="btn big" data-game="yes" type="button">Yes, let's play</button><button class="btn alt big" data-game="no" type="button">No, keep exploring</button></div></div></div>`;
     $('#pn').textContent = document.getElementById('botName').textContent;
@@ -113,8 +118,8 @@ export function createStory({ world, toast, onSection }) {
     const was = closeScreen(); if (!was) return;
     av.play('Idle', { fade: .5 }); if (S.current === 'edu' || true) { /* keep position */ }
     if (P.y > 0.01 && S.current !== 'play') world.tween(.5, (k) => setY(P.y * (1 - k)), 'io');
-    if (S.current === 'play') { S.free = true; }
-    S.camMode = 'follow'; world.setCam(followPose(), { tau: 1.1, sx: 0, sy: 0 });
+    if (S.current === 'play' || was === 'home') { enterHome(); return; }
+    farCam(1.2);
     showNext();
   }
 
@@ -136,8 +141,19 @@ export function createStory({ world, toast, onSection }) {
     for (const n of rollsFor(steps)) { setHint(`${document.getElementById('botName').textContent} rolls…`); await world.rollDice(n); setHint(`Rolled a ${n}!`); await world.wait(.35); }
     setHint('');
   }
-  async function travel(id) {
+  async function runTo(id) { // tile click / menu: run straight there, no dice
     if (S.busy) return; const s = SEC[id]; if (!s) return;
+    if (S.cur === s.tile && S.current === id) { stopHome(); closeScreen(); openSection(id); return; }
+    stopHome(); S.busy = true; hideCta(); closeScreen(); skipBtn.hidden = false; cta.hidden = false; nextBtn.hidden = true; world.W.skip = false; setHint('');
+    S.camMode = 'follow'; world.setCam(followPose(), { tau: .7, sx: 0, sy: 0 });
+    const startY = P.y; if (P.y > .05) await world.tween(.35, (k) => setY(startY * (1 - k)), 'io');
+    try { av.play('Run', { fade: .2, speed: 1.35 }); await moveAlong([P.clone().setY(0), tileV(s.tile)], 7.5); }
+    finally { world.W.skip = false; S.busy = false; skipBtn.hidden = true; }
+    P.copy(tileV(s.tile)); S.cur = s.tile; S.current = id; av.play('Idle', { fade: .25 });
+    await openSection(id);
+  }
+  async function travel(id) {
+    if (S.busy) return; const s = SEC[id]; if (!s) return; stopHome();
     if (S.cur === s.tile && S.current === id) { openSection(id); return; }
     S.busy = true; hideCta(); closeScreen(); skipBtn.hidden = false; cta.hidden = false; nextBtn.hidden = true; world.W.skip = false; world.holo.visible = false;
     S.camMode = 'follow'; world.setCam(followPose(), { tau: .9, sx: 0, sy: 0 });
@@ -152,7 +168,7 @@ export function createStory({ world, toast, onSection }) {
       else if (s.motion === 'snake') { await snakeTo(from, s); }
       else if (s.motion === 'fly') { await flyTo(s); }
     } finally { world.W.skip = false; S.busy = false; skipBtn.hidden = true; }
-    P.copy(tileV(s.tile, s.motion === 'fly' ? 2.2 : 0)); S.cur = s.tile; S.current = id;
+    P.copy(tileV(s.tile, 0)); S.cur = s.tile; S.current = id;
     if (s.motion === 'snake') av.play('Sit', { fade: .3 });
     await openSection(id);
   }
@@ -169,7 +185,7 @@ export function createStory({ world, toast, onSection }) {
     const tiles = tilesBetween(from, s.via); await showRolls(tiles.length - 1);
     const pts = tilePts(tiles); pts.push(foot.clone().setY(0));
     av.play('Walk', { fade: .25, speed: 1.9 }); await moveAlong(pts, 2.7);
-    const dir = top.clone().sub(foot); world.face(yawOf(dir.x, dir.z)); av.play('Climb', { fade: .25, speed: 1.1 });
+    const dir = top.clone().sub(foot); world.face(yawOf(dir.x, dir.z) + CLIMB_YAW); av.play('Climb', { fade: .25, speed: 1.1 });
     await world.tween(2.8, (k) => { P.copy(foot).lerp(top, k); P.y = foot.y + (top.y - foot.y) * k - .15; P.x -= dir.x / dir.length() * .15; P.z -= dir.z / dir.length() * .15; }, 'lin');
     const end = tileV(s.tile); av.play('Jump', { fade: .1, speed: 1.8 });
     await world.tween(.6, (k) => { P.set(top.x + (end.x - top.x) * k, Math.max(0, top.y * (1 - k * k) + Math.sin(k * Math.PI) * .4), top.z + (end.z - top.z) * k); }, 'out');
@@ -189,18 +205,20 @@ export function createStory({ world, toast, onSection }) {
     const end = tileV(s.tile); await world.tween(.4, (k) => { P.x += (end.x - P.x) * k; P.z += (end.z - P.z) * k; P.y *= 1 - k; }, 'out');
   }
   async function flyTo(s) {
-    const a = P.clone(); const b = tileV(s.tile, 2.2); av.play('Fly', { fade: .3 });
+    const a = P.clone(); const b = tileV(s.tile, 2.2); av.play('Fly', { fade: .3 }); world.face(FLY_YAW);
     const d = new THREE.Vector3(b.x - a.x, 0, b.z - a.z); await showRolls(Math.max(1, Math.round(d.length() / T)));
-    world.face(yawOf(d.x, d.z));
-    await world.tween(Math.max(2.2, d.length() / 4.2), (k) => { P.set(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k + Math.sin(Math.min(1, k * 1.0) * Math.PI) * 2.2 + 1.2 * Math.sin(k * Math.PI) , a.z + (b.z - a.z) * k); }, 'io');
+    world.face(yawOf(d.x, d.z) + FLY_YAW);
+    await world.tween(Math.max(2.2, d.length() / 4.2), (k) => { P.set(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k + Math.sin(k * Math.PI) * 3.4, a.z + (b.z - a.z) * k); }, 'io');
+    av.play('Jump', { fade: .2, speed: 1.4 }); world.face(0); await world.tween(.6, (k) => setY(2.2 * (1 - k)), 'io');
   }
 
   // ---------- start ----------
   function intro() {
     P.copy(tileV(1)); world.faceSnap(0); av.play('Idle', { fade: 0 }); startCam(0.01);
-    world.dice.position.copy(P).add(V(1.2, 1.8, -.3)); S.cur = 1;
+    world.dice.position.copy(P).add(V(.6, 1.85, -1.3)); S.cur = 1;
     // after the loader is gone: the camera is already in place; Faisal turns to the camera and waves
-    setTimeout(() => { world.face(yawOf(cam.position.x - P.x, cam.position.z - P.z)); av.play('Wave', { fade: .3 }); }, 500);
+    const sp = world.camGoal(); world.face(yawOf(sp.x - P.x, sp.z - P.z));
+    setTimeout(() => { av.play('Wave', { fade: .3 }); }, 500);
     setTimeout(() => { av.play('Idle', { fade: .6 }); }, 500 + av.duration('Wave') * 1000 + 100);
     cta.hidden = false; skipBtn.hidden = true; nextBtn.hidden = false; nextBtn.textContent = 'Start the tour: About me →'; nextBtn.dataset.id = 'about';
     setHint('Or tap any glowing tile on the board');
@@ -217,11 +235,11 @@ export function createStory({ world, toast, onSection }) {
   const posFor = (who, n) => tileV(n).add(slotOffset(who));
   function gamePanel(html2, actions = '') { scr.className = 'scr k-game'; scr.hidden = false; S.screen = 'game'; scr.innerHTML = `<div class="gbar" role="region" aria-label="Game">${html2}${actions}</div>`; scr.classList.add('in'); }
   async function startGame() {
-    closeScreen(); hideCta(); setHint(''); G.on = true; G.over = false; G.me = 1; G.bot = 1; G.turn = 'me'; S.mode = 'game'; S.busy = true;
+    stopHome(); closeScreen(); hideCta(); setHint(''); G.on = true; G.over = false; G.me = 1; G.bot = 1; G.turn = 'me'; S.mode = 'game'; S.busy = true;
     S.camMode = 'far'; world.setCam(world.boardFit(), { tau: 1.2, sx: 0, sy: 0 });
     const pawn = makePawn(); pawn.visible = true;
     // back to tile 1
-    av.play('Fly', { fade: .3 }); const a = P.clone(); const b = posFor('me', 1); await world.tween(2.2, (k) => { P.set(a.x + (b.x - a.x) * k, a.y * (1 - k) + Math.sin(k * Math.PI) * 1.2, a.z + (b.z - a.z) * k); }, 'io'); P.copy(b); av.play('Idle', { fade: .3 });
+    av.play('Fly', { fade: .3 }); const a = P.clone(); const b = posFor('me', 1); world.face(yawOf(b.x - a.x, b.z - a.z) + FLY_YAW); await world.tween(2.2, (k) => { P.set(a.x + (b.x - a.x) * k, a.y * (1 - k) + Math.sin(k * Math.PI) * 1.2, a.z + (b.z - a.z) * k); }, 'io'); P.copy(b); av.play('Idle', { fade: .3 });
     pawn.position.copy(posFor('bot', 1)); world.faceSnap(yawOf(0, -1)); S.busy = false; myTurn();
   }
   function status() { return `<div class="gstat"><span>You: tile <b>${G.me}</b></span><span>${document.getElementById('botName').textContent}: tile <b>${G.bot}</b></span></div>`; }
@@ -234,7 +252,7 @@ export function createStory({ world, toast, onSection }) {
     if (JUMPS[to] && to < 100) {
       const dest = JUMPS[to]; const isLadder = dest > to; setHint(isLadder ? 'A ladder! Up we go.' : 'A snake! Down we slide.', 1800);
       if (who === 'me') {
-        if (isLadder) { const { foot, top } = ladderEnds(to, dest); av.play('Walk', { fade: .2, speed: 2 }); await moveAlong([P.clone(), foot.clone().setY(0)], 3); world.face(yawOf(top.x - foot.x, top.z - foot.z)); av.play('Climb', { fade: .2, speed: 1.1 }); await world.tween(2.2, (k) => { P.copy(foot).lerp(top, k); P.y = foot.y + (top.y - foot.y) * k - .15; }, 'lin'); const end = posFor('me', dest); av.play('Jump', { fade: .1, speed: 1.8 }); await world.tween(.6, (k) => { P.set(top.x + (end.x - top.x) * k, Math.max(0, top.y * (1 - k * k) + Math.sin(k * Math.PI) * .4), top.z + (end.z - top.z) * k); }, 'out'); P.copy(end); av.play('Idle', { fade: .3 }); }
+        if (isLadder) { const { foot, top } = ladderEnds(to, dest); av.play('Walk', { fade: .2, speed: 2 }); await moveAlong([P.clone(), foot.clone().setY(0)], 3); world.face(yawOf(top.x - foot.x, top.z - foot.z) + CLIMB_YAW); av.play('Climb', { fade: .2, speed: 1.1 }); await world.tween(2.2, (k) => { P.copy(foot).lerp(top, k); P.y = foot.y + (top.y - foot.y) * k - .15; }, 'lin'); const end = posFor('me', dest); av.play('Jump', { fade: .1, speed: 1.8 }); await world.tween(.6, (k) => { P.set(top.x + (end.x - top.x) * k, Math.max(0, top.y * (1 - k * k) + Math.sin(k * Math.PI) * .4), top.z + (end.z - top.z) * k); }, 'out'); P.copy(end); av.play('Idle', { fade: .3 }); }
         else { const c = snakeCurve(to, dest, SNAKES.findIndex(([a]) => a === to) * 1.7); av.play('Fall', { fade: .1 }); await world.wait(1.0); av.play('Slide', { fade: .2, speed: .8 }); await world.tween(2.2, (k) => { const p = c.getPointAt(Math.min(1, k)); const t = c.getTangentAt(Math.min(.999, k)); P.set(p.x, p.y + .18, p.z); world.face(yawOf(t.x, t.z)); }, 'io'); const end = posFor('me', dest); await world.tween(.4, (k) => { P.x += (end.x - P.x) * k; P.z += (end.z - P.z) * k; P.y *= 1 - k; }, 'out'); av.play('Idle', { fade: .3 }); }
       } else { const c = isLadder ? null : snakeCurve(to, dest, SNAKES.findIndex(([a]) => a === to) * 1.7); const end = posFor('bot', dest); const a0 = G.pawn.position.clone(); await world.tween(1.6, (k) => { if (c) { const p = c.getPointAt(k); G.pawn.position.set(p.x, .2, p.z); } else { G.pawn.position.set(a0.x + (end.x - a0.x) * k, Math.sin(k * Math.PI) * 1.6, a0.z + (end.z - a0.z) * k); } }, 'io'); G.pawn.position.copy(end); }
       at = dest;
@@ -261,24 +279,49 @@ export function createStory({ world, toast, onSection }) {
     requestAnimationFrame(() => scr.classList.add('in'));
   }
   async function quitGame() {
-    G.on = false; S.mode = 'explore'; if (G.pawn) G.pawn.visible = false; closeScreen(); S.busy = true; setHint('');
-    const a = P.clone(); const b = tileV(100, 2.2); av.play('Fly', { fade: .3 }); S.camMode = 'follow'; await world.tween(2.2, (k) => { P.set(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k + Math.sin(k * Math.PI) * 1.5, a.z + (b.z - a.z) * k); }, 'io'); S.busy = false; S.cur = 100; S.current = 'play'; S.free = true; showNext();
+    G.on = false; S.mode = 'explore'; if (G.pawn) G.pawn.visible = false; closeScreen(); setHint('');
+    S.busy = true; const a = P.clone(); const b = tileV(100); av.play('Run', { fade: .3, speed: 1.35 });
+    S.camMode = 'follow'; await moveAlong([a.setY(0), b], 8); S.busy = false; S.cur = 100; S.current = 'play'; enterHome();
+  }
+
+  // ---------- home screen (after the finish): Faisal big, the board beside him, ready to click ----------
+  const HOME_CLIPS = ['Wave', 'Idle', 'Dance', 'Talk', 'Victory', 'Think', 'Point', 'Idle'];
+  let homeTimer = 0; let homeI = 0;
+  function homeCam() { // camera just outside the corner, Faisal big in front, the board stretching out behind him
+    S.camMode = 'home'; const toC = V(-P.x, 0, -P.z).normalize(); const por = portrait();
+    const pos = P.clone().addScaledVector(toC, por ? -6.2 : -5.0).add(V(0, por ? 3.6 : 2.9, 0));
+    const look = P.clone().addScaledVector(toC, por ? 2.4 : 1.6).add(V(0, .9, 0));
+    world.setCam({ pos, look, fov: por ? 50 : 40 }, { tau: 1.2, sx: por ? 0 : 0.17, sy: por ? 0.2 : 0 });
+    world.face(yawOf(pos.x - P.x, pos.z - P.z));
+  }
+  function cycleHome() { av.play(HOME_CLIPS[homeI++ % HOME_CLIPS.length], { fade: .45, loop: true }); homeTimer = setTimeout(cycleHome, 4200); }
+  function stopHome() { clearTimeout(homeTimer); homeTimer = 0; world.D.side = false; document.body.classList.remove('home'); if (S.screen === 'home') closeScreen(); }
+  function enterHome() {
+    stopHome(); closeScreen(); P.y = 0; S.free = true; homeCam(); cycleHome(); hideCta(); setHint('');
+    scr.className = 'scr k-home'; scr.hidden = false; S.screen = 'home'; document.body.dataset.screen = 'home'; document.body.classList.add('home'); world.D.hide = 0; world.D.side = true;
+    scr.innerHTML = `<div class="home-card" role="region" aria-label="Home"><p class="kick">Muhammad Faisal Hameed</p><h2>Thanks for playing!</h2><p>Tap any glowing tile on the board to jump back into a section, or play another round.</p>
+      <div class="home-tiles">${SECTIONS.filter((x) => x.id !== 'play').map((x) => `<button type="button" class="tile-btn" data-run="${x.id}" style="--c:${x.color}">${x.title}</button>`).join('')}</div>
+      <div class="row"><button class="btn" data-game="yes" type="button">Play again</button><button class="btn alt" data-tour type="button">Restart the tour</button></div></div>`;
+    requestAnimationFrame(() => scr.classList.add('in'));
   }
 
   // ---------- input ----------
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-close]')) { closeSection(); return; }
-    const g = e.target.closest('[data-game]'); if (g) { if (g.dataset.game === 'yes') startGame(); else closeSection(); return; }
+    const g = e.target.closest('[data-game]'); if (g) { if (g.dataset.game === 'yes') { stopHome(); startGame(); } else enterHome(); return; }
+    const rt = e.target.closest('[data-run]'); if (rt) { runTo(rt.dataset.run); return; }
+    if (e.target.closest('[data-tour]')) { stopHome(); closeScreen(); S.visited.clear(); S.current = null; P.copy(tileV(1)); S.cur = 1; intro(); return; }
     if (e.target.closest('[data-roll]')) { roll('me'); return; }
     if (e.target.closest('[data-quit]')) { quitGame(); }
   });
   nextBtn.addEventListener('click', () => { const id = nextBtn.dataset.id; if (id === 'game') startGame(); else travel(id); });
   skipBtn.addEventListener('click', () => { world.W.skip = true; });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.screen && S.screen !== 'game') { if (!$('#lightbox').hidden || !$('#chat').hidden || !$('#menu').hidden) return; closeSection(); } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.screen && S.screen !== 'game' && S.screen !== 'home') { if (!$('#lightbox').hidden || !$('#chat').hidden || !$('#menu').hidden) return; closeSection(); } });
 
   return {
-    S, intro, travel, closeSection, startGame, startCam, farCam,
-    go(id) { if (id === 'credits') return false; if (S.mode === 'game' || S.busy) return false; if (S.screen) closeScreen(); travel(id); return true; },
+    S, intro, travel, runTo, closeSection, startGame, startCam, farCam,
+    go(id) { if (id === 'credits') return false; if (S.mode === 'game' || S.busy) return false; runTo(id); return true; },
+    enterHome,
     resize() { if (S.camMode === 'far' && !S.busy) { if (S.cur === 1 && !S.visited.size) startCam(1); else farCam(1); } },
   };
 }

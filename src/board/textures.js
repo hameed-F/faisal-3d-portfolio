@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { N, rc } from './layout.js';
 
 const INK = '#1d2540';
-const TILE_COLORS = ['#e8c9a0', '#9fd0c4', '#f0d27a', '#e9a38f']; // muted paper tones: sand, teal, mustard, brick
+const TILE_COLORS = ['#ef4b3f', '#2fb86e', '#2f8cf0', '#ffc72c']; // Ludo red, green, blue, yellow
+const TILE_WHITE = '#fff8ea';
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; };
 const tex = (c, srgb = true) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
 
@@ -36,13 +37,14 @@ export function makeBoardTexture(size) {
   const px = size / N; const [c, g] = mk(size, size);
   for (let n = 1; n <= 100; n++) {
     const { r, c: col } = rc(n); const x = col * px; const y = (N - 1 - r) * px; // texture y grows downward; row 0 is the near (bottom) edge
-    g.fillStyle = TILE_COLORS[(r + col * 2 + (r % 2)) % 4]; g.fillRect(x, y, px, px);
+    const coloured = (r + col) % 2 === 0; g.fillStyle = coloured ? TILE_COLORS[(Math.floor(col / 2) + r) % 4] : TILE_WHITE; g.fillRect(x, y, px, px);
+    if (coloured) { g.fillStyle = '#ffffff22'; g.fillRect(x + px * .06, y + px * .06, px * .88, px * .88); }
     // paper grain
     g.globalAlpha = 0.06; for (let i = 0; i < 26; i++) { g.fillStyle = Math.random() < .5 ? '#fff' : '#000'; g.fillRect(x + Math.random() * px, y + Math.random() * px, 1 + Math.random() * 2, 1 + Math.random() * 2); } g.globalAlpha = 1;
     // printed icon (varies per tile, pseudo-random but fixed)
-    g.save(); g.translate(x + px * .5, y + px * .56); g.scale(px * .5, px * .5); g.fillStyle = INK; g.globalAlpha = .62; ICONS[(n * 7 + r * 3) % ICONS.length](g); g.restore();
+    g.save(); g.translate(x + px * .5, y + px * .56); g.scale(px * .5, px * .5); g.fillStyle = coloured ? '#ffffff' : INK; g.globalAlpha = coloured ? .85 : .55; ICONS[(n * 7 + r * 3) % ICONS.length](g); g.restore();
     // number
-    g.fillStyle = INK; g.font = `700 ${px * .2}px Fredoka, system-ui, sans-serif`; g.textBaseline = 'top'; g.textAlign = 'left'; g.fillText(String(n), x + px * .09, y + px * .06);
+    g.fillStyle = coloured ? '#ffffff' : INK; g.font = `700 ${px * .2}px Fredoka, system-ui, sans-serif`; g.textBaseline = 'top'; g.textAlign = 'left'; g.fillText(String(n), x + px * .09, y + px * .06);
     // grid line
     g.strokeStyle = '#1d254033'; g.lineWidth = Math.max(1, px * .02); g.strokeRect(x, y, px, px);
   }

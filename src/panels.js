@@ -25,7 +25,7 @@ export const html = {
     const groups = [...new Set(projects.map((p) => p.group))];
     return `<h2>Projects</h2><p class="sub">${projects.length} projects. Tap the arrow on a card for the details.</p>
       <div class="groups" id="pGroups"><button type="button" class="gbtn" data-g="" aria-pressed="true">All</button>${groups.map((g) => `<button type="button" class="gbtn" data-g="${esc(g)}" style="--gc:${GROUP_COLORS[g] || '#444'}" aria-pressed="false">${esc(g)}</button>`).join('')}</div>
-      <div class="pgrid" id="pGrid">${projects.map((p) => `<article class="pcard" data-g="${esc(p.group)}" style="--gc:${GROUP_COLORS[p.group] || '#444'}">
+      <div class="pgrid" id="pGrid">${projects.map((p) => `<article class="pcard" id="pc-${p.id}" data-g="${esc(p.group)}" style="--gc:${GROUP_COLORS[p.group] || '#444'}">
         ${p.image ? `<img loading="lazy" decoding="async" src="${p.image}" alt="${esc(p.name)} screenshot" />` : '<div class="ph">No image yet</div>'}
         <div class="pbody"><h3>${esc(p.name)}</h3><div class="meta">${esc(p.stack)}${p.year ? ' · ' + p.year : ''}</div>
           <button type="button" class="arrow" aria-expanded="false" aria-label="Show details of ${esc(p.name)}"><span aria-hidden="true">▾</span></button>
@@ -59,6 +59,11 @@ export const html = {
 };
 
 /** Wire up interactions inside a freshly mounted section (collapsible project cards, group filter, video player, contact form). */
+export function openProject(id) {
+  const card = document.getElementById('pc-' + id); if (!card) return;
+  const a = card.querySelector('.arrow'); if (a && a.getAttribute('aria-expanded') !== 'true') a.click();
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('flash'); setTimeout(() => card.classList.remove('flash'), 1400);
+}
 export function bind(root, id, { onSent } = {}) {
   if (id === 'projects') {
     root.querySelector('#pGroups')?.addEventListener('click', (e) => {

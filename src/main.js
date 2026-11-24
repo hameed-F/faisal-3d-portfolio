@@ -1,5 +1,5 @@
 import './style.css';
-import { html, bind, openCert, SECTION_TITLES } from './panels.js';
+import { html, bind, openCert, openProject, SECTION_TITLES } from './panels.js';
 import { CONFIG, profile } from './content.js';
 import { detectTier, saveTier, clearSavedTier, TIERS, FpsGovernor } from './quality.js';
 import { initChat } from './chat.js';
@@ -30,10 +30,11 @@ $('#mTheme').addEventListener('click', () => applyTheme(theme === 'dark' ? 'ligh
 // ---------- loader: a folded board that unfolds ----------
 const fold = $('#fold'); const t0 = performance.now(); let real = 0; let shown = 0; let doneCb = null;
 function setFold(p) {
-  // panels open outermost-first: panel 3 (top of the stack) opens in the first quarter, then 2, then 1
-  let sum = 0;
-  for (let i = 1; i <= 3; i++) { const open = Math.min(1, Math.max(0, p * 3.2 - (3 - i) * 0.75)); sum += open; fold.style.setProperty('--a' + i, (i % 2 ? 1 : -1) * 180 * (1 - open) + 'deg'); }
-  fold.style.setProperty('--w', (sum / 3).toFixed(3)); $('#ldPct').textContent = Math.round(p * 100);
+  // two folds = four quarters: first the right half swings open, then the bottom half
+  const e = (t) => t * t * (3 - 2 * t); const o1 = e(Math.min(1, Math.max(0, p / 0.5))); const o2 = e(Math.min(1, Math.max(0, (p - 0.5) / 0.5)));
+  fold.style.setProperty('--o1', o1.toFixed(3)); fold.style.setProperty('--o2', o2.toFixed(3));
+  fold.style.setProperty('--a', (-180 * (1 - o1)).toFixed(1) + 'deg'); fold.style.setProperty('--b', (180 * (1 - o2)).toFixed(1) + 'deg');
+  $('#ldPct').textContent = Math.round(p * 100);
 }
 function tickLoader() { const target = Math.min(real, (performance.now() - t0) / 2100); shown += (target - shown) * 0.18 + 0.002; shown = Math.min(shown, target); setFold(shown); if (shown >= 0.995 && real >= 1) { setFold(1); doneCb?.(); return; } requestAnimationFrame(tickLoader); }
 function onProgress(f, msg) { real = Math.max(real, f); if (msg) $('#ldMsg').textContent = msg + '…'; }
@@ -58,7 +59,7 @@ document.addEventListener('click', (e) => {
   const g = e.target.closest('[data-go]'); if (g) { menu.hidden = true; go(g.dataset.go); return; }
   const c = e.target.closest('[data-cert]'); if (c) { openCert(c.dataset.cert); return; }
   const r = e.target.closest('[data-read]'); if (r) { toggleRead(r); return; }
-  const t = e.target.closest('[data-tier]'); if (t) { const v = t.dataset.tier; menu.hidden = true; if (v === 'auto') { clearSavedTier(); location.reload(); } else setTier(v, true); }
+  const t = e.target.closest('button[data-tier]'); if (t) { const v = t.dataset.tier; menu.hidden = true; if (v === 'auto') { clearSavedTier(); location.reload(); } else setTier(v, true); }
 });
 $('#lbClose').addEventListener('click', () => { $('#lightbox').hidden = true; });
 $('#lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') $('#lightbox').hidden = true; });
@@ -115,7 +116,7 @@ async function boot3D() {
     // dice + tile picking
     const cv = $('#stage'); let down = null;
     cv.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
-    cv.addEventListener('pointerup', (e) => { if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 8) { down = null; return; } down = null; if (story.S.screen) return; const h = world.pick(e.clientX, e.clientY); if (!h) return; if (h.dice) { hooks.openChat?.(); return; } if (h.section && !story.S.busy && story.S.mode !== 'game') story.go(h.section); });
+    cv.addEventListener('pointerup', (e) => { if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 8) { down = null; return; } down = null; const scrK = story.S.screen; if (scrK && scrK !== 'home' && scrK !== 'holo') return; const h = world.pick(e.clientX, e.clientY); if (!h) return; if (h.project) { openProject(h.project); return; } if (scrK === 'holo') return; if (h.dice) { hooks.openChat?.(); return; } if (h.section && !story.S.busy && story.S.mode !== 'game') story.go(h.section); });
     cv.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; const h = world.pick(e.clientX, e.clientY); cv.style.cursor = h ? 'pointer' : ''; world.D.hover = !!h?.dice; });
     let rt = 0; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => story.resize(), 200); });
     doneCb = () => {

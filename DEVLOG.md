@@ -97,3 +97,18 @@
 - Tested (headless Edge, software GL so ~6 fps): all 7 trips and screens open, game mode rolls/moves/turns, dark mode, phone layout (390x844), text version, production build (vite preview); 0 console errors. Real-GPU frame rate not measured yet.
 - Test hygiene: my headless test runs had left ~97 Edge processes running and slowing the PC; killed them and fixed the test script to close its browser.
 - Known/untested: real email send and chat on Vercel (need env vars there), read-aloud voices depend on the device, Urdu voice only if the OS has one.
+
+### 2026-11-24 (evening): polish round 1 (owner's 19 notes)
+- Loader: a real two-fold board (four Ludo-coloured quarters) that unfolds right half, then bottom half; title is now the owner's name, no "Snakes & Ladders" (it's a portfolio).
+- Board: vivid Ludo colours (red, green, blue, yellow tiles alternating with white), emissive map so colours stay bright under the lights.
+- Street lights removed; four floating paper lanterns (two in Lite) light the board in light mode and go dark in dark mode (snakes glow).
+- Section titles are now 3D extruded text (helvetiker bold, ~20 kB gz), circling over each glowing tile.
+- Facing: the Climb clip faces the model's -z and the Fly clip heads along +x; both are now corrected. Faisal turns to the camera's final position (not the old one) at the start and on About/Contact.
+- Ladder: Education is filmed from the far side so the ladder stays behind him.
+- Projects: the hologram now spawns floating 3D project cards (real thumbnails) that rise out of the projector and orbit; tap a card to open its details in the list.
+- Dice companion trails behind Faisal (relative to where he faces), and stands beside him on the home screen.
+- Tile click / menu: he runs straight there (7.5 units/s), no dice. The Next button keeps the story moves with dice rolls.
+- Closing a section zooms out to the whole board. Tile 100: lands (no hanging in the air), Yes/No card; "No" or quitting the game opens a Home screen (Faisal big, board behind him, cycling 8 animations, section buttons, Play again, Restart the tour).
+- Menu bug: a document click handler matched `[data-tier]` on <body> and closed the menu on every click. Fixed (button[data-tier]).
+- UI skin: panels framed with a Ludo RGBY checker border, tile-style buttons, dark HUD tiles with coloured bases; the cream background is gone.
+- Tested headless (software GL, so camera moves were snapped for screenshots): every section screen, home screen, menu (real mouse clicks), dark mode, phone 390x844; 0 console errors. Build: world chunk 190 kB gz.

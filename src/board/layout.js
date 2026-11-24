@@ -9,7 +9,7 @@ export function tileXZ(n) { const { r, c } = rc(n); return [(c - 4.5) * T, (4.5 
 export function tilesBetween(a, b) { const out = []; const s = a <= b ? 1 : -1; for (let i = a; i !== b + s; i += s) out.push(i); return out; }
 
 export const LADDERS = [[8, 29], [70, 91]];
-export const SNAKES = [[58, 18], [99, 63], [85, 47]];
+export const SNAKES = [[58, 18], [97, 63], [85, 47]];
 export const JUMPS = Object.fromEntries([...LADDERS, ...SNAKES].map(([a, b]) => [a, b]));
 
 /** The seven glowing tiles, in story order. */

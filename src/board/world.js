@@ -3,6 +3,9 @@ import * as THREE from 'three';
 import { T, N, tileXZ, SECTIONS, LADDERS, SNAKES } from './layout.js';
 import * as TX from './textures.js';
 import { loadAvatar } from './avatar.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+import fontJson from 'three/examples/fonts/helvetiker_bold.typeface.json';
 
 export const TIER_CFG = {
   full: { dpr: 2, boardTex: 2048, snakeSegs: 110, stars: 320, lamps: 4, aa: true, fps: 60, avatarHz: 60 },
@@ -51,18 +54,20 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   // ---------- lights ----------
   const hemi = new THREE.HemisphereLight(0x7d89c8, 0x1a2040, 0.5); scene.add(hemi);
   const moon = new THREE.DirectionalLight(0x9db4ff, 0.3); moon.position.set(-8, 14, 6); scene.add(moon);
-  const lamps = []; const lampPos = (cfg.lamps === 2 ? [[-10.6, -6], [10.6, -6]] : [[-10.6, -9.8], [10.6, -9.8], [-11.2, 3.2], [11.2, 3.2]]);
-  const lampMat = new THREE.MeshBasicMaterial({ color: 0xffe2a6 }); const poleMat = new THREE.MeshLambertMaterial({ color: 0x2a2f4d });
-  const shadeMat = new THREE.MeshLambertMaterial({ color: 0xd9a441, side: THREE.DoubleSide });
-  for (const [x, z] of lampPos) {
-    const g = new THREE.Group(); g.position.set(x, 0, z);
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.09, .13, 6.4, 8), poleMat); pole.position.y = 3.2; g.add(pole);
-    const arm = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 1.7, 6), poleMat); arm.rotation.z = Math.PI / 2; arm.position.set(-Math.sign(x) * .85, 6.4, 0); g.add(arm);
-    const shade = new THREE.Mesh(new THREE.ConeGeometry(.8, .6, 16, 1, true), shadeMat); shade.position.set(-Math.sign(x) * 1.6, 6.45, 0); g.add(shade);
-    const bulb = new THREE.Mesh(new THREE.SphereGeometry(.26, 14, 10), lampMat.clone()); bulb.position.set(-Math.sign(x) * 1.6, 6.15, 0); g.add(bulb);
-    const light = new THREE.PointLight(0xffe8cc, 0, 50, 2); light.position.set(-Math.sign(x) * 1.6, 6.0, 0); g.add(light);
-    scene.add(g); lamps.push({ light, bulb });
-  }
+  // floating paper lanterns (light mode): they light the board; in dark mode they dim and the snakes glow instead
+  const lamps = []; const glowTex0 = TX.makeGlowTexture();
+  const lampPos = cfg.lamps === 2 ? [[-9.8, 6.4, -2], [9.8, 6.4, -2]] : [[-9.8, 6.6, -6.5], [9.8, 6.6, -6.5], [-9.8, 6.2, 3.5], [9.8, 6.2, 3.5]];
+  const capMat = new THREE.MeshLambertMaterial({ color: 0x1d2540 });
+  lampPos.forEach(([x, y, z], i) => {
+    const g = new THREE.Group(); g.position.set(x, y, z);
+    const paper = new THREE.Mesh(new THREE.SphereGeometry(.62, 18, 14), new THREE.MeshBasicMaterial({ color: 0xfff0c8 })); paper.scale.set(1, 1.25, 1); g.add(paper);
+    const ribs = new THREE.Mesh(new THREE.SphereGeometry(.635, 10, 7), new THREE.MeshBasicMaterial({ color: 0xc2503e, wireframe: true, transparent: true, opacity: .35 })); ribs.scale.set(1, 1.25, 1); g.add(ribs);
+    for (const yy of [-.8, .8]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.28, .28, .14, 14), capMat); c.position.y = yy; g.add(c); }
+    const tassel = new THREE.Mesh(new THREE.CylinderGeometry(.03, .06, .5, 6), new THREE.MeshBasicMaterial({ color: [0xef4b3f, 0x2fb86e, 0x2f8cf0, 0xffc72c][i % 4] })); tassel.position.y = -1.1; g.add(tassel);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex0, color: 0xffc98a, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: .8 })); glow.scale.setScalar(4.2); g.add(glow);
+    const light = new THREE.PointLight(0xfff1dd, 0, 60, 2); g.add(light);
+    scene.add(g); lamps.push({ light, bulb: paper, glow, g, y, ph: i * 1.3 });
+  });
 
   // ---------- ground + stars ----------
   const ground = new THREE.Mesh(new THREE.CircleGeometry(60, 48), new THREE.MeshBasicMaterial({ map: TX.makeGroundTexture(), fog: false })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.42; scene.add(ground);
@@ -73,7 +78,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   // ---------- board ----------
   const board = new THREE.Group(); scene.add(board);
   const boardTex = TX.makeBoardTexture(cfg.boardTex);
-  const boardMat = new THREE.MeshLambertMaterial({ map: boardTex });
+  const boardMat = new THREE.MeshLambertMaterial({ map: boardTex, emissive: 0xffffff, emissiveMap: boardTex, emissiveIntensity: .3 });
   const top = new THREE.Mesh(new THREE.PlaneGeometry(N * T, N * T), boardMat); top.rotation.x = -Math.PI / 2; top.position.y = 0.012; board.add(top);
   const edgeTex = TX.makeEdgeTexture(); const edgeMat = new THREE.MeshLambertMaterial({ map: edgeTex });
   const slab = new THREE.Mesh(new THREE.BoxGeometry(N * T + .9, .42, N * T + .9), edgeMat); slab.position.y = -.21; board.add(slab);
@@ -122,13 +127,14 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   // ---------- glowing tiles ----------
   const ringTex = TX.makeRingTexture(); const beamTex = TX.makeBeamTexture(); const glowTex = TX.makeGlowTexture();
-  const markers = []; const hits = [];
+  const markers = []; const hits = []; const font = new FontLoader().parse(fontJson);
   for (const s of SECTIONS) {
     const [x, z] = tileXZ(s.tile); const col = new THREE.Color(s.color); const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
     const ring = new THREE.Mesh(new THREE.PlaneGeometry(T * 1.55, T * 1.55), new THREE.MeshBasicMaterial({ map: ringTex, color: col, transparent: true, opacity: .9, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = .05; g.add(ring);
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(.62, .85, 3.2, 20, 1, true), new THREE.MeshBasicMaterial({ map: beamTex, color: col, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 1.6; g.add(beam);
     const orbs = []; for (let i = 0; i < 3; i++) { const o = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); o.scale.setScalar(.55); g.add(o); orbs.push(o); }
-    const lab = TX.makeLabel(s.title, s.color, 2); const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: lab.texture, transparent: true, depthTest: false, fog: false })); label.scale.set(.5 * lab.aspect * 1.2, .5 * 1.2, 1); label.renderOrder = 20; g.add(label);
+    const tg = new TextGeometry(s.title, { font, size: .42, depth: .2, curveSegments: 3, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 2 }); tg.computeBoundingBox(); tg.center();
+    const label = new THREE.Group(); const txt = new THREE.Mesh(tg, [new THREE.MeshBasicMaterial({ color: col.clone().lerp(new THREE.Color('#ffffff'), .25) }), new THREE.MeshBasicMaterial({ color: 0x17203d })]); label.add(txt); g.add(label);
     const hit = new THREE.Mesh(new THREE.CylinderGeometry(.95, .95, 3.4, 12), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 1.5; hit.userData.section = s.id; g.add(hit); hits.push(hit);
     markers.push({ s, g, ring, beam, orbs, label, ph: Math.random() * 6.28 });
   }
@@ -138,6 +144,33 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const holoMat = new THREE.MeshBasicMaterial({ color: 0x7fe3d4, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
   const cone = new THREE.Mesh(new THREE.CylinderGeometry(2.6, .5, 3.4, 28, 1, true), holoMat); cone.position.y = 1.7; holo.add(cone);
   const hdisc = new THREE.Mesh(new THREE.RingGeometry(.4, .75, 28), new THREE.MeshBasicMaterial({ color: 0x7fe3d4, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); hdisc.rotation.x = -Math.PI / 2; hdisc.position.y = .06; holo.add(hdisc);
+
+  // floating project cards inside the hologram
+  const cards = new THREE.Group(); cards.visible = false; scene.add(cards); const cardHits = []; const texLoader = new THREE.TextureLoader();
+  const frameMat = new THREE.LineBasicMaterial({ color: 0x9ff5e6, transparent: true, opacity: .9 });
+  function buildCards(list) {
+    if (cards.children.length) return;
+    list.forEach((p, i) => {
+      const g = new THREE.Group(); const mat = new THREE.MeshBasicMaterial({ color: 0xbffcf2, transparent: true, opacity: .0, side: THREE.DoubleSide, depthWrite: false });
+      if (p.image) texLoader.load(p.image, (t) => { t.colorSpace = THREE.SRGBColorSpace; mat.map = t; mat.color.set(0xd8fff8); mat.needsUpdate = true; });
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(1.5, .9), mat); g.add(plane); plane.userData.project = p.id; cardHits.push(plane);
+      const fr = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.56, .96)), frameMat); g.add(fr);
+      const back = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.06), new THREE.MeshBasicMaterial({ color: 0x5fe0cc, transparent: true, opacity: .14, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); back.position.z = -.02; g.add(back);
+      g.userData = { i, mat, n: list.length }; cards.add(g);
+    });
+  }
+  let cardsT = 0;
+  function updateCards(dt) {
+    if (!cards.visible) return; cardsT = Math.min(1, cardsT + dt * .9);
+    cards.children.forEach((g) => {
+      const { i, mat, n } = g.userData; const ring = i % 2; const per = Math.ceil(n / 2); const a = (Math.floor(i / 2) / per) * Math.PI * 2 + W.t * .22 + ring * .5;
+      const rad = ring ? 2.3 : 3.1; const e = Math.min(1, Math.max(0, cardsT * 1.6 - i * .05));
+      g.position.set(Math.cos(a) * rad * e, .3 + e * (ring ? 3.4 : 2.3) + Math.sin(W.t * 1.2 + i) * .06, Math.sin(a) * rad * e);
+      g.scale.setScalar(.2 + .8 * e); g.lookAt(camera.position.x, g.getWorldPosition(tmp2).y, camera.position.z);
+      mat.opacity = .9 * e;
+    });
+  }
+  const tmp2 = new THREE.Vector3();
 
   // ---------- avatar ----------
   const avatar = await loadAvatar('/models/avatar.glb', (f) => onProgress(.35 + f * .5, 'waking Faisal up'));
@@ -176,7 +209,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     const tv = Math.tan(THREE.MathUtils.degToRad(fov / 2)); const D2 = Math.max(halfW / (size.a * tv), halfH / tv, 7.5); const e = THREE.MathUtils.degToRad(elev);
     return { look: center.clone(), pos: center.clone().add(new THREE.Vector3(0, Math.sin(e) * D2, Math.cos(e) * D2)), fov };
   }
-  const boardFit = () => fit(new THREE.Vector3(0, 0, 0.5), 9.8, 58, 38, 8.4);
+  const boardFit = () => fit(new THREE.Vector3(0, 0, 1.9), 10.2, 58, 38, 9.4);
   function setCam(p, { tau = 0.9, sx = 0, sy = 0, snap = false } = {}) {
     goal.pos.copy(p.pos); goal.look.copy(p.look); goal.fov = p.fov ?? 38; goal.sx = sx; goal.sy = sy; goal.tau = tau;
     if (snap) { cam.pos.copy(goal.pos); cam.look.copy(goal.look); cam.sx = sx; cam.sy = sy; cam.fov = goal.fov; }
@@ -200,9 +233,9 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   function applyTheme(v) {
     const lit = 1 - v;
     hemi.intensity = lerp(.5, .28, v); moon.intensity = lerp(.3, .14, v);
-    const lampI = lerp(58, 0, v) * (lamps.length === 2 ? 1.7 : 1);
-    for (const l of lamps) { l.light.intensity = lampI; l.bulb.material.color.setHex(0x4a4a4a).lerp(new THREE.Color(0xffe2a6), lit); }
-    boardMat.color.setScalar(lerp(1, .78, v));
+    const lampI = lerp(60, 0, v) * (lamps.length === 2 ? 1.7 : 1);
+    for (const l of lamps) { l.light.intensity = lampI; l.bulb.material.color.setHex(0x3a3f5c).lerp(new THREE.Color(0xfff0c8), lit); l.glow.material.opacity = .8 * lit; }
+    boardMat.color.setScalar(lerp(1, .62, v)); boardMat.emissiveIntensity = lerp(.32, .05, v);
     for (const s of snakes) { s.mat.emissiveIntensity = v * (.9 + .25 * Math.sin(W.t * 2.2 + s.a)); s.haloMat.opacity = v * (.3 + .1 * Math.sin(W.t * 2.2 + s.a)); }
     for (const m of markers) m.ring.material.opacity = .85 + .1 * v;
     stars.material.opacity = lerp(.55, .95, v);
@@ -212,6 +245,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
   function pick(clientX, clientY) {
     const r = canvas.getBoundingClientRect(); ndc.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
+    if (cards.visible) { const c = ray.intersectObjects(cardHits, false); if (c.length) return { project: c[0].object.userData.project }; }
     const d = ray.intersectObject(cube, false); const h = ray.intersectObjects(hits, false);
     if (d.length && (!h.length || d[0].distance < h[0].distance)) return { dice: true };
     if (h.length) return { section: h[0].object.userData.section };
@@ -237,11 +271,12 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     for (const m of markers) {
       const a = W.t * .9 + m.ph; m.ring.rotation.z = W.t * .5 + m.ph; m.ring.scale.setScalar(1 + .06 * Math.sin(W.t * 2 + m.ph));
       m.orbs.forEach((o, i) => { const aa = a * 1.4 + i * 2.094; o.position.set(Math.cos(aa) * .95, .55 + .55 * Math.sin(W.t * 1.3 + i * 2 + m.ph) + i * .35, Math.sin(aa) * .95); });
-      m.label.position.set(Math.cos(a) * .42, 3.1 + Math.sin(W.t * 1.6 + m.ph) * .12, Math.sin(a) * .42);
+      m.label.position.set(Math.cos(a) * .45, 3.0 + Math.sin(W.t * 1.6 + m.ph) * .12, Math.sin(a) * .45); m.label.quaternion.copy(camera.quaternion); m.label.rotateY(Math.sin(W.t * .9 + m.ph) * .28);
       m.beam.material.opacity = .26 + .07 * Math.sin(W.t * 2.4 + m.ph);
     }
+    for (const l of lamps) { l.g.position.y = l.y + Math.sin(W.t * .8 + l.ph) * .18; l.g.rotation.y = W.t * .2 + l.ph; }
     for (const s of snakes) { s.head.rotation.y = s.base + Math.sin(W.t * 1.4 + s.a) * .18; s.head.position.y = .42 + Math.sin(W.t * 2 + s.a) * .03; }
-    cone.rotation.y = W.t * .6; hdisc.rotation.z = W.t * .8;
+    cone.rotation.y = W.t * .6; hdisc.rotation.z = W.t * .8; updateCards(dt);
     // camera
     const k = 1 - Math.exp(-dt / Math.max(.05, goal.tau));
     cam.pos.lerp(goal.pos, k); cam.look.lerp(goal.look, k); cam.sx += (goal.sx - cam.sx) * k; cam.sy += (goal.sy - cam.sy) * k; cam.fov += (goal.fov - cam.fov) * k;
@@ -251,14 +286,14 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     camera.updateMatrixWorld();
     // dice follows Faisal on his left (as seen from the camera)
     right.setFromMatrixColumn(camera.matrixWorld, 0); right.y = 0; right.normalize();
-    D.bob += dt; tmp.copy(ap).addScaledVector(right, 1.2); tmp.x += (camera.position.x - ap.x) * 0; tmp.z -= .3; tmp.y += 1.75 + Math.sin(D.bob * 2.2) * .09 + (D.mood === 'talk' ? Math.abs(Math.sin(D.bob * 7)) * .18 : 0);
-    if (!D.rolling) { dice.position.lerp(tmp, Math.min(1, dt * 5)); }
+    const fy = avatar.pivot.rotation.y; D.bob += dt; const bk = D.side ? .2 : 1.35; const sd = D.side ? 1.5 : .55; tmp.set(ap.x - Math.sin(fy) * bk + Math.cos(fy) * sd, ap.y, ap.z - Math.cos(fy) * bk - Math.sin(fy) * sd); if (D.side) tmp.y -= .6; tmp.y += 1.85 + Math.sin(D.bob * 2.2) * .09 + (D.mood === 'talk' ? Math.abs(Math.sin(D.bob * 7)) * .18 : 0);
+    if (!D.rolling) { dice.position.lerp(tmp, Math.min(1, dt * 3.5)); }
     if (!D.rolling) { // idle motion
       const spin = D.mood === 'think' ? 1.6 : 0; if (spin) cube.rotation.y += dt * spin; else { cube.quaternion.slerp(D.q, Math.min(1, dt * 6)); }
       D.hv = (D.hv ?? 0) + (D.hide - (D.hv ?? 0)) * Math.min(1, dt * 6); const s = (D.hover ? 1.12 : 1) * (1 - D.hv); dice.scale.setScalar(Math.max(.001, s)); dice.visible = s > .02;
     }
     charG.visible = !D.rolling && D.mood !== 'think'; charG.scale.setScalar(D.rolling ? .001 : 1);
-    ndiff.copy(camera.position).sub(dice.position).setY(0); charG.rotation.y = 0; // eyes always face the +z (toward the camera at the start)
+    ndiff.copy(camera.position).sub(dice.position).setY(0); charG.rotation.y = Math.atan2(ndiff.x, ndiff.z); // eyes always look toward the camera
     diceMats.forEach((m) => { m.emissiveIntensity = (D.mood === 'listen' ? .55 : 0) + (D.hover ? .15 : 0); });
     dBlob.position.x = dice.position.x; dBlob.position.z = dice.position.z; dBlob.scale.setScalar(1.1 / (1 + dice.position.y * .25)); dBlob.material.opacity = .32;
     for (const f of frameCbs) f(dt, W.t);
@@ -283,11 +318,12 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   const api = {
     renderer, scene, camera, avatar, dice, D, faceQ, W, size, snakes, markers, holo, hits, cube,
-    setCam, fit, boardFit, tween, wait, rollDice, setDiceFace, pick, start,
+    camGoal: () => goal.pos.clone(), snapCam() { cam.pos.copy(goal.pos); cam.look.copy(goal.look); cam.sx = goal.sx; cam.sy = goal.sy; cam.fov = goal.fov; }, setCam, fit, boardFit, tween, wait, rollDice, setDiceFace, pick, start,
     onFrame: (f) => frameCbs.push(f),
     face: (yaw) => { face.yaw = yaw; }, faceSnap: (yaw) => { face.yaw = yaw; avatar.pivot.rotation.y = yaw; },
     setTheme(t) { TH.target = t === 'dark' ? 1 : 0; },
     showLabels(v) { for (const m of markers) m.label.visible = v; },
+    showCards(list, at) { if (!list) { cards.visible = false; return; } buildCards(list); cards.position.copy(at); cards.visible = true; cardsT = 0; },
     setTier(t) { cfg = TIER_CFG[t] || cfg; renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, cfg.dpr)); avatar.setHz(cfg.avatarHz); resize(); },
     setActive(v) { W.covered = !v; W.active = v && !document.hidden; },
     govReset: () => gov?.reset(), get gov() { return gov; },
