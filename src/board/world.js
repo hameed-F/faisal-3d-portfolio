@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { T, N, tileXZ, SECTIONS, LADDERS, SNAKES } from './layout.js';
 import * as TX from './textures.js';
 import { loadAvatar } from './avatar.js';
+import { sfx } from '../audio.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 export const TIER_CFG = {
@@ -381,13 +382,14 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   // ---------- dice actions ----------
   async function rollDice(n) {
+    sfx('roll');
     D.rolling = true; D.hide = 0; const start = dice.position.clone(); const axis = new THREE.Vector3(Math.random() - .5, 1, Math.random() - .5).normalize(); const target = faceQ(n, Math.random() * 6.28); const spin = 7 + Math.random() * 3;
     const q0 = cube.quaternion.clone(); const qa = new THREE.Quaternion();
     await tween(1.05, (t) => {
       const h = Math.sin(Math.min(1, t) * Math.PI); dice.position.set(start.x, start.y + h * 1.9, start.z); qa.setFromAxisAngle(axis, spin * (1 - t)); cube.quaternion.copy(qa).multiply(t < .5 ? q0.clone().slerp(target, t * 2) : target);
       dice.scale.setScalar(1 + h * .25);
     }, 'out');
-    D.q = target; cube.quaternion.copy(target); D.rolling = false;
+    D.q = target; cube.quaternion.copy(target); D.rolling = false; sfx('land');
   }
   function setDiceFace(n) { D.q = faceQ(n, 0.4); }
 

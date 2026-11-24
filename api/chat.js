@@ -6,10 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 const INDEX = JSON.parse(readFileSync(new URL('../data/portfolio-index.json', import.meta.url), 'utf8'));
 // Checked against Google's model list on 2026-11-22. Override with env vars if a model is retired.
 // gemini-3.8-flash timed out (>40 s) in testing; 3.5 Flash-Lite answered in about 1 s.
-// Checked 2026-11-24: 3.5 Flash-Lite answers in 1-3 s but now and then takes 12+ s; 3.6 Flash and 3.5 Flash were returning 503 "high demand",
-// 2.5 Flash-Lite is retired. So we "hedge": if the first request is slow, a second identical one starts, then a third, and the first answer wins.
-const GEN_MODELS = [process.env.CHAT_MODEL, 'gemini-3.5-flash-lite', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'].filter(Boolean);
-const HEDGE_MS = [0, 4500, 9000]; const GEN_DEADLINE = 22000;
+const GEN_MODELS = [process.env.CHAT_MODEL, 'gemini-3.5-flash-lite', 'gemini-3.6-flash'].filter(Boolean);
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
 const TOP_K = 5; const MIN_SCORE = 0.45;
 
@@ -72,36 +69,17 @@ export default async function handler(req, res) {
       ...history.map((h) => ({ role: h.role, parts: [{ text: h.text }] })),
       { role: 'user', parts: [{ text: `Context passages:\n${context}\n\nReply language: ${replyLanguage(question)}\nVisitor's question: ${question}` }] },
     ];
-    let text = ''; let lastErr = null; let done = false;
-    const t0 = Date.now(); const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-    // one "lane": waits its turn, then keeps retrying overload errors (503/429/empty) until the deadline
-    const attempt = async (model, wait) => {
-      await sleep(wait);
-      for (let k = 0; ; k++) {
-        if (done) throw new Error('not needed');
-        try {
-          const out = await ai.models.generateContent({ model, contents, config: { systemInstruction: SYSTEM, temperature: 0.3, maxOutputTokens: 400 } });
-          const t = (out.text || '').trim(); if (t) return t; throw new Error('empty answer');
-        } catch (err) {
-          lastErr = err; const retry = /503|429|unavailable|overloaded|high demand|empty answer|fetch failed|ECONNRESET/i.test(String(err?.message));
-          if (!retry || Date.now() - t0 > GEN_DEADLINE - 2500) throw err;
-          await sleep(700 + k * 600 + Math.random() * 400);
-        }
-      }
-    };
-    try { text = await withTimeout(Promise.any(GEN_MODELS.slice(0, HEDGE_MS.length).map((m, i) => attempt(m, HEDGE_MS[i]))), GEN_DEADLINE); }
-    catch (err) { lastErr = lastErr || err; }
-    done = true;
-    let fallback = false;
-    if (!text) { // the model is unavailable: answer straight from the retrieved passages instead of failing (still grounded and cited)
-      console.error('chat: generation failed, using extractive fallback:', lastErr?.message); fallback = true;
-      const lang = replyLanguage(question); const intro = lang.startsWith('Urdu') ? 'میرا دماغ ابھی مصروف ہے، تو یہ فیصل کے پورٹ فولیو سے متعلقہ حصے ہیں:' : lang.startsWith('Roman') ? 'Mera dimagh abhi busy hai, to yeh Faisal ke portfolio se sab se qareebi hissay hain:' : "My dice brain is busy right now, so here are the most relevant bits from Faisal's portfolio:";
-      const clip = (t) => (t.length > 230 ? t.slice(0, t.lastIndexOf(' ', 230)) + '…' : t);
-      text = intro + String.fromCharCode(10) + top.slice(0, 2).map((r, i) => `• ${r.c.title}: ${clip(r.c.text)} [${i + 1}]`).join(String.fromCharCode(10));
+    let text = ''; let lastErr = null;
+    for (const model of GEN_MODELS) {
+      try {
+        const r = await withTimeout(ai.models.generateContent({ model, contents, config: { systemInstruction: SYSTEM, temperature: 0.3, maxOutputTokens: 400 } }), 12000);
+        text = (r.text || '').trim(); if (text) break;
+      } catch (err) { lastErr = err; if (!/404|not found|unsupported|deprecated|timeout|503|unavailable/i.test(String(err?.message))) break; }
     }
+    if (!text) { console.error('chat: generation failed', lastErr?.message); return res.status(502).json({ error: 'The dice got stuck. Please try again.' }); }
     const used = new Set([...text.matchAll(/\[(\d+)\]/g)].map((m) => +m[1]));
     const sources = top.map((r, i) => ({ n: i + 1, id: r.c.id, title: r.c.title, section: r.c.section, score: +r.score.toFixed(3), used: used.has(i + 1) }));
-    return res.status(200).json({ answer: text, sources, fallback });
+    return res.status(200).json({ answer: text, sources });
   } catch (err) {
     console.error('chat: error', err?.message);
     return res.status(502).json({ error: 'The dice could not reach its brain right now. Please try again shortly.' });

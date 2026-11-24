@@ -33,8 +33,6 @@ export function initChat({ go, hooks, name }) {
   }); }
   if (canSpeak) { spk.hidden = false; spk.addEventListener('click', () => { speakOn = !speakOn; spk.setAttribute('aria-pressed', String(speakOn)); if (!speakOn) stopSpeaking(); }); }
   const dirFix = () => { input.dir = dir(input.value); };
-  let warnedVoice = false;
-  const noUrduVoice = () => { if (warnedVoice) return; warnedVoice = true; bubble('bot', 'I cannot read this aloud: this device has no Urdu voice installed. On Windows: Settings → Time & language → Speech → Add voices → Urdu. On Android: Settings → Text-to-speech → Google → install Urdu. On iPhone: Settings → Accessibility → Spoken Content → Voices.'); };
   input.addEventListener('input', dirFix);
 
   const open = () => {
@@ -52,8 +50,7 @@ export function initChat({ go, hooks, name }) {
     busy = true; input.value = ''; dirFix(); bubble('me', q);
     const wait = bubble('bot', '…'); hooks.onChat?.('think');
     try {
-      const ask = () => fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: q, history }) });
-      let r; try { r = await ask(); if (r.status >= 500) throw new Error('retry'); } catch { await new Promise((ok) => setTimeout(ok, 900)); r = await ask(); }
+      const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: q, history }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.answer) throw new Error(j.error || 'I could not answer right now.');
       const used = (j.sources || []).filter((s) => s.used); const shown = used.length ? used : (j.sources || []).slice(0, 2);
@@ -61,7 +58,7 @@ export function initChat({ go, hooks, name }) {
       wait.innerHTML = esc(j.answer).replace(/\n/g, '<br>').replace(/\[(\d+)\]/g, '<sup>[$1]</sup>')
         + (shown.length ? `<div class="src" dir="ltr">${shown.map((s) => `<button type="button" data-sec="${esc(s.section)}" title="relevance ${s.score}">[${s.n}] ${esc(s.title)}</button>`).join('')}</div>` : '');
       history.push({ role: 'user', text: q }, { role: 'bot', text: j.answer }); history.splice(0, Math.max(0, history.length - 6));
-      hooks.onChat?.('talk'); if (speakOn) speak(j.answer, { lang: langSel.value === 'auto' ? undefined : langSel.value, onNoVoice: noUrduVoice });
+      hooks.onChat?.('talk'); if (speakOn) speak(j.answer, { lang: langSel.value === 'auto' ? undefined : langSel.value });
     } catch (err) { wait.dir = 'ltr'; wait.textContent = err.message || 'Something went wrong.'; hooks.onChat?.('open'); }
     finally { busy = false; log.scrollTop = log.scrollHeight; }
   });

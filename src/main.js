@@ -5,6 +5,7 @@ import { detectTier, saveTier, clearSavedTier, TIERS, FpsGovernor } from './qual
 import { initChat } from './chat.js';
 import { toggleRead, canRead, stopReading } from './read.js';
 import { SECTIONS } from './board/layout.js';
+import { setOn as setSound, isOn as soundOn, onChange as onSound, savedOn as soundSaved } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -24,6 +25,10 @@ function applyTheme(t, save = true) {
   world?.setTheme(t); document.querySelector('meta[name=theme-color]').content = '#0a0f26';
 }
 applyTheme(theme, false);
+// ---------- sound (off until the visitor turns it on; remembered) ----------
+onSound((v) => { const c = $('#soundChip'); c.setAttribute('aria-pressed', String(v)); c.setAttribute('aria-label', v ? 'Mute sound' : 'Turn sound on'); $('.lbl', c).textContent = v ? 'Sound on' : 'Sound off';  c.classList.toggle('on', v); });
+$('#soundChip').addEventListener('click', () => setSound(!soundOn()));
+if (soundSaved()) { const resume = () => { if (soundSaved() && !soundOn()) setSound(true, false); }; addEventListener('pointerdown', resume, { once: true }); addEventListener('keydown', resume, { once: true }); onSound(() => {}); }
 $('#themeChip').addEventListener('click', () => applyTheme(theme === 'dark' ? 'light' : 'dark'));
 $('#mTheme').addEventListener('click', () => applyTheme(theme === 'dark' ? 'light' : 'dark'));
 $('#mRead').addEventListener('click', () => { $('#menu').hidden = true; world?.setActive(false); enterPageMode(); });

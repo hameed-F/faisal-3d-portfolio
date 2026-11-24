@@ -226,3 +226,5 @@ body.home .cta { display: none; }
 .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(ellipse 75% 70% at 50% 48%, transparent 55%, #05081acc 100%); }
 body[data-mode='page'] .vignette, body[data-mode='loading'] .vignette { display: none; }
 @media (max-aspect-ratio: 9/10), (max-width: 760px) { body[data-screen]:not([data-screen='game']) .chat-fab { bottom: auto; top: calc(72px + var(--safe-t)); left: auto; right: 12px; } }
+
+#soundChip { --chipc: var(--Y); } #soundChip:not(.on) .ic { opacity: .55; }

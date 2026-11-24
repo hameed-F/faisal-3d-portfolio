@@ -4,6 +4,7 @@ import { T, tileXZ, tilesBetween, rollsFor, SECTIONS, JUMPS, LADDERS } from './l
 import { ladderEnds, snakeCurve } from './world.js';
 import { html, bind, SECTION_TITLES } from '../panels.js';
 import { projects as PROJECTS } from '../content.js';
+import { sfx, steps, stopSteps } from '../audio.js';
 import { SNAKES } from './layout.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -16,6 +17,16 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function createStory({ world, toast, onSection }) {
   const av = world.avatar; const P = av.group.position; const cam = world.camera;
+  // every clip change also sets the matching (quiet) sound
+  const play0 = av.play; let jumpT = 0;
+  av.play = (name, o = {}) => {
+    const sp = o.speed || 1; clearTimeout(jumpT);
+    if (name === 'Walk') steps('step', .55 / sp); else if (name === 'Run') steps('run', .34 / sp); else if (name === 'Climb') steps('climb', .5 / sp); else stopSteps();
+    if (name === 'Slide') sfx('slide'); else if (name === 'Fly') sfx('whoosh'); else if (name === 'Fall') sfx('fall');
+    else if (name === 'Roll') { sfx('jump'); jumpT = setTimeout(() => sfx('land'), 600 / sp); }
+    else if (name === 'Jump') { sfx('jump'); jumpT = setTimeout(() => sfx('land'), Math.min(900, 520 / sp)); }
+    return play0(name, o);
+  };
   const S = { cur: 1, visited: new Set(), busy: false, screen: null, mode: 'explore', camMode: 'far', free: false, bot: null, theme: 'light' };
   const scr = $('#scr'); const cta = $('#cta'); const nextBtn = $('#nextBtn'); const skipBtn = $('#skipBtn'); const hint = $('#hint');
   const portrait = () => world.size.a < 0.85;
@@ -95,6 +106,7 @@ export function createStory({ world, toast, onSection }) {
 
   const SEC = Object.fromEntries(SECTIONS.map((s) => [s.id, s]));
   async function openSection(id) {
+    if (id !== 'play') sfx('chime');
     const s = SEC[id]; S.visited.add(id); S.cur = s.tile; S.current = id; hideCta(); setHint('');
     onSection?.(id);
     lookAtCam(id === 'about' || id === 'contact' || id === 'play');
