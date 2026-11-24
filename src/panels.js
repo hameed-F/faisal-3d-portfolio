@@ -48,9 +48,9 @@ export const html = {
 
   video: () => {
     const id = youtubeId(CONFIG.PROMO_VIDEO_URL); const file = CONFIG.PROMO_VIDEO_FILE;
-    return `<h2>Promo video</h2><p class="sub">A 40-second showreel of my work.</p>
+    return `<h2>Promo video</h2><p class="sub">"Roll the dice": a 40-second showreel of my work.</p>
       <div class="vid" id="vidBox">${id ? `<button type="button" class="btn big" id="vidPlay">▶ Play the video</button>`
-        : file ? `<video controls playsinline preload="none" poster="${CONFIG.PROMO_VIDEO_POSTER}" aria-label="Showreel of my work"><source src="${file}" type="video/mp4" />Your browser cannot play this video. <a href="${file}">Download it</a>.</video>`
+        : file ? `<video controls playsinline preload="none" poster="${CONFIG.PROMO_VIDEO_POSTER}" aria-label="Showreel: Roll the dice"><source src="${file}" type="video/mp4" />Your browser cannot play this video. <a href="${file}">Download it</a>.</video>`
         : '<div class="soon"><b>Coming soon</b><span>The promo video will appear here.</span></div>'}</div>`;
   },
 
