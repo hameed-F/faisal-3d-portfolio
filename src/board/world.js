@@ -182,7 +182,9 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.075, 12, 8), eyeM); e.position.set(s * .3, .16, .34); head.add(e); const p = new THREE.Mesh(new THREE.BoxGeometry(.018, .1, .02), pupM); p.position.set(s * .3 + s * .018, .16, .405); head.add(p); }
     const tongue = new THREE.Mesh(new THREE.BoxGeometry(.05, .02, .4), new THREE.MeshBasicMaterial({ color: 0xd9334a })); tongue.position.set(0, -.05, .78); head.add(tongue);
     scene.add(head);
-    snakes.push({ a, b, curve, mat, haloMat, head, rf, base: head.rotation.y });
+    // in dark mode each snake lights the board around it
+    const glowL = new THREE.PointLight(haloMat.color.getHex(), 0, 9, 1.6); const mid = curve.getPointAt(.5); glowL.position.set(mid.x, 1.2, mid.z); scene.add(glowL);
+    snakes.push({ a, b, curve, mat, haloMat, head, rf, base: head.rotation.y, glowL });
   });
   onProgress(0.3, 'painting the snakes');
 
@@ -299,12 +301,12 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const TH = { target: theme === 'dark' ? 1 : 0, v: theme === 'dark' ? 1 : 0 };
   function applyTheme(v) {
     const lit = 1 - v;
-    hemi.intensity = lerp(.32, .28, v); moon.intensity = lerp(.18, .14, v);
-    key.intensity = lerp(250, 0, v); fill.intensity = lerp(110, 50, v); desk.bulb.material.color.setHex(0x55504a).lerp(new THREE.Color(0xfff0c8), lit);
+    hemi.intensity = lerp(.32, .045, v); moon.intensity = lerp(.18, .03, v); scene.environmentIntensity = lerp(.35, .03, v); renderer.toneMappingExposure = lerp(.95, .85, v);
+    key.intensity = lerp(250, 0, v); fill.intensity = lerp(110, 0, v); desk.bulb.material.color.setHex(0x55504a).lerp(new THREE.Color(0xfff0c8), lit);
     const lampI = 0;
     for (const l of lamps) { l.light.intensity = lampI; l.bulb.material.color.setHex(0x3a3f5c).lerp(new THREE.Color(0xfff0c8), lit); l.glow.material.opacity = .8 * lit; }
-    boardMat.color.setScalar(lerp(1, .62, v)); boardMat.emissiveIntensity = lerp(.1, .04, v);
-    for (const s of snakes) { s.mat.emissiveIntensity = v * (.9 + .25 * Math.sin(W.t * 2.2 + s.a)); s.haloMat.opacity = v * (.3 + .1 * Math.sin(W.t * 2.2 + s.a)); }
+    boardMat.color.setScalar(lerp(1, .55, v)); boardMat.emissiveIntensity = lerp(.1, .0, v);
+    for (const s of snakes) { const pulse = Math.sin(W.t * 2.2 + s.a); s.mat.emissiveIntensity = v * (1.5 + .35 * pulse); s.haloMat.opacity = v * (.42 + .12 * pulse); s.glowL.intensity = v * (16 + 4 * pulse); }
     for (const m of markers) m.ring.material.opacity = .55 + .25 * v;
     stars.material.opacity = lerp(.55, .95, v);
   }
