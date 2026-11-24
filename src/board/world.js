@@ -45,7 +45,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   renderer.setClearColor(SKY); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, cfg.dpr));
   const scene = new THREE.Scene(); scene.background = SKY.clone(); scene.fog = new THREE.Fog(SKY, 46, 110);
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
-  try { await Promise.race([document.fonts.load('700 40px Fredoka'), new Promise((r) => setTimeout(r, 1500))]); } catch { /* font optional */ }
+  try { await Promise.race([Promise.all([document.fonts.load('700 40px Fredoka'), document.fonts.load("700 40px 'Nunito Sans'"), document.fonts.load("600 40px 'Nunito Sans'")]), new Promise((r) => setTimeout(r, 1500))]); } catch { /* font optional */ }
   onProgress(0.05, 'unfolding the board');
 
   // ---------- lights ----------
@@ -79,7 +79,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const top = new THREE.Mesh(new THREE.PlaneGeometry(N * T, N * T), boardMat); top.rotation.x = -Math.PI / 2; top.position.y = 0.012; board.add(top);
   const edgeTex = TX.makeEdgeTexture(); const edgeMat = new THREE.MeshLambertMaterial({ map: edgeTex });
   const slab = new THREE.Mesh(new THREE.BoxGeometry(N * T + .9, .42, N * T + .9), edgeMat); slab.position.y = -.21; board.add(slab);
-  const rimMat = new THREE.MeshLambertMaterial({ color: 0x1d2540 }); const S = N * T + .9;
+  const rimMat = new THREE.MeshLambertMaterial({ color: 0xc9a24a, emissive: 0x3a2c0c }); const S = N * T + .9;
   for (const [w, d, x, z] of [[S, .22, 0, S / 2 - .11], [S, .22, 0, -S / 2 + .11], [.22, S, S / 2 - .11, 0], [.22, S, -S / 2 + .11, 0]]) { const r = new THREE.Mesh(new THREE.BoxGeometry(w, .16, d), rimMat); r.position.set(x, .06, z); board.add(r); }
   onProgress(0.15, 'printing the tiles');
 
@@ -124,19 +124,19 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   // ---------- glowing tiles ----------
   const ringTex = TX.makeRingTexture(); const beamTex = TX.makeBeamTexture(); const glowTex = TX.makeGlowTexture();
-  const markers = []; const hits = []; const poleMat = new THREE.MeshLambertMaterial({ color: 0x17203d }); const knobMat = new THREE.MeshLambertMaterial({ color: 0xffc72c, emissive: 0xffc72c, emissiveIntensity: .4 });
+  const markers = []; const hits = []; const poleMat = new THREE.MeshLambertMaterial({ color: 0xc9ced8, emissive: 0x30343e }); const knobMat = new THREE.MeshLambertMaterial({ color: 0xd9b45a, emissive: 0x6a5420 });
   for (const s of SECTIONS) {
     const [x, z] = tileXZ(s.tile); const col = new THREE.Color(s.color); const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
-    const ring = new THREE.Mesh(new THREE.PlaneGeometry(T * 1.55, T * 1.55), new THREE.MeshBasicMaterial({ map: ringTex, color: col, transparent: true, opacity: .9, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = .05; g.add(ring);
+    const ring = new THREE.Mesh(new THREE.PlaneGeometry(T * 1.55, T * 1.55), new THREE.MeshBasicMaterial({ map: ringTex, color: col, transparent: true, opacity: .6, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = .05; g.add(ring);
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(.62, .85, 3.2, 20, 1, true), new THREE.MeshBasicMaterial({ map: beamTex, color: col, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); beam.position.y = 1.6; g.add(beam);
-    const orbs = []; for (let i = 0; i < 3; i++) { const o = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); o.scale.setScalar(.55); g.add(o); orbs.push(o); }
+    const orbs = []; for (let i = 0; i < 3; i++) { const o = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); o.scale.setScalar(.32); g.add(o); orbs.push(o); }
     // a flag planted on the tile, like a pin on a map; the cloth waves
-    const fl = TX.makeFlag(s.title, s.color); const fh = .78; const fw = Math.min(3.4, fh * fl.aspect);
+    const fl = TX.makeFlag(s.title, s.color, s.tile); const fh = .56; const fw = Math.min(3.6, fh * fl.aspect);
     const label = new THREE.Group(); label.position.set(-.62, 0, -.45); g.add(label);
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.045, .06, 3.3, 8), poleMat); pole.position.y = 1.65; label.add(pole);
-    const knob = new THREE.Mesh(new THREE.SphereGeometry(.12, 12, 8), knobMat); knob.position.y = 3.34; label.add(knob);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.03, .04, 3.3, 10), poleMat); pole.position.y = 1.65; label.add(pole);
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(.07, 12, 8), knobMat); const foot = new THREE.Mesh(new THREE.CylinderGeometry(.14, .17, .06, 16), knobMat); foot.position.y = .05; label.add(foot); knob.position.y = 3.34; label.add(knob);
     const fgeo = new THREE.PlaneGeometry(fw, fh, 16, 2); fgeo.translate(fw / 2 + .04, 3.3 - fh / 2, 0);
-    const cloth = new THREE.Mesh(fgeo, new THREE.MeshBasicMaterial({ map: fl.texture, transparent: true, alphaTest: .4, side: THREE.DoubleSide })); label.add(cloth);
+    const cloth = new THREE.Mesh(fgeo, new THREE.MeshBasicMaterial({ map: fl.texture, side: THREE.DoubleSide })); label.add(cloth);
     const base = Float32Array.from(fgeo.attributes.position.array); cloth.userData = { base, fw };
     const hit = new THREE.Mesh(new THREE.CylinderGeometry(.95, .95, 3.4, 12), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 1.5; hit.userData.section = s.id; g.add(hit); hits.push(hit);
     markers.push({ s, g, ring, beam, orbs, label, cloth, ph: Math.random() * 6.28 });
@@ -240,7 +240,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     for (const l of lamps) { l.light.intensity = lampI; l.bulb.material.color.setHex(0x3a3f5c).lerp(new THREE.Color(0xfff0c8), lit); l.glow.material.opacity = .8 * lit; }
     boardMat.color.setScalar(lerp(1, .62, v)); boardMat.emissiveIntensity = lerp(.32, .05, v);
     for (const s of snakes) { s.mat.emissiveIntensity = v * (.9 + .25 * Math.sin(W.t * 2.2 + s.a)); s.haloMat.opacity = v * (.3 + .1 * Math.sin(W.t * 2.2 + s.a)); }
-    for (const m of markers) m.ring.material.opacity = .85 + .1 * v;
+    for (const m of markers) m.ring.material.opacity = .55 + .25 * v;
     stars.material.opacity = lerp(.55, .95, v);
   }
 
@@ -277,10 +277,10 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
       if (m.label.visible) {
         m.label.rotation.y = Math.atan2(camera.position.x - m.g.position.x, camera.position.z - m.g.position.z) + Math.sin(W.t * .5 + m.ph) * .12;
         const pa = m.cloth.geometry.attributes.position; const b0 = m.cloth.userData.base; const fw = m.cloth.userData.fw;
-        for (let i = 0; i < pa.count; i++) { const x = b0[i * 3] - .04; const f = Math.max(0, x / fw); pa.array[i * 3 + 2] = Math.sin(x * 2.4 - W.t * 3.2 + m.ph) * .16 * f; pa.array[i * 3 + 1] = b0[i * 3 + 1] - f * f * .08 + Math.sin(x * 1.7 - W.t * 2.4) * .03 * f; }
+        for (let i = 0; i < pa.count; i++) { const x = b0[i * 3] - .04; const f = Math.max(0, x / fw); pa.array[i * 3 + 2] = Math.sin(x * 1.8 - W.t * 2.2 + m.ph) * .07 * f; pa.array[i * 3 + 1] = b0[i * 3 + 1] - f * f * .03; }
         pa.needsUpdate = true;
       }
-      m.beam.material.opacity = .26 + .07 * Math.sin(W.t * 2.4 + m.ph);
+      m.beam.material.opacity = .14 + .04 * Math.sin(W.t * 2.4 + m.ph);
     }
     for (const l of lamps) { l.g.position.y = l.y + Math.sin(W.t * .8 + l.ph) * .18; l.g.rotation.y = W.t * .2 + l.ph; }
     for (const s of snakes) { s.head.rotation.y = s.base + Math.sin(W.t * 1.4 + s.a) * .18; s.head.position.y = .42 + Math.sin(W.t * 2 + s.a) * .03; }

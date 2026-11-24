@@ -205,3 +205,19 @@ body.home .cta { display: none; }
 .scr.k-card .panel { top: 72px; transform: none; max-height: calc(100vh - 92px); }
 .scr.k-home .home-card { top: 72px; transform: none; max-height: calc(100vh - 92px); overflow: auto; }
 @media (max-aspect-ratio: 9/10), (max-width: 760px) { .scr.k-card .panel, .scr.k-home .home-card { top: auto; max-height: 56vh; } }
+
+/* ---------- loader: Ludo board folded in quarters (above the tile bar) ---------- */
+.fold-stage { height: calc(var(--S) * 1.02); display: grid; place-items: center; margin: 0 auto; perspective: 1100px; }
+.board4 { position: relative; width: var(--S); height: var(--S); transform-style: preserve-3d; transform: translate(calc(var(--S) / 4 * (1 - var(--o1, 0))), calc(var(--S) / 4 * (1 - var(--o2, 0)))) rotateX(14deg); --a: -180deg; --b: 180deg; }
+.half { position: absolute; left: 0; width: 100%; height: 50%; transform-style: preserve-3d; }
+.half.top { top: 0; } .half.bot { top: 50%; transform-origin: center top; transform: translateZ(-2px) rotateX(var(--b)); }
+.q { position: absolute; top: 0; width: 50%; height: 100%; transform-style: preserve-3d; }
+.q.tl, .q.bl { left: 0; } .q.tr, .q.br { left: 50%; transform-origin: left center; transform: translateZ(1px) rotateY(var(--a)); }
+.q i { position: absolute; inset: 0; backface-visibility: hidden; border: 3px solid #17203d; }
+.q .f { background: linear-gradient(#17203d33 2px, transparent 2px) 0 0 / 100% calc(var(--S) / 10), linear-gradient(90deg, #17203d33 2px, transparent 2px) 0 0 / calc(var(--S) / 10) 100%, repeating-conic-gradient(var(--qc) 0 25%, #fff8ea 0 50%) 0 0 / calc(var(--S) / 5) calc(var(--S) / 5); }
+.q.tl { --qc: var(--R); } .q.tr { --qc: var(--G); } .q.bl { --qc: var(--Y); } .q.br { --qc: var(--B); }
+.q .b { transform: rotateY(180deg); background: repeating-linear-gradient(45deg, #24305f 0 10px, #1d2750 10px 20px); }
+.emblem { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(4px) scale(calc(.4 + .6 * var(--o2, 0))); opacity: var(--o2, 0); font-family: var(--font-d); font-weight: 700; font-size: calc(var(--S) / 7); color: #17203d; background: #fff; border: 4px solid #17203d; border-radius: 14px; padding: .05em .35em; box-shadow: 0 6px 0 #17203d; }
+
+.ld-in { --S: min(38vmin, 290px); }
+.tilebar { width: min(80vw, 420px); margin-top: 14px; gap: 5px; }

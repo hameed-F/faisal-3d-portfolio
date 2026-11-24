@@ -41,24 +41,30 @@ function hole(g, x, y, r) { g.save(); g.globalAlpha = 1; g.fillStyle = g.canvas.
 
 export function makeBoardTexture(size) {
   const px = size / N; const [c, g] = mk(size, size);
+  g.fillStyle = '#1a1410'; g.fillRect(0, 0, size, size); // grout between the tiles
+  const gap = px * .035; const s2 = px - gap * 2;
   for (let n = 1; n <= 100; n++) {
-    const { r, c: col } = rc(n); const x = col * px; const y = (N - 1 - r) * px; // texture y grows downward; row 0 is the near (bottom) edge
-    const coloured = (r + col) % 2 === 0; const bg = coloured ? TILE_COLORS[(Math.floor(col / 2) + r) % 4] : TILE_WHITE; g.fillStyle = bg; g.fillRect(x, y, px, px); c.__bg = bg;
-    if (coloured) { g.fillStyle = '#ffffff22'; g.fillRect(x + px * .06, y + px * .06, px * .88, px * .88); }
-    // paper grain
-    g.globalAlpha = 0.06; for (let i = 0; i < 26; i++) { g.fillStyle = Math.random() < .5 ? '#fff' : '#000'; g.fillRect(x + Math.random() * px, y + Math.random() * px, 1 + Math.random() * 2, 1 + Math.random() * 2); } g.globalAlpha = 1;
-    // printed icon (varies per tile, pseudo-random but fixed)
-    g.save(); g.translate(x + px * .5, y + px * .56); g.scale(px * .5, px * .5); g.fillStyle = coloured ? '#ffffff' : INK; g.globalAlpha = coloured ? .85 : .55; ICONS[(n * 7 + r * 3) % ICONS.length](g); g.restore();
-    // number
-    g.fillStyle = coloured ? '#ffffff' : INK; g.font = `700 ${px * .2}px Fredoka, system-ui, sans-serif`; g.textBaseline = 'top'; g.textAlign = 'left'; g.fillText(String(n), x + px * .09, y + px * .06);
-    // grid line
-    g.strokeStyle = '#1d254033'; g.lineWidth = Math.max(1, px * .02); g.strokeRect(x, y, px, px);
+    const { r, c: col } = rc(n); const x = col * px + gap; const y = (N - 1 - r) * px + gap; // texture y grows downward; row 0 is the near edge
+    const coloured = (r + col) % 2 === 0; const bg = coloured ? TILE_COLORS[(Math.floor(col / 2) + r) % 4] : TILE_WHITE; c.__bg = bg;
+    // tile body with a soft glaze: lighter top-left, deeper bottom-right
+    g.fillStyle = bg; g.beginPath(); g.roundRect(x, y, s2, s2, px * .06); g.fill();
+    const gr = g.createLinearGradient(x, y, x + s2, y + s2); gr.addColorStop(0, '#ffffff2e'); gr.addColorStop(.55, '#ffffff00'); gr.addColorStop(1, '#00000026');
+    g.fillStyle = gr; g.beginPath(); g.roundRect(x, y, s2, s2, px * .06); g.fill();
+    // bevel: highlight on top/left, shade on bottom/right
+    g.lineWidth = px * .025; g.strokeStyle = '#ffffff55'; g.beginPath(); g.moveTo(x + px * .05, y + s2 - px * .04); g.lineTo(x + px * .04, y + px * .04); g.lineTo(x + s2 - px * .05, y + px * .04); g.stroke();
+    g.strokeStyle = '#00000033'; g.beginPath(); g.moveTo(x + s2 - px * .03, y + px * .06); g.lineTo(x + s2 - px * .03, y + s2 - px * .03); g.lineTo(x + px * .06, y + s2 - px * .03); g.stroke();
+    // a fine inset line, like a printed board
+    g.lineWidth = Math.max(1, px * .008); g.strokeStyle = coloured ? '#ffffff40' : '#17203d22'; g.strokeRect(x + px * .1, y + px * .1, s2 - px * .2, s2 - px * .2);
+    // emblem, quieter than before
+    g.save(); g.translate(x + s2 * .5, y + s2 * .57); g.scale(px * .4, px * .4); g.fillStyle = coloured ? '#ffffff' : INK; g.globalAlpha = coloured ? .62 : .34; ICONS[(n * 7 + r * 3) % ICONS.length](g); g.restore();
+    // number: small, clean
+    g.globalAlpha = .9; g.fillStyle = coloured ? '#ffffff' : '#17203dcc'; g.font = `700 ${px * .15}px 'Nunito Sans', system-ui, sans-serif`; g.textBaseline = 'top'; g.textAlign = 'left'; g.fillText(String(n).padStart(2, '0'), x + px * .13, y + px * .12); g.globalAlpha = 1;
   }
   const t = tex(c); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; return t;
 }
 
-/** Board edge (cardboard) texture. */
-export function makeEdgeTexture() { const [c, g] = mk(128, 32); g.fillStyle = '#b98a58'; g.fillRect(0, 0, 128, 32); for (let i = 0; i < 40; i++) { g.fillStyle = Math.random() < .5 ? '#a47745' : '#c99a66'; g.fillRect(0, Math.random() * 32, 128, 1); } const t = tex(c); t.wrapS = THREE.RepeatWrapping; return t; }
+/** Board frame: dark lacquered walnut. */
+export function makeEdgeTexture() { const [c, g] = mk(256, 32); g.fillStyle = '#3a2416'; g.fillRect(0, 0, 256, 32); for (let i = 0; i < 70; i++) { g.fillStyle = Math.random() < .5 ? '#2c1a10' : '#4a2f1d'; g.globalAlpha = .7; g.fillRect(0, Math.random() * 32, 256, 1 + Math.random()); } g.globalAlpha = 1; const t = tex(c); t.wrapS = THREE.RepeatWrapping; return t; }
 
 /** Snake skin: along the length (u). */
 export function makeSnakeTexture(a, b, kind) {
@@ -89,17 +95,18 @@ export function makeBeamTexture() { const [c, g] = mk(8, 128); const gr = g.crea
 /** Ground: dark, fading radial pool. */
 export function makeGroundTexture() { const [c, g] = mk(256, 256); const gr = g.createRadialGradient(128, 128, 20, 128, 128, 128); gr.addColorStop(0, '#26305a'); gr.addColorStop(.5, '#151b38'); gr.addColorStop(1, '#0a0e22'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); return tex(c); }
 
-/** Swallow-tail flag cloth with the section title. Returns { texture, aspect }. */
-export function makeFlag(text, color) {
-  const fs = 96; const [m, mg] = mk(1, 1); mg.font = `700 ${fs}px Fredoka, system-ui, sans-serif`;
-  const tw = mg.measureText(text).width; const w = Math.ceil(tw + fs * 1.6); const h = Math.ceil(fs * 1.75); const [c, g] = mk(w, h);
-  const notch = h * .32;
-  g.beginPath(); g.moveTo(0, 0); g.lineTo(w, 0); g.lineTo(w - notch, h / 2); g.lineTo(w, h); g.lineTo(0, h); g.closePath();
-  g.fillStyle = color; g.fill(); g.lineWidth = 10; g.strokeStyle = INK; g.stroke();
-  g.fillStyle = '#ffffff33'; g.fillRect(0, 0, w, h * .18); // a sheen band
-  g.fillStyle = INK; g.fillRect(0, 0, fs * .22, h); // hem at the pole
-  g.font = `700 ${fs}px Fredoka, system-ui, sans-serif`; g.textBaseline = 'middle'; g.textAlign = 'left';
-  g.lineWidth = 12; g.strokeStyle = INK; g.lineJoin = 'round'; g.strokeText(text, fs * .45, h / 2 + 4); g.fillStyle = '#ffffff'; g.fillText(text, fs * .45, h / 2 + 4);
+/** Banner for a section: navy cloth, a coloured edge at the pole, the tile number and the title in clean capitals. */
+export function makeFlag(text, color, tile) {
+  const fs = 64; const label = text.toUpperCase(); const num = String(tile).padStart(2, '0');
+  const [m, mg] = mk(1, 1); mg.font = `700 ${fs}px 'Nunito Sans', system-ui, sans-serif`; if ('letterSpacing' in mg) mg.letterSpacing = '6px';
+  const tw = mg.measureText(label).width; mg.font = `600 ${fs * .62}px 'Nunito Sans', system-ui, sans-serif`; const nw = mg.measureText(num).width;
+  const w = Math.ceil(fs * .55 + nw + fs * .6 + tw + fs * .8); const h = Math.ceil(fs * 1.9); const [c, g] = mk(w, h);
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#222c52'); gr.addColorStop(1, '#141a36'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.fillStyle = color; g.fillRect(0, 0, fs * .22, h); g.fillRect(0, h - fs * .09, w, fs * .09); // accent edge + underline
+  g.textBaseline = 'middle'; g.textAlign = 'left';
+  g.font = `600 ${fs * .62}px 'Nunito Sans', system-ui, sans-serif`; g.fillStyle = color; g.fillText(num, fs * .55, h / 2 + 2);
+  g.fillStyle = '#ffffff33'; g.fillRect(fs * .55 + nw + fs * .28, h * .3, 2, h * .4);
+  g.font = `700 ${fs}px 'Nunito Sans', system-ui, sans-serif`; if ('letterSpacing' in g) g.letterSpacing = '6px'; g.fillStyle = '#f4f6ff'; g.fillText(label, fs * .55 + nw + fs * .6, h / 2 + 3);
   return { texture: tex(c), aspect: w / h };
 }
 

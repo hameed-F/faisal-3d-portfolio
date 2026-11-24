@@ -30,9 +30,12 @@ $('#mRead').addEventListener('click', () => { $('#menu').hidden = true; world?.s
 
 // ---------- loader: a folded board that unfolds ----------
 const fold = $('#fold'); const t0 = performance.now(); let real = 0; let shown = 0; let doneCb = null;
-const ltiles = [...document.querySelectorAll('#fold .lt')];
+const ltiles = [...document.querySelectorAll('#ldBar .lt')];
 function setFold(p) {
-  // a loading bar made of board tiles: each tile flips face-up as the files arrive
+  // the Ludo board unfolds in quarters (right half, then bottom half) while the tile bar fills underneath
+  const e = (t) => t * t * (3 - 2 * t); const o1 = e(Math.min(1, Math.max(0, p / 0.5))); const o2 = e(Math.min(1, Math.max(0, (p - 0.5) / 0.5)));
+  fold.style.setProperty('--o1', o1.toFixed(3)); fold.style.setProperty('--o2', o2.toFixed(3));
+  fold.style.setProperty('--a', (-180 * (1 - o1)).toFixed(1) + 'deg'); fold.style.setProperty('--b', (180 * (1 - o2)).toFixed(1) + 'deg');
   ltiles.forEach((t, i) => { const o = Math.min(1, Math.max(0, p * 10 - i)); t.style.setProperty('--o', o.toFixed(3)); });
   $('#ldPct').textContent = Math.round(p * 100);
 }

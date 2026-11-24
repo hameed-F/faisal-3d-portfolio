@@ -119,3 +119,8 @@
 - Faisal looks up at the camera while waving at the start (head, neck and upper spine tilt toward the camera on top of the clip; also on About, Contact, tile 100 and the home screen).
 - Tile art replaced: emblems of his own projects (ghost, lantern, cat, fish, bulb, clock, mask, VR headset, chomper, aircraft, block, clapperboard, controller) plus Karachi/Pakistan doodles (chai, cricket bat and ball, kite, rickshaw, mango, minaret, truck-art flower, dome, samosa).
 - "Read as a page" in the menu had no click handler; fixed. Removed the "No third-party 3D models" line from Credits.
+
+### 2026-11-24 (late night): polish round 3
+- Loading screen shows both: the Ludo board unfolding in quarters (right half, then bottom half) and the tile loading bar under it, driven by the same progress.
+- Flags redesigned to look professional: slim navy banners with a coloured edge at the pole, the tile number and the title in spaced capitals (Nunito Sans), thin metal pole with a brass base and finial, gentle wave.
+- Board refinements: tiles are glazed and bevelled with dark grout between them, quieter emblems, small two-digit numbers, a thin inset line; dark walnut frame with a brass rim; softer glow rings, beams and orbs.
