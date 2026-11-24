@@ -132,6 +132,8 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const key = new THREE.SpotLight(0xffe2b8, 0, 0, .72, .75, 1.4); key.position.copy(keyPos); key.target.position.set(-1.5, 0, 1.5); scene.add(key, key.target);
   if (cfg.shadows) { key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0004; key.shadow.normalBias = .03; key.shadow.camera.near = 4; key.shadow.camera.far = 50; key.shadow.radius = 4; }
   const fill = new THREE.PointLight(0xc8d2ff, 0, 0, 1.6); fill.position.set(-10, 14, 12); scene.add(fill);
+  // dark mode only: a soft cool light that travels with Faisal (front-left of him) plus a faint rim from behind, so he is never a silhouette
+  const avFill = new THREE.PointLight(0xcfd8ff, 0, 3.6, 1.6); const avRim = new THREE.PointLight(0x9fe8ff, 0, 3.4, 1.6); scene.add(avFill, avRim);
   tableTop.receiveShadow = true;
   const sp = new Float32Array(cfg.stars * 3); for (let i = 0; i < cfg.stars; i++) { const a = Math.random() * Math.PI * 2; const e = .15 + Math.random() * 1.2; const r = 90; sp[i * 3] = Math.cos(a) * Math.cos(e) * r; sp[i * 3 + 1] = Math.sin(e) * r * .9 + 4; sp[i * 3 + 2] = Math.sin(a) * Math.cos(e) * r; }
   const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
@@ -303,7 +305,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   function applyTheme(v) {
     const lit = 1 - v;
     hemi.intensity = lerp(.32, .045, v); moon.intensity = lerp(.18, .03, v); scene.environmentIntensity = lerp(.35, .03, v); renderer.toneMappingExposure = lerp(.95, .85, v);
-    key.intensity = lerp(250, 0, v); fill.intensity = lerp(110, 0, v); desk.bulb.material.color.setHex(0x55504a).lerp(new THREE.Color(0xfff0c8), lit);
+    key.intensity = lerp(250, 0, v); fill.intensity = lerp(110, 0, v); avFill.intensity = v * 8; avRim.intensity = v * 6; desk.bulb.material.color.setHex(0x55504a).lerp(new THREE.Color(0xfff0c8), lit);
     const lampI = 0;
     for (const l of lamps) { l.light.intensity = lampI; l.bulb.material.color.setHex(0x3a3f5c).lerp(new THREE.Color(0xfff0c8), lit); l.glow.material.opacity = .8 * lit; }
     boardMat.color.setScalar(lerp(1, .55, v)); boardMat.emissiveIntensity = lerp(.1, .0, v);
@@ -335,6 +337,9 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     // theme blend
     if (Math.abs(TH.v - TH.target) > .001) TH.v += (TH.target - TH.v) * Math.min(1, dt * 4); else TH.v = TH.target; applyTheme(TH.v);
     // avatar facing + shadow
+    { const ap0 = avatar.group.position; const fy0 = avatar.pivot.rotation.y; const cdx = camera.position.x - ap0.x; const cdz = camera.position.z - ap0.z; const cl = Math.hypot(cdx, cdz) || 1;
+      avFill.position.set(ap0.x + cdx / cl * 1.5 - cdz / cl * .7, ap0.y + 2.4, ap0.z + cdz / cl * 1.7 + cdx / cl * .8);
+      avRim.position.set(ap0.x - cdx / cl * 1.3, ap0.y + 2.3, ap0.z - cdz / cl * 1.3); void fy0; }
     let dy = face.yaw - avatar.pivot.rotation.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); avatar.pivot.rotation.y += dy * Math.min(1, dt * 9);
     avatar.update(dt);
     const ap = avatar.group.position; avBlob.position.x = ap.x; avBlob.position.z = ap.z; const hgt = Math.max(0, ap.y); avBlob.scale.setScalar(1.7 / (1 + hgt * .6)); avBlob.material.opacity = .5 / (1 + hgt * .8); avBlob.visible = hgt < 6;

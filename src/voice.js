@@ -39,7 +39,7 @@ export async function speak(text, { lang, onNoVoice } = {}) {
   stopSpeaking(); const my = ++token;
   const urdu = /[؀-ۿ]/.test(clean) || (lang || '').startsWith('ur');
   if (!urdu) {
-    const voices = canSpeak ? await waitVoices() : []; const v = femaleVoice(voices, (lang || 'en').slice(0, 2));
+    const voices = canSpeak ? await waitVoices() : []; if (my !== token) return; const v = femaleVoice(voices, (lang || 'en').slice(0, 2));
     if (v) say(clean, v, 1.02); else onNoVoice?.('en');
     return;
   }
@@ -48,11 +48,11 @@ export async function speak(text, { lang, onNoVoice } = {}) {
     const r = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: clean }) });
     if (my !== token) return;
     if (r.ok && !(r.headers.get('content-type') || '').includes('audio')) serverVoice = false;
-    if (r.ok && (r.headers.get('content-type') || '').includes('audio')) { const url = URL.createObjectURL(await r.blob()); audioEl = new Audio(url); window.__ttsPlaying = true; audioEl.onended = audioEl.onpause = () => { window.__ttsPlaying = false; URL.revokeObjectURL(url); }; await audioEl.play(); return; }
+    if (r.ok && (r.headers.get('content-type') || '').includes('audio')) { const blob = await r.blob(); if (my !== token) return; const url = URL.createObjectURL(blob); audioEl = new Audio(url); window.__ttsPlaying = true; audioEl.onended = audioEl.onpause = () => { window.__ttsPlaying = false; URL.revokeObjectURL(url); }; await audioEl.play(); return; }
   } catch { /* fall through */ }
   if (my !== token || !canSpeak) return;
   // 2) the browser's own Urdu voice
-  const voices = await waitVoices(); const ur = femaleVoice(voices, 'ur');
+  const voices = await waitVoices(); if (my !== token) return; const ur = femaleVoice(voices, 'ur');
   if (ur) { say(clean, ur, 0.98); return; }
   // 3) Hindi voice reading the same words in Devanagari
   const hi = femaleVoice(voices, 'hi');

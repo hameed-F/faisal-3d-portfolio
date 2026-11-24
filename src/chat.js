@@ -59,7 +59,7 @@ export function initChat({ go, hooks, name }) {
       wait.innerHTML = esc(j.answer).replace(/\n/g, '<br>').replace(/\[(\d+)\]/g, '<sup>[$1]</sup>')
         + (shown.length ? `<div class="src" dir="ltr">${shown.map((s) => `<button type="button" data-sec="${esc(s.section)}" title="relevance ${s.score}">[${s.n}] ${esc(s.title)}</button>`).join('')}</div>` : '');
       history.push({ role: 'user', text: q }, { role: 'bot', text: j.answer }); history.splice(0, Math.max(0, history.length - 6));
-      hooks.onChat?.('talk'); if (speakOn) speak(j.answer, { lang: langSel.value === 'auto' ? undefined : langSel.value, onNoVoice: (l) => { if (noVoiceShown) return; noVoiceShown = true; bubble('bot', l === 'ur' ? 'Sorry, I could not read this aloud in Urdu on this browser right now. Microsoft Edge, Android and iPhone have Urdu voices built in.' : 'Sorry, this browser has no voice I can read with.'); } });
+      hooks.onChat?.('talk'); if (speakOn && !chat.hidden) speak(j.answer, { lang: langSel.value === 'auto' ? undefined : langSel.value, onNoVoice: (l) => { if (noVoiceShown) return; noVoiceShown = true; bubble('bot', l === 'ur' ? 'Sorry, I could not read this aloud in Urdu on this browser right now. Microsoft Edge, Android and iPhone have Urdu voices built in.' : 'Sorry, this browser has no voice I can read with.'); } });
     } catch (err) { wait.dir = 'ltr'; wait.textContent = err.message || 'Something went wrong.'; hooks.onChat?.('open'); }
     finally { busy = false; log.scrollTop = log.scrollHeight; }
   });
