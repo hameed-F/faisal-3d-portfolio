@@ -3,10 +3,11 @@ import * as THREE from 'three';
 import { T, N, tileXZ, SECTIONS, LADDERS, SNAKES } from './layout.js';
 import * as TX from './textures.js';
 import { loadAvatar } from './avatar.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 export const TIER_CFG = {
-  full: { dpr: 2, boardTex: 2048, snakeSegs: 110, stars: 320, lamps: 4, aa: true, fps: 60, avatarHz: 60 },
-  lite: { dpr: 1.25, boardTex: 1024, snakeSegs: 56, stars: 90, lamps: 2, aa: false, fps: 30, avatarHz: 30 },
+  full: { shadows: true, dpr: 2, boardTex: 2048, snakeSegs: 110, stars: 320, lamps: 4, aa: true, fps: 60, avatarHz: 60 },
+  lite: { shadows: false, dpr: 1.25, boardTex: 1024, snakeSegs: 56, stars: 90, lamps: 2, aa: false, fps: 30, avatarHz: 30 },
 };
 const SKY = new THREE.Color('#0a0f26');
 const UP = new THREE.Vector3(0, 1, 0);
@@ -39,91 +40,98 @@ export function ladderEnds(a, b) {
   return { foot: new THREE.Vector3(ax + d.x * .9, .06, az + d.z * .9), top: new THREE.Vector3(bx - d.x * .85, 1.45, bz - d.z * .85) };
 }
 
-// Study-table props around the board (all simple shapes, drawn in code).
+// Study-table props around the board (simple shapes, refined materials). Returns the desk lamp's bulb (the key light sits there).
 function addStationery(scene, cfg) {
   const Y = -.42; const g = new THREE.Group(); scene.add(g); const lite = cfg.lamps === 2;
-  const L = (c, e = 0) => new THREE.MeshLambertMaterial({ color: c, emissive: e });
-  const put = (m, x, z, ry = 0, y = 0) => { m.position.set(x, Y + y, z); m.rotation.y = ry; g.add(m); return m; };
-  // pencils: hexagonal body, wood cone, graphite tip, ferrule + eraser
-  const pencil = (col, x, z, ry) => {
-    const p = new THREE.Group(); const len = 3.4;
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, len, 6), L(col)); body.rotation.z = Math.PI / 2; p.add(body);
-    const wood = new THREE.Mesh(new THREE.ConeGeometry(.13, .42, 6), L(0xe8c39a)); wood.rotation.z = -Math.PI / 2; wood.position.x = len / 2 + .21; p.add(wood);
-    const tip = new THREE.Mesh(new THREE.ConeGeometry(.045, .14, 6), L(0x333333)); tip.rotation.z = -Math.PI / 2; tip.position.x = len / 2 + .37; p.add(tip);
-    const fer = new THREE.Mesh(new THREE.CylinderGeometry(.14, .14, .2, 10), L(0xc0c4cc)); fer.rotation.z = Math.PI / 2; fer.position.x = -len / 2 - .1; p.add(fer);
-    const er = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .22, 10), L(0xef8c8c)); er.rotation.z = Math.PI / 2; er.position.x = -len / 2 - .31; p.add(er);
-    return put(p, x, z, ry, .13);
+  const M = (c, r = .6, m = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m });
+  const put = (m, x, z, ry = 0, y = 0) => { m.position.set(x, Y + y, z); m.rotation.y = ry; g.add(m); m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); return m; };
+  // pencils: slim hexagonal lacquer, sharpened wood, graphite, brass ferrule
+  const pencil = (col, x, z, ry, len = 4.4) => {
+    const p = new THREE.Group(); const r = .085;
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 6), M(col, .35)); body.rotation.z = Math.PI / 2; p.add(body);
+    const wood = new THREE.Mesh(new THREE.ConeGeometry(r, .34, 6), M(0xd9b48a, .8)); wood.rotation.z = -Math.PI / 2; wood.position.x = len / 2 + .17; p.add(wood);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(.03, .1, 6), M(0x2a2a2a, .4, .3)); tip.rotation.z = -Math.PI / 2; tip.position.x = len / 2 + .3; p.add(tip);
+    const fer = new THREE.Mesh(new THREE.CylinderGeometry(r + .006, r + .006, .2, 12), M(0xb89a5a, .3, .9)); fer.rotation.z = Math.PI / 2; fer.position.x = -len / 2 - .1; p.add(fer);
+    const er = new THREE.Mesh(new THREE.CylinderGeometry(r, r, .16, 12), M(0xc98a82, .9)); er.rotation.z = Math.PI / 2; er.position.x = -len / 2 - .28; p.add(er);
+    return put(p, x, z, ry, r);
   };
-  pencil(0xffc72c, -11.2, 6.8, .5); pencil(0x2f8cf0, -12.4, 4.6, -.2); pencil(0xef4b3f, 11.6, -3.4, 2.4);
-  // sticky notes with a few scribbled lines
-  const noteTex = (c) => { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const x = cv.getContext('2d'); x.fillStyle = c; x.fillRect(0, 0, 128, 128); x.fillStyle = '#00000014'; x.fillRect(0, 0, 128, 22); x.strokeStyle = '#1d2540aa'; x.lineWidth = 4; x.lineCap = 'round'; for (let i = 0; i < 4; i++) { x.beginPath(); x.moveTo(16, 42 + i * 20); for (let k = 0; k < 6; k++) x.lineTo(16 + k * 16 + Math.random() * 6, 42 + i * 20 + (Math.random() - .5) * 6); x.stroke(); } const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; };
-  const notes = [['#ffe066', -11.6, -2.2, .25], ['#ff9fb2', -10.4, -4.0, -.35], ['#9ee6c9', 11.0, 5.6, .15], ['#9cc8ff', 12.2, 7.4, -.4], ['#ffe066', 4.5, 10.6, .3]];
-  notes.slice(0, lite ? 3 : 5).forEach(([c, x, z, ry], i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 2.3), new THREE.MeshLambertMaterial({ map: noteTex(c) })); m.rotation.x = -Math.PI / 2; m.rotation.z = ry; m.position.set(x, Y + .012 + i * .004, z); g.add(m); });
-  // notebook (cover + pages + elastic band)
-  const nb = new THREE.Group(); const cover = new THREE.Mesh(new THREE.BoxGeometry(4.2, .28, 5.6), L(0x2a3a6b)); nb.add(cover); const pages = new THREE.Mesh(new THREE.BoxGeometry(4.0, .2, 5.4), L(0xf4efe2)); pages.position.set(.08, .02, 0); nb.add(pages); const band = new THREE.Mesh(new THREE.BoxGeometry(.12, .3, 5.65), L(0xef4b3f)); band.position.x = 1.5; nb.add(band); put(nb, 11.6, 1.2, -.12, .14);
-  // ruler
-  const rcv = document.createElement('canvas'); rcv.width = 512; rcv.height = 32; const rx = rcv.getContext('2d'); rx.fillStyle = '#e9edf2'; rx.fillRect(0, 0, 512, 32); rx.fillStyle = '#1d2540'; for (let i = 0; i < 60; i++) rx.fillRect(8 + i * 8.2, 0, 2, i % 5 ? 8 : 15); const rt = new THREE.CanvasTexture(rcv); rt.colorSpace = THREE.SRGBColorSpace;
-  const ruler = new THREE.Mesh(new THREE.BoxGeometry(7, .08, .9), [L(0xd7dde6), L(0xd7dde6), new THREE.MeshLambertMaterial({ map: rt }), L(0xd7dde6), L(0xd7dde6), L(0xd7dde6)]); put(ruler, -4.5, 10.8, .08, .04);
-  // eraser + paper clips
-  put(new THREE.Mesh(new THREE.BoxGeometry(1.0, .35, .6), L(0xf3a0a0)), -9.8, 9.4, .6, .18);
-  if (!lite) for (let i = 0; i < 3; i++) { const clip = new THREE.Mesh(new THREE.TorusGeometry(.22, .03, 6, 16), L(0xb8bec8)); clip.scale.set(1, 2.2, 1); clip.rotation.x = Math.PI / 2; clip.position.set(9.6 + i * .5, Y + .04, 10.2 - i * .3); g.add(clip); }
-  // pen cup with pens
-  const cup = new THREE.Group(); const cyl = new THREE.Mesh(new THREE.CylinderGeometry(.85, .75, 2.2, 18, 1, true), new THREE.MeshLambertMaterial({ color: 0x2fb86e, side: THREE.DoubleSide })); cyl.position.y = 1.1; cup.add(cyl);
-  const bottom = new THREE.Mesh(new THREE.CircleGeometry(.75, 18), L(0x248f56)); bottom.rotation.x = -Math.PI / 2; bottom.position.y = .05; cup.add(bottom);
-  [[0x1d2540, .2, .1, .15], [0xef4b3f, -.25, .15, -.2], [0x2f8cf0, .05, -.3, .1], [0xffc72c, .3, -.1, -.25]].forEach(([c, x, z, t]) => { const pen = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 3.0, 8), L(c)); pen.position.set(x, 1.9, z); pen.rotation.z = t; pen.rotation.x = t * .6; cup.add(pen); });
+  pencil(0x2e4a3f, -11.4, 6.6, .42); pencil(0xd9a83a, -12.6, 4.9, -.16); pencil(0x1f1f24, 11.9, -2.6, 2.5, 3.8);
+  // paper notes: soft pastel paper, faint handwriting, a slight curl
+  const noteTex = (c) => { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d'); x.fillStyle = c; x.fillRect(0, 0, 256, 256); const gr = x.createLinearGradient(0, 0, 256, 256); gr.addColorStop(0, '#ffffff22'); gr.addColorStop(1, '#00000018'); x.fillStyle = gr; x.fillRect(0, 0, 256, 256); x.strokeStyle = '#2a2f4a66'; x.lineWidth = 3; x.lineCap = 'round'; for (let i = 0; i < 5; i++) { x.beginPath(); x.moveTo(30, 60 + i * 34); let px = 30; while (px < 200 - (i === 4 ? 70 : 0)) { px += 8 + Math.random() * 10; x.lineTo(px, 60 + i * 34 + (Math.random() - .5) * 5); } x.stroke(); } const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
+  const notes = [['#f3e3a0', -11.8, -2.4, .22], ['#efcfc9', -10.6, -4.1, -.3], ['#d6e6d8', 11.4, 6.0, .14], ['#f3e3a0', 12.4, 7.8, -.36], ['#dfe4ef', 4.8, 10.8, .26]];
+  notes.slice(0, lite ? 3 : 5).forEach(([c, x, z, ry], i) => {
+    const geo = new THREE.PlaneGeometry(1.9, 1.9, 6, 6); const pa = geo.attributes.position; for (let k = 0; k < pa.count; k++) { const v = pa.getY(k); if (v < -.5) pa.setZ(k, (-.5 - v) * (-.5 - v) * .18); } geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: noteTex(c), roughness: .95, side: THREE.DoubleSide })); m.rotation.x = -Math.PI / 2; m.rotation.z = ry; m.position.set(x, Y + .012 + i * .004, z); m.receiveShadow = true; g.add(m);
+  });
+  // notebook: leather cover, cream pages, elastic band, ribbon
+  const nb = new THREE.Group(); nb.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, .26, 5.6), M(0x2b2420, .7)));
+  const pages = new THREE.Mesh(new THREE.BoxGeometry(4.05, .2, 5.45), M(0xeee6d4, .95)); pages.position.set(.06, .01, 0); nb.add(pages);
+  const band = new THREE.Mesh(new THREE.BoxGeometry(.08, .28, 5.62), M(0x111111, .6)); band.position.x = 1.6; nb.add(band);
+  const ribbon = new THREE.Mesh(new THREE.BoxGeometry(.14, .02, 1.0), M(0x8a2b2b, .7)); ribbon.position.set(-.6, -.12, 3.2); nb.add(ribbon);
+  put(nb, 11.6, 1.2, -.12, .13);
+  // steel ruler
+  const rcv = document.createElement('canvas'); rcv.width = 1024; rcv.height = 64; const rx = rcv.getContext('2d'); rx.fillStyle = '#c9ced6'; rx.fillRect(0, 0, 1024, 64); rx.fillStyle = '#20232b'; for (let i = 0; i < 120; i++) rx.fillRect(10 + i * 8.4, 0, 1.5, i % 10 ? (i % 5 ? 12 : 20) : 28); const rt = new THREE.CanvasTexture(rcv); rt.colorSpace = THREE.SRGBColorSpace; rt.anisotropy = 4;
+  const steel = M(0xb8bec8, .35, .85);
+  const ruler = new THREE.Mesh(new THREE.BoxGeometry(7, .04, .8), [steel, steel, new THREE.MeshStandardMaterial({ map: rt, roughness: .35, metalness: .7 }), steel, steel, steel]); put(ruler, -4.5, 10.8, .08, .02);
+  // eraser, paper clips
+  put(new THREE.Mesh(new THREE.BoxGeometry(.9, .28, .5), M(0xe9e4dc, .95)), -9.8, 9.4, .6, .14);
+  if (!lite) for (let i = 0; i < 3; i++) { const clip = new THREE.Mesh(new THREE.TorusGeometry(.18, .022, 6, 18), steel); clip.scale.set(1, 2.3, 1); clip.rotation.x = Math.PI / 2; clip.rotation.z = i * .5; clip.position.set(9.6 + i * .45, Y + .03, 10.2 - i * .3); g.add(clip); }
+  // pen cup: matte ceramic with pens and a brush
+  const cup = new THREE.Group(); const cer = M(0x2d3138, .85);
+  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(.8, .72, 2.2, 28, 1, true), new THREE.MeshStandardMaterial({ color: 0x2d3138, roughness: .85, side: THREE.DoubleSide })); cyl.position.y = 1.1; cup.add(cyl);
+  const lip = new THREE.Mesh(new THREE.TorusGeometry(.8, .04, 6, 28), cer); lip.rotation.x = Math.PI / 2; lip.position.y = 2.2; cup.add(lip);
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(.72, 24), cer); bottom.rotation.x = -Math.PI / 2; bottom.position.y = .04; cup.add(bottom);
+  [[0x1b1d22, .2, .1, .15], [0x7a2e2a, -.25, .15, -.2], [0x2b3f5c, .05, -.3, .1], [0xb89a5a, .3, -.1, -.25]].forEach(([c, x, z, t], i) => { const pen = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 3.0, 10), M(c, .35, i === 3 ? .8 : 0)); pen.position.set(x, 1.9, z); pen.rotation.z = t; pen.rotation.x = t * .6; cup.add(pen); });
   put(cup, -12.0, -6.6, 0, 0);
-  // desk lamp: heavy base, two arms, a shade with a glowing bulb (no extra light, the lanterns still light the scene)
-  const lamp = new THREE.Group(); const metal = L(0x1d2540); const brass = L(0xc9a24a, 0x2a2008);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.5, .35, 24), metal); base.position.y = .18; lamp.add(base);
-  const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, 4.2, 8), brass); arm1.position.set(.6, 2.2, 0); arm1.rotation.z = -.3; lamp.add(arm1);
-  const joint = new THREE.Mesh(new THREE.SphereGeometry(.2, 12, 8), metal); joint.position.set(1.22, 4.2, 0); lamp.add(joint);
-  const arm2 = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 3.4, 8), brass); arm2.position.set(-.2, 4.75, 0); arm2.rotation.z = 1.25; lamp.add(arm2);
-  const shade = new THREE.Mesh(new THREE.ConeGeometry(1.0, 1.4, 20, 1, true), new THREE.MeshLambertMaterial({ color: 0xef4b3f, side: THREE.DoubleSide })); shade.position.set(-1.75, 4.6, 0); shade.rotation.z = .5; lamp.add(shade);
-  const bulb = new THREE.Mesh(new THREE.SphereGeometry(.32, 12, 10), new THREE.MeshBasicMaterial({ color: 0xfff0c8 })); bulb.position.set(-1.95, 4.25, 0); lamp.add(bulb);
-  put(lamp, 12.8, -5.6, -2.5, 0);
-  // a cup of chai with a saucer
-  if (!lite) { const mug = new THREE.Group(); const sau = new THREE.Mesh(new THREE.CylinderGeometry(1.0, .85, .1, 24), L(0xf4efe2)); sau.position.y = .05; mug.add(sau); const body = new THREE.Mesh(new THREE.CylinderGeometry(.6, .5, 1.0, 20), L(0xf4efe2)); body.position.y = .6; mug.add(body); const tea = new THREE.Mesh(new THREE.CircleGeometry(.55, 20), L(0x9a5a2a)); tea.rotation.x = -Math.PI / 2; tea.position.y = 1.0; mug.add(tea); const h = new THREE.Mesh(new THREE.TorusGeometry(.28, .07, 8, 14), L(0xf4efe2)); h.position.set(.68, .62, 0); mug.add(h); put(mug, 9.6, 8.8, .4, 0); }
+  // desk lamp: weighted base, two brass arms, a dark metal shade aimed at the board
+  const lamp = new THREE.Group(); const iron = M(0x22252c, .45, .6); const brass = M(0xb8954f, .3, .9);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.5, .35, 32), iron); base.position.y = .18; lamp.add(base);
+  const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 4.2, 12), brass); arm1.position.set(.6, 2.2, 0); arm1.rotation.z = -.3; lamp.add(arm1);
+  const joint = new THREE.Mesh(new THREE.SphereGeometry(.18, 16, 10), iron); joint.position.set(1.22, 4.2, 0); lamp.add(joint);
+  const arm2 = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, 3.4, 12), brass); arm2.position.set(-.2, 4.75, 0); arm2.rotation.z = 1.25; lamp.add(arm2);
+  const shade = new THREE.Mesh(new THREE.ConeGeometry(1.0, 1.4, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0x1f3a33, roughness: .4, metalness: .5, side: THREE.DoubleSide })); shade.position.set(-1.75, 4.6, 0); shade.rotation.z = .5; lamp.add(shade);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(.3, 16, 12), new THREE.MeshBasicMaterial({ color: 0xfff0c8 })); bulb.position.set(-1.95, 4.25, 0); lamp.add(bulb);
+  lamp.scale.setScalar(1.9); put(lamp, 15.0, -8.6, .41, 0);
+  // cup of chai on a saucer
+  if (!lite) { const mug = new THREE.Group(); const por = M(0xf1ece2, .25); const sau = new THREE.Mesh(new THREE.CylinderGeometry(1.0, .85, .08, 32), por); sau.position.y = .04; mug.add(sau); const body = new THREE.Mesh(new THREE.CylinderGeometry(.6, .48, 1.0, 28), por); body.position.y = .58; mug.add(body); const tea = new THREE.Mesh(new THREE.CircleGeometry(.56, 28), M(0x8a5328, .15)); tea.rotation.x = -Math.PI / 2; tea.position.y = .98; mug.add(tea); const h = new THREE.Mesh(new THREE.TorusGeometry(.26, .06, 8, 18), por); h.position.set(.66, .6, 0); mug.add(h); put(mug, 9.6, 8.8, .4, 0); }
+  g.updateMatrixWorld(true);
+  return { bulb };
 }
 
 export async function createWorld({ canvas, tier = 'full', theme = 'light', onProgress = () => {}, onSlow, FpsGovernor }) {
   let cfg = TIER_CFG[tier] || TIER_CFG.full;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: cfg.aa, powerPreference: 'high-performance', alpha: false });
   renderer.setClearColor(SKY); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, cfg.dpr));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+  renderer.shadowMap.enabled = !!cfg.shadows; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene(); scene.background = SKY.clone(); scene.fog = new THREE.Fog(SKY, 40, 95);
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+  { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), .04).texture; scene.environmentIntensity = .35; pm.dispose(); }
   try { await Promise.race([Promise.all([document.fonts.load('700 40px Fredoka'), document.fonts.load("700 40px 'Nunito Sans'"), document.fonts.load("600 40px 'Nunito Sans'")]), new Promise((r) => setTimeout(r, 1500))]); } catch { /* font optional */ }
   onProgress(0.05, 'unfolding the board');
 
   // ---------- lights ----------
-  const hemi = new THREE.HemisphereLight(0x7d89c8, 0x1a2040, 0.5); scene.add(hemi);
+  const hemi = new THREE.HemisphereLight(0x8a93c8, 0x20160f, 0.5); scene.add(hemi);
   const moon = new THREE.DirectionalLight(0x9db4ff, 0.3); moon.position.set(-8, 14, 6); scene.add(moon);
-  // floating paper lanterns (light mode): they light the board; in dark mode they dim and the snakes glow instead
-  const lamps = []; const glowTex0 = TX.makeGlowTexture();
-  const lampPos = cfg.lamps === 2 ? [[-9.8, 6.4, -2], [9.8, 6.4, -2]] : [[-9.8, 6.6, -6.5], [9.8, 6.6, -6.5], [-9.8, 6.2, 3.5], [9.8, 6.2, 3.5]];
-  const capMat = new THREE.MeshLambertMaterial({ color: 0x1d2540 });
-  lampPos.forEach(([x, y, z], i) => {
-    const g = new THREE.Group(); g.position.set(x, y, z);
-    const paper = new THREE.Mesh(new THREE.SphereGeometry(.62, 18, 14), new THREE.MeshBasicMaterial({ color: 0xfff0c8 })); paper.scale.set(1, 1.25, 1); g.add(paper);
-    const ribs = new THREE.Mesh(new THREE.SphereGeometry(.635, 10, 7), new THREE.MeshBasicMaterial({ color: 0xc2503e, wireframe: true, transparent: true, opacity: .35 })); ribs.scale.set(1, 1.25, 1); g.add(ribs);
-    for (const yy of [-.8, .8]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.28, .28, .14, 14), capMat); c.position.y = yy; g.add(c); }
-    const tassel = new THREE.Mesh(new THREE.CylinderGeometry(.03, .06, .5, 6), new THREE.MeshBasicMaterial({ color: [0xef4b3f, 0x2fb86e, 0x2f8cf0, 0xffc72c][i % 4] })); tassel.position.y = -1.1; g.add(tassel);
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex0, color: 0xffc98a, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: .8 })); glow.scale.setScalar(4.2); g.add(glow);
-    const light = new THREE.PointLight(0xfff1dd, 0, 60, 2); g.add(light);
-    scene.add(g); lamps.push({ light, bulb: paper, glow, g, y, ph: i * 1.3 });
-  });
+  const lamps = []; // (the floating lanterns were removed; the desk lamp is the key light now)
 
   // ---------- ground + stars ----------
   // the board rests on a big wooden table (top, thick edge, four legs) standing on a dark floor
   const ground = new THREE.Mesh(new THREE.CircleGeometry(70, 40), new THREE.MeshBasicMaterial({ map: TX.makeGroundTexture(), fog: false })); ground.rotation.x = -Math.PI / 2; ground.position.y = -9.5; scene.add(ground);
   const tableTex = TX.makeTableTexture(); tableTex.wrapS = tableTex.wrapT = THREE.RepeatWrapping; tableTex.repeat.set(2, 2);
-  const tableMat = new THREE.MeshLambertMaterial({ map: tableTex, emissive: 0xffffff, emissiveMap: tableTex, emissiveIntensity: .06 });
+  const tableMat = new THREE.MeshStandardMaterial({ map: tableTex, roughness: .5, metalness: 0 });
   const TW = 30, TD = 27, TT = .9;
   const tableTop = new THREE.Mesh(new THREE.BoxGeometry(TW, TT, TD), tableMat); tableTop.position.set(0, -.42 - TT / 2, .4); scene.add(tableTop);
-  const apronMat = new THREE.MeshLambertMaterial({ color: 0x2a1a10 });
+  const apronMat = new THREE.MeshStandardMaterial({ color: 0x24160d, roughness: .6 });
   const apron = new THREE.Mesh(new THREE.BoxGeometry(TW - 1.6, 1.1, TD - 1.6), apronMat); apron.position.set(0, -.42 - TT - .55, .4); scene.add(apron);
   const legGeo = new THREE.BoxGeometry(1.1, 8.2, 1.1);
   for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const leg = new THREE.Mesh(legGeo, apronMat); leg.position.set(lx * (TW / 2 - 1.3), -.42 - TT - 4.1, .4 + lz * (TD / 2 - 1.3)); scene.add(leg); }
-  addStationery(scene, cfg);
+  const desk = addStationery(scene, cfg);
+  const keyPos = new THREE.Vector3(); desk.bulb.getWorldPosition(keyPos);
+  const key = new THREE.SpotLight(0xffe2b8, 0, 0, .72, .75, 1.4); key.position.copy(keyPos); key.target.position.set(-1.5, 0, 1.5); scene.add(key, key.target);
+  if (cfg.shadows) { key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0004; key.shadow.normalBias = .03; key.shadow.camera.near = 4; key.shadow.camera.far = 50; key.shadow.radius = 4; }
+  const fill = new THREE.PointLight(0xc8d2ff, 0, 0, 1.6); fill.position.set(-10, 14, 12); scene.add(fill);
+  tableTop.receiveShadow = true;
   const sp = new Float32Array(cfg.stars * 3); for (let i = 0; i < cfg.stars; i++) { const a = Math.random() * Math.PI * 2; const e = .15 + Math.random() * 1.2; const r = 90; sp[i * 3] = Math.cos(a) * Math.cos(e) * r; sp[i * 3 + 1] = Math.sin(e) * r * .9 + 4; sp[i * 3 + 2] = Math.sin(a) * Math.cos(e) * r; }
   const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xdfe6ff, size: 1.8, sizeAttenuation: false, transparent: true, opacity: .8, fog: false })); scene.add(stars);
@@ -131,11 +139,11 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   // ---------- board ----------
   const board = new THREE.Group(); scene.add(board);
   const boardTex = TX.makeBoardTexture(cfg.boardTex);
-  const boardMat = new THREE.MeshLambertMaterial({ map: boardTex, emissive: 0xffffff, emissiveMap: boardTex, emissiveIntensity: .3 });
-  const top = new THREE.Mesh(new THREE.PlaneGeometry(N * T, N * T), boardMat); top.rotation.x = -Math.PI / 2; top.position.y = 0.012; board.add(top);
-  const edgeTex = TX.makeEdgeTexture(); const edgeMat = new THREE.MeshLambertMaterial({ map: edgeTex });
+  const boardMat = new THREE.MeshStandardMaterial({ map: boardTex, roughness: .66, metalness: 0, emissive: 0xffffff, emissiveMap: boardTex, emissiveIntensity: .1 });
+  const top = new THREE.Mesh(new THREE.PlaneGeometry(N * T, N * T), boardMat); top.rotation.x = -Math.PI / 2; top.position.y = 0.012; top.receiveShadow = true; board.add(top);
+  const edgeTex = TX.makeEdgeTexture(); const edgeMat = new THREE.MeshStandardMaterial({ map: edgeTex, roughness: .35 });
   const slab = new THREE.Mesh(new THREE.BoxGeometry(N * T + .9, .42, N * T + .9), edgeMat); slab.position.y = -.21; board.add(slab);
-  const rimMat = new THREE.MeshLambertMaterial({ color: 0xc9a24a, emissive: 0x3a2c0c }); const S = N * T + .9;
+  const rimMat = new THREE.MeshStandardMaterial({ color: 0xc09a50, roughness: .3, metalness: .9 }); const S = N * T + .9;
   for (const [w, d, x, z] of [[S, .22, 0, S / 2 - .11], [S, .22, 0, -S / 2 + .11], [.22, S, S / 2 - .11, 0], [.22, S, -S / 2 + .11, 0]]) { const r = new THREE.Mesh(new THREE.BoxGeometry(w, .16, d), rimMat); r.position.set(x, .06, z); board.add(r); }
   onProgress(0.15, 'printing the tiles');
 
@@ -156,7 +164,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   }
 
   // ---------- snakes ----------
-  const snakeSkins = [['#3f8f7d', '#f0c85a', 0], ['#c2503e', '#f4dca0', 1], ['#7a58a8', '#e7c1a0', 2], ['#5f9a4d', '#2d4a2a', 0]];
+  const snakeSkins = [['#3f7f68', '#d8b768', 0], ['#a4533a', '#e2c38f', 1], ['#5c5290', '#c9ad80', 2], ['#6b7f3a', '#2c3d20', 0]];
   const snakes = [];
   SNAKES.forEach(([a, b], i) => {
     const [c1, c2, kind] = snakeSkins[i % snakeSkins.length]; const curve = snakeCurve(a, b, i * 1.7);
@@ -170,8 +178,8 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
     const head = new THREE.Group(); const p0 = curve.getPointAt(0); const tan = curve.getTangentAt(0).negate();
     head.position.copy(p0); head.position.y = .42; head.rotation.y = Math.atan2(tan.x, tan.z);
     const hm = new THREE.Mesh(new THREE.SphereGeometry(.5, 16, 12), mat); hm.scale.set(.9, .62, 1.15); head.add(hm);
-    const eyeM = new THREE.MeshBasicMaterial({ color: 0xffffff }); const pupM = new THREE.MeshBasicMaterial({ color: 0x111111 });
-    for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.12, 10, 8), eyeM); e.position.set(s * .27, .2, .38); head.add(e); const p = new THREE.Mesh(new THREE.SphereGeometry(.06, 8, 6), pupM); p.position.set(s * .27, .2, .48); head.add(p); }
+    const eyeM = new THREE.MeshStandardMaterial({ color: 0xd9b23c, roughness: .2, emissive: 0x2a1e00 }); const pupM = new THREE.MeshBasicMaterial({ color: 0x0b0b0b });
+    for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.075, 12, 8), eyeM); e.position.set(s * .3, .16, .34); head.add(e); const p = new THREE.Mesh(new THREE.BoxGeometry(.018, .1, .02), pupM); p.position.set(s * .3 + s * .018, .16, .405); head.add(p); }
     const tongue = new THREE.Mesh(new THREE.BoxGeometry(.05, .02, .4), new THREE.MeshBasicMaterial({ color: 0xd9334a })); tongue.position.set(0, -.05, .78); head.add(tongue);
     scene.add(head);
     snakes.push({ a, b, curve, mat, haloMat, head, rf, base: head.rotation.y });
@@ -233,7 +241,7 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   // ---------- avatar ----------
   const avatar = await loadAvatar('/models/avatar.glb', (f) => onProgress(.35 + f * .5, 'waking Faisal up'));
-  avatar.setHz(cfg.avatarHz); scene.add(avatar.group);
+  avatar.setHz(cfg.avatarHz); scene.add(avatar.group); avatar.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   const blobTex = TX.makeGlowTexture(); const mkBlob = (s) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: blobTex, color: 0x000000, transparent: true, opacity: .5, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.scale.setScalar(s); m.position.y = .03; scene.add(m); return m; };
   const avBlob = mkBlob(1.7);
   const face = { yaw: 0 }; avatar.group.rotation.y = 0;
@@ -241,15 +249,15 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
 
   // ---------- dice companion ----------
   const dice = new THREE.Group(); scene.add(dice);
-  const faceVals = [3, 4, 1, 6, 2, 5]; const diceMats = faceVals.map((v) => new THREE.MeshLambertMaterial({ map: TX.makeDiceFaceTexture(v), emissive: 0xffd9a0, emissiveIntensity: 0 }));
+  const faceVals = [3, 4, 1, 6, 2, 5]; const diceMats = faceVals.map((v) => new THREE.MeshStandardMaterial({ map: TX.makeDiceFaceTexture(v), roughness: .3, emissive: 0xffd9a0, emissiveIntensity: 0 }));
   const cube = new THREE.Mesh(new THREE.BoxGeometry(.9, .9, .9), diceMats); dice.add(cube);
   const normals = { 1: [0, 1, 0], 6: [0, -1, 0], 2: [0, 0, 1], 5: [0, 0, -1], 3: [1, 0, 0], 4: [-1, 0, 0] };
   const faceQ = (n, yaw = 0) => new THREE.Quaternion().setFromAxisAngle(UP, yaw).multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(...normals[n]), UP));
   // little character: googly eyes + moustache that pop in when he is not tumbling
   const charG = new THREE.Group(); dice.add(charG);
   const eyeW = new THREE.MeshBasicMaterial({ color: 0xffffff }); const eyeB = new THREE.MeshBasicMaterial({ color: 0x151515 }); const stache = new THREE.MeshBasicMaterial({ color: 0x1b1b1b });
-  const eyes = []; for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.15, 12, 10), eyeW); e.position.set(s * .2, .16, .5); const p = new THREE.Mesh(new THREE.SphereGeometry(.075, 10, 8), eyeB); p.position.set(0, 0, .11); e.add(p); charG.add(e); eyes.push(e); }
-  for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.CapsuleGeometry(.04, .26, 4, 8), stache); m.rotation.z = Math.PI / 2 + s * .35; m.position.set(s * .15, -.1, .47); charG.add(m); }
+  const eyes = []; for (const s of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.09, 14, 10), eyeW); e.position.set(s * .17, .14, .47); const p = new THREE.Mesh(new THREE.SphereGeometry(.05, 10, 8), eyeB); p.position.set(0, 0, .06); e.add(p); charG.add(e); eyes.push(e); }
+  for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.CapsuleGeometry(.025, .2, 4, 8), stache); m.rotation.z = Math.PI / 2 + s * .3; m.position.set(s * .11, -.08, .46); charG.add(m); }
   const cap = new THREE.Mesh(new THREE.CylinderGeometry(.24, .3, .2, 14), new THREE.MeshLambertMaterial({ color: 0x2b6b5a })); cap.position.set(0, .5, 0); charG.add(cap); // a little topi on top
   const dBlob = mkBlob(1.1);
   const D = { target: new THREE.Vector3(), rolling: false, mood: 'idle', hover: false, q: faceQ(1), bob: 0, hide: 0, tumble: 0 };
@@ -291,10 +299,11 @@ export async function createWorld({ canvas, tier = 'full', theme = 'light', onPr
   const TH = { target: theme === 'dark' ? 1 : 0, v: theme === 'dark' ? 1 : 0 };
   function applyTheme(v) {
     const lit = 1 - v;
-    hemi.intensity = lerp(.5, .28, v); moon.intensity = lerp(.3, .14, v);
-    const lampI = lerp(60, 0, v) * (lamps.length === 2 ? 1.7 : 1);
+    hemi.intensity = lerp(.32, .28, v); moon.intensity = lerp(.18, .14, v);
+    key.intensity = lerp(250, 0, v); fill.intensity = lerp(110, 50, v); desk.bulb.material.color.setHex(0x55504a).lerp(new THREE.Color(0xfff0c8), lit);
+    const lampI = 0;
     for (const l of lamps) { l.light.intensity = lampI; l.bulb.material.color.setHex(0x3a3f5c).lerp(new THREE.Color(0xfff0c8), lit); l.glow.material.opacity = .8 * lit; }
-    boardMat.color.setScalar(lerp(1, .62, v)); boardMat.emissiveIntensity = lerp(.32, .05, v);
+    boardMat.color.setScalar(lerp(1, .62, v)); boardMat.emissiveIntensity = lerp(.1, .04, v);
     for (const s of snakes) { s.mat.emissiveIntensity = v * (.9 + .25 * Math.sin(W.t * 2.2 + s.a)); s.haloMat.opacity = v * (.3 + .1 * Math.sin(W.t * 2.2 + s.a)); }
     for (const m of markers) m.ring.material.opacity = .55 + .25 * v;
     stars.material.opacity = lerp(.55, .95, v);

@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import { N, rc } from './layout.js';
 
 const INK = '#1d2540';
-const TILE_COLORS = ['#ef4b3f', '#2fb86e', '#2f8cf0', '#ffc72c']; // Ludo red, green, blue, yellow
-const TILE_WHITE = '#fff8ea';
+const TILE_COLORS = ['#c9443a', '#2a8a58', '#2e6cb0', '#dfaa2c']; // Ludo red, green, blue, yellow (deep, printed)
+const TILE_WHITE = '#f1ebdf';
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; };
 const tex = (c, srgb = true) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
 
