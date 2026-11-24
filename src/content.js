@@ -2,7 +2,7 @@
 export const CONFIG = {
   // One-line change: paste the YouTube link of the promo video here (e.g. "https://youtu.be/XXXXXXXXXXX").
   PROMO_VIDEO_URL: '',
-  // The showreel hosted with the site (used when PROMO_VIDEO_URL is empty). Web copy of video/showreel_v1.mp4.
+  // The showreel hosted with the site (used when PROMO_VIDEO_URL is empty). Web copy of video/web/showreel_720p.mp4.
   PROMO_VIDEO_FILE: '/video/showreel.mp4', PROMO_VIDEO_POSTER: '/video/showreel-poster.jpg',
   // Name of the dice companion (the chatbot). One-line change.
   COMPANION: 'Pappu Pansa',
